@@ -1,4 +1,4 @@
-﻿   
+   
 --- This is for correctly setting up the orthophoto onto localhost
 UPDATE system.config_map_layer 
 SET url = 'http://localhost:8085/geoserver/katsina/wms',
@@ -207,8 +207,8 @@ ALTER TABLE cadastre.survey_point ADD CONSTRAINT enforce_srid_original_geom CHEC
 ALTER TABLE cadastre.survey_point_historic DROP CONSTRAINT IF EXISTS enforce_srid_original_geom;
 ALTER TABLE cadastre.survey_point_historic ADD CONSTRAINT enforce_srid_original_geom CHECK (st_srid(original_geom) = 32632);
 
---ALTER TABLE bulk_operation.spatial_unit_temporary DROP CONSTRAINT IF EXISTS enforce_srid_geom;
---ALTER TABLE bulk_operation.spatial_unit_temporary ADD CONSTRAINT enforce_srid_geom CHECK (st_srid(geom) = 32632);
+ALTER TABLE bulk_operation.spatial_unit_temporary DROP CONSTRAINT IF EXISTS enforce_srid_geom;
+ALTER TABLE bulk_operation.spatial_unit_temporary ADD CONSTRAINT enforce_srid_geom CHECK (st_srid(geom) = 32632);
 
 -- Creates wrapper functions for those PostGIS 1.5 
 -- functions used by SOLA that have been deprecated 
