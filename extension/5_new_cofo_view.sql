@@ -1,4 +1,4 @@
-﻿
+
 --
 -- PostgreSQL database dump
 --
@@ -62,14 +62,14 @@ ALTER TABLE ba_unit_detail_type ENABLE TRIGGER ALL;
 
 --- METADATA AND SETTINGS  
 
-insert into system.config_map_layer_metadata (name_layer ,"name" , "value") values ('orthophoto', 'date', '?? DATE ??');
-insert into system.config_map_layer_metadata (name_layer ,"name" , "value") values ('orthophoto', 'sheet-number', '?? NW, SE, SW');
-insert into system.config_map_layer_metadata (name_layer ,"name" , "value") values ('orthophoto', 'resolution', '?? 50 cm ??');
-insert into system.config_map_layer_metadata (name_layer ,"name" , "value") values ('orthophoto', 'data-source', '?? DATUM ??');
+insert into system.config_map_layer_metadata (name_layer ,"name" , "value") values ('orthophoto', 'date', 'TBU DATE ??');
+insert into system.config_map_layer_metadata (name_layer ,"name" , "value") values ('orthophoto', 'sheet-number', 'TBU ?? NW, SE, SW');
+insert into system.config_map_layer_metadata (name_layer ,"name" , "value") values ('orthophoto', 'resolution', 'TBU 50 cm ??');
+insert into system.config_map_layer_metadata (name_layer ,"name" , "value") values ('orthophoto', 'data-source', 'TBU DATUM ??');
 
-insert into system.setting(name, vl, active, description) values('surveyor', '??', true, 'Name of Surveyor');
-insert into system.setting(name, vl, active, description) values('surveyorRank', '??', true, 'The rank of the Surveyor');
---insert into system.setting(name, vl, active, description) values('state', 'Katsina', true, 'the state');
+insert into system.setting(name, vl, active, description) values('surveyor', 'TBU SURVEYOR NAME', true, 'Name of Surveyor');
+insert into system.setting(name, vl, active, description) values('surveyorRank', 'TBU SURVEYOR RANK', true, 'The rank of the Surveyor');
+insert into system.setting(name, vl, active, description) values('state', 'Kogi', true, 'the state');
 --insert into system.setting(name, vl, active, description) values('featureFloatFront', 'images/sola/front_float.svg', true, 'svg for the floating element in front page');
 --insert into system.setting(name, vl, active, description) values('featureFloatBack', 'images/sola/back_float.svg', true, 'svg for the floating element in back page');
 --insert into system.setting(name, vl, active, description) values('featureFront', 'images/sola/front.svg', true, 'svg for the background element in front page');
@@ -77,6 +77,8 @@ insert into system.setting(name, vl, active, description) values('surveyorRank',
 
 
 
+--- source type
+INSERT INTO source.administrative_source_type (code, display_value, status, description, is_for_registration) VALUES ('parcelPlan', 'Title Deeds Plan', 'x', '...::::::::...::::...::::...::::...::::...', false);
 
 
 
@@ -147,10 +149,9 @@ $BODY$
 ALTER FUNCTION administrative.get_parcel_share(character varying)
   OWNER TO postgres;
 ---------------------------------------------------------------------------
+--DROP FUNCTION administrative.get_baunit_detail(ba_unit_id character varying, detail_code character varying , is_for character varying) CASCADE;
 
--- DROP FUNCTION administrative.get_baunit_detail(ba_unit_id character varying, detail_code character varying , is_for character varying);
-
-CREATE OR REPLACE FUNCTION administrative.get_baunit_detail(ba_unit_id character varying, detail_code character varying , is_for character varying)
+CREATE OR REPLACE FUNCTION administrative.get_baunit_detail(baunitid character varying, detailcode character varying )
   RETURNS character varying AS
 $BODY$
 declare
@@ -163,10 +164,9 @@ BEGIN
 
 	SELECT bud.custom_detail_text 
 	INTO result
-	FROM cdministrative.ba_unit_detail bud
-	WHERE bud.ba_unit_id = ba_unit_id 
-	AND bud.detail_code = detail_code
-	AND bud.is_for = is_for;
+	FROM administrative.ba_unit_detail bud
+	WHERE bud.ba_unit_id = baunitid 
+	AND bud.detail_code = detailcode;
 
         if result = '' then
 	  result = 'No Result ';
@@ -176,14 +176,14 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION administrative.get_baunit_detail(character varying, character varying, character varying)
+ALTER FUNCTION administrative.get_baunit_detail(character varying, character varying)
   OWNER TO postgres;
 
 
 
--- DROP FUNCTION administrative.get_rrr_detail(ba_unit_id character varying, detail_code character varying, is_for character varying);
+--DROP FUNCTION administrative.get_rrr_detail(ba_unit_id character varying, detail_code character varying, is_for character varying) CASCADE;
 
-CREATE OR REPLACE FUNCTION administrative.get_rrr_detail(ba_unit_id character varying, detail_code character varying, is_for character varying)
+CREATE OR REPLACE FUNCTION administrative.get_rrr_detail(baunitid character varying, detailcode character varying)
   RETURNS character varying AS
 $BODY$
 declare
@@ -199,15 +199,14 @@ BEGIN
 	FROM administrative.rrr_detail rrrd,
 	     administrative.rrr rrr
 	WHERE 
-	     rrr.ba_unit_id  = ba_unit_id
+	     rrr.ba_unit_id  = baunitid
         AND 
 	     rrr.type_code = 'ownership' 
 	AND 
 	     rrrd.rrr_id = rrr.id 
 	AND 
-	     rrrd.detail_code = detail_code
-	AND 
-	     rrrd.is_for = is_for;
+	     rrrd.detail_code = detailcode
+	;
 
         if result = '' then
 	  result = 'No Result ';
@@ -217,7 +216,7 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION administrative.get_rrr_detail(character varying, character varying, character varying)
+ALTER FUNCTION administrative.get_rrr_detail(character varying, character varying)
   OWNER TO postgres;
 
 
@@ -257,7 +256,7 @@ CREATE OR REPLACE VIEW application.systematic_registration_certificates AS
 --	system.setting.system_id
     ( SELECT setting.vl
              from system.setting
-             WHERE setting.name::text = 'system-id'::text) 					AS state, 
+             WHERE setting.name::text = 'state'::text) 					AS state, 
           
 -- 	system.setting.surveyor
     ( SELECT setting.vl
@@ -293,31 +292,31 @@ CREATE OR REPLACE VIEW application.systematic_registration_certificates AS
 
 --    	BA UNIT DETAIL TABLE
 --   	 lga 
-    administrative.get_baunit_detail(su.ba_unit_id, 'lga', 'cofo') 				AS lga, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'lga') 				AS lga, 
 
 --   	 zone 
-    administrative.get_baunit_detail(su.ba_unit_id, 'zone', 'cofo') 				AS zone, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'zone') 				AS zone, 
 
 --   	 location 
-    administrative.get_baunit_detail(su.ba_unit_id, 'location', 'cofo') 			AS location, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'location') 			AS location, 
 
 --    	 plan        
-    administrative.get_baunit_detail(su.ba_unit_id, 'plan', 'cofo') 				AS plan, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'plan') 				AS plan, 
 
 -- 	 sheetnr  
-    administrative.get_baunit_detail(su.ba_unit_id, 'sheetnr', 'cofo') 				AS sheetnr, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'sheetnr') 				AS sheetnr, 
 
 -- 	 date commenced
-    administrative.get_baunit_detail(su.ba_unit_id, 'startdate', 'cofo')  			AS commencingdate, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'startdate')  			AS commencingdate, 
 
 --  	 purpose     
-    administrative.get_baunit_detail(su.ba_unit_id, 'purpose', 'cofo')   			AS purpose, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'purpose')   			AS purpose, 
 
 --  	 term     
-    administrative.get_baunit_detail(su.ba_unit_id, 'term', 'cofo')	              		AS term,
+    administrative.get_baunit_detail(su.ba_unit_id, 'term')	              		AS term,
 
 --       rent
-    administrative.get_baunit_detail(su.ba_unit_id, 'rent', 'cofo')	              		AS  rent
+    administrative.get_baunit_detail(su.ba_unit_id, 'rent')	              		AS  rent
 
    FROM 
     --- cadastre.spatial_unit_group sg, 
@@ -415,31 +414,31 @@ CREATE OR REPLACE VIEW cadastre.parcel_plan AS
 
 --    	BA UNIT DETAIL TABLE
 --   	 lga 
-    administrative.get_baunit_detail(su.ba_unit_id, 'lga', 'cofo') 				AS lga, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'lga') 				AS lga, 
 
 --   	 zone 
-    administrative.get_baunit_detail(su.ba_unit_id, 'zone', 'cofo') 				AS zone, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'zone') 				AS zone, 
 
 --   	 location 
-    administrative.get_baunit_detail(su.ba_unit_id, 'location', 'cofo') 			AS proplocation, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'location') 			AS proplocation, 
 
 --    	 plan        
-    administrative.get_baunit_detail(su.ba_unit_id, 'plan', 'cofo') 				AS title, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'plan') 				AS title, 
 
 -- 	 sheetnr  
-    administrative.get_baunit_detail(su.ba_unit_id, 'sheetnr', 'cofo') 				AS sheetnr, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'sheetnr') 				AS sheetnr, 
 
 -- 	 date commenced
-    administrative.get_baunit_detail(su.ba_unit_id, 'startdate', 'cofo')  			AS commencingdate, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'startdate')  			AS commencingdate, 
 
 --  	 purpose     
-    administrative.get_baunit_detail(su.ba_unit_id, 'purpose', 'cofo')   			AS landuse, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'purpose')   			AS landuse, 
 
 --  	 term     
-    administrative.get_baunit_detail(su.ba_unit_id, 'term', 'cofo')	              		AS term,
+    administrative.get_baunit_detail(su.ba_unit_id, 'term')	              		AS term,
 
 --       rent
-    administrative.get_baunit_detail(su.ba_unit_id, 'rent', 'cofo')	              		AS  rent
+    administrative.get_baunit_detail(su.ba_unit_id, 'rent')	              		AS  rent
 
    FROM 
     --- cadastre.spatial_unit_group sg, 
