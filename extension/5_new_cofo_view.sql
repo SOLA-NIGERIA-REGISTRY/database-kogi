@@ -1,4 +1,4 @@
-
+﻿
 --
 -- PostgreSQL database dump
 --
@@ -28,23 +28,25 @@ DELETE FROM condition_type  where is_for = 'cofo';
 
 ALTER TABLE ba_unit_detail_type DISABLE TRIGGER ALL;
 DELETE FROM ba_unit_detail_type;
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for) VALUES ('plot', 'Plot Number', 'Plot number', 'c', 'cofo');
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for) VALUES ('block', 'Block', 'Block', 'c', 'cofo');
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for) VALUES ('plan', 'Layout Plan', 'Layout Plan', 'c', 'cofo');
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for) VALUES ('zone', 'Zone', 'Zonal areas', 'c', 'cofo');
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for) VALUES ('location', 'Location', 'Location of the property', 'c', 'cofo');
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for) VALUES ('lga', 'LGA', 'Lga', 'c', 'cofo');
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for) VALUES ('estate', 'Estate', 'Estate type', 'c', 'cofo');
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for) VALUES ('yearsTodevelope', 'Years to develope', 'Within the specified number of years the piece of land has to be developed by erecting buildings or other works', 'c', 'cofo');
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for) VALUES ('valueTodevelope', 'Value of the buildings/other works', 'the value of the buildings to be erected or the additional works to be completed in the specified period of time', 'c', 'cofo');
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for) VALUES ('term', 'Term of Occupancy', 'The term the occupancy will last', 'c', 'cofo');
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for) VALUES ('revperiod', 'Review Period', 'The divided period of term of occupancy', 'c', 'cofo');
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for) VALUES ('startdate', 'Date Commenced', 'Date in which the occupancy started', 'c', 'cofo');
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for) VALUES ('purpose', 'Occupancy Right Purpose', 'Purpose of Occupancy', 'c', 'cofo');
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for) VALUES ('dateissued', 'Date Signed', 'Date when governor signed', 'c', 'cofo');
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for) VALUES ('rent', 'Yearly Rent', 'Amount of yearly rent', 'c', 'cofo');
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for) VALUES ('advpayment', 'Advance Payment', 'Payment in advance', 'c', 'cofo');
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for) VALUES ('instrnum', 'Instrument Number', 'The number of the CofO  Register', 'c', 'cofo');
+
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type) VALUES ('advpayment', 'Advance Payment', 'Payment in advance', 'c', 'cofo', 'NUMBER');
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type) VALUES ('block', 'Block', 'Block', 'c', 'cofo', 'TEXT');
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type) VALUES ('estate', 'Estate', 'Estate type', 'c', 'cofo', 'TEXT');
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type) VALUES ('instrnum', 'Instrument Number', 'Registration Instrument Number', 'c', 'cofo', 'TEXT');
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type) VALUES ('lga', 'LGA', 'Lga', 'c', 'cofo', 'TEXT');
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type) VALUES ('location', 'Location', 'Location of the property', 'c', 'cofo', 'TEXT');
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type) VALUES ('plan', 'Layout Plan', 'Layout Plan', 'c', 'cofo', 'TEXT');
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type) VALUES ('plot', 'Plot Number', 'Plot number', 'c', 'cofo', 'TEXT');
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type) VALUES ('purpose', 'Occupancy Right Purpose', 'Purpose of Occupancy', 'c', 'cofo', 'TEXT');
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type) VALUES ('zone', 'Zone', 'Zonal areas', 'c', 'cofo', 'TEXT');
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type) VALUES ('rent', 'Yearly Rent', 'Amount of yearly rent', 'c', 'cofo', 'NUMBER');
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type) VALUES ('revperiod', 'Review Period', 'The divided period of term of occupancy', 'c', 'cofo', 'NUMBER');
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type) VALUES ('term', 'Term of Occupancy', 'The term the occupancy will last', 'c', 'cofo', 'NUMBER');
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type) VALUES ('valueTodevelope', 'Value of the buildings/other works', 'the value of the buildings to be erected or the additional works to be completed in the specified period of time', 'c', 'cofo', 'NUMBER');
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type) VALUES ('yearsTodevelope', 'Years to develope', 'Within the specified number of years the piece of land has to be developed by erecting buildings or other works', 'c', 'cofo', 'NUMBER');
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type) VALUES ('dateissued', 'Date Signed', 'Date when governor signed', 'c', 'cofo', 'DATE');
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type) VALUES ('startdate', 'Date Commenced', 'Date in which the occupancy started', 'c', 'cofo', 'DATE');
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type) VALUES ('cofonum', 'CofO Number', 'Existing Certificate number', 'c', 'cofo', 'TEXT');
 
 
 
@@ -69,7 +71,7 @@ insert into system.config_map_layer_metadata (name_layer ,"name" , "value") valu
 
 insert into system.setting(name, vl, active, description) values('surveyor', 'TBU SURVEYOR NAME', true, 'Name of Surveyor');
 insert into system.setting(name, vl, active, description) values('surveyorRank', 'TBU SURVEYOR RANK', true, 'The rank of the Surveyor');
-insert into system.setting(name, vl, active, description) values('state', 'Kogi', true, 'the state');
+insert into system.setting(name, vl, active, description) values('state', 'Katsina', true, 'the state');
 --insert into system.setting(name, vl, active, description) values('featureFloatFront', 'images/sola/front_float.svg', true, 'svg for the floating element in front page');
 --insert into system.setting(name, vl, active, description) values('featureFloatBack', 'images/sola/back_float.svg', true, 'svg for the floating element in back page');
 --insert into system.setting(name, vl, active, description) values('featureFront', 'images/sola/front.svg', true, 'svg for the background element in front page');
