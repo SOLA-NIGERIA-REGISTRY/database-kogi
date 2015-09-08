@@ -1,4 +1,4 @@
-﻿-- Table: administrative.ba_unit_detail_type
+-- Table: administrative.ba_unit_detail_type
 ALTER TABLE administrative.condition_type
   ADD COLUMN is_for character varying(20);
 
@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS   administrative.ba_unit_detail_type
   description character varying(10000) NOT NULL, -- The template text describing the detail.
   status character(1) NOT NULL, -- Status of the detail type.
   is_for character varying(20) , -- What the ba_unit_detail_type is for.
+  field_type character varying(20) -- type of field,
   CONSTRAINT ba_unit_detail_type_pkey PRIMARY KEY (code),
   CONSTRAINT ba_unit_detail_type_display_value_unique UNIQUE (display_value)
 )
