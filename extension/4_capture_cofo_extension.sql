@@ -1,3 +1,4 @@
+
 -- Table: administrative.ba_unit_detail_type
 ALTER TABLE administrative.condition_type
   ADD COLUMN is_for character varying(20);
