@@ -227,7 +227,7 @@ ALTER FUNCTION administrative.get_rrr_detail(character varying, character varyin
 
 
 ---------------------------------------------------------------------------
--- DROP VIEW application.systematic_registration_certificates;
+DROP VIEW application.systematic_registration_certificates;
 CREATE OR REPLACE VIEW application.systematic_registration_certificates AS 
   SELECT DISTINCT 
     

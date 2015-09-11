@@ -1,4 +1,3 @@
-﻿--------------------------------------------------------------------------------------------
 delete from system.br_definition  WHERE br_id = 'application-approve-cancel-old-titles';
 delete from system.br_validation  WHERE br_id = 'application-approve-cancel-old-titles';
 delete from system.br WHERE id = 'application-approve-cancel-old-titles';
