@@ -92,11 +92,11 @@ INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_fo
 INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('valueTodevelope', 'Value of the buildings/other works', 'the value of the buildings to be erected or the additional works to be completed in the specified period of time', 'c', 'cofo', 'NUMBER', 8);
 INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('yearsTodevelope', 'Years to develope', 'Within the specified number of years the piece of land has to be developed by erecting buildings or other works', 'c', 'cofo', 'NUMBER', 9);
 INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('location', 'Location', 'Location of the property', 'c', 'cofo', 'TEXT', 10);
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('plan', 'Layout Plan', 'Layout Plan', 'c', 'plan', 'TEXT', 100);
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('plan', 'Layout Plan', 'Layout Plan', 'c', 'plan', 'TEXT', 12);
 INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('dateregistered', 'Registration Date', 'Date when the CofO has been registered', 'c', 'cofo', 'DATE', 11);
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('block', 'Block', 'Block', 'c', 'plan', 'TEXT', 101);
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('plot', 'Plot Number', 'Plot number', 'c', 'plan', 'TEXT', 102);
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('dateissued', 'Date Signed', 'Date when governor signed', 'c', 'plan', 'DATE', 103);
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('block', 'Block', 'Block', 'c', 'plan', 'TEXT', 13);
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('plot', 'Plot Number', 'Plot number', 'c', 'plan', 'TEXT', 14);
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('dateissued', 'Date Signed', 'Date when governor signed', 'c', 'plan', 'DATE', 15);
 
 
 -- Completed on 2015-09-14 09:53:36
