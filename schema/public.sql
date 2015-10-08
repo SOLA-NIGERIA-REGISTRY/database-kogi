@@ -1,3 +1,10 @@
+-- Function public.uuid_generate_v1() --
+CREATE OR REPLACE FUNCTION  public.uuid_generate_v1()
+  RETURNS uuid AS
+'$libdir/uuid-ossp', 'uuid_generate_v1'
+  LANGUAGE c VOLATILE STRICT
+  COST 1;
+
 -- Function public.f_for_trg_track_changes --
 CREATE OR REPLACE FUNCTION public.f_for_trg_track_changes(
 
