@@ -3,6 +3,7 @@
 -- PostgreSQL database dump
 --
  
+ 
 -- Dumped from database version 9.2.3
 -- Dumped by pg_dump version 9.3.1
 -- Started on 2015-08-06 16:41:13
@@ -34,25 +35,25 @@ DELETE FROM ba_unit_detail_type;
 -- Data for Name: ba_unit_detail_type; Type: TABLE DATA; Schema: administrative; Owner: postgres
 --
 
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('lga', 'LGA', 'Lga', 'x', 'cofo', 'TEXT', 0);
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('LGA', 'LGA', 'Lga', 'x', 'cofo', 'TEXT', 0);
 INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('estate', 'Estate', 'Estate type', 'x', 'cofo', 'TEXT', 0);
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('instrnum', 'Instrument Number', 'Registration Instrument Number', 'x', 'cofo', 'TEXT', 0);
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('instrumentRegistrationNo', 'Instrument Number', 'Registration Instrument Number', 'x', 'cofo', 'TEXT', 0);
 INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('zone', 'Zone', 'Zonal areas', 'x', 'cofo', 'TEXT', 0);
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('cofonum', 'CofO Number', 'Existing Certificate number', 'c', 'cofo', 'TEXT', 1);
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('purpose', 'Occupancy Right Purpose', 'Purpose of Occupancy', 'c', 'cofo', 'COMBO', 2);
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('cOfO', 'CofO Number', 'Existing Certificate number', 'c', 'cofo', 'TEXT', 1);
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('cOfOtype', 'Occupancy Right Purpose', 'Purpose of Occupancy', 'c', 'cofo', 'COMBO', 2);
 INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('term', 'Term of Occupancy', 'The term the occupancy will last', 'c', 'cofo', 'NUMBER', 3);
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('startdate', 'Date Commenced', 'Date in which the occupancy started', 'c', 'cofo', 'DATE', 4);
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('rent', 'Yearly Rent', 'Amount of yearly rent', 'c', 'cofo', 'NUMBER', 5);
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('advpayment', 'Advance Payment', 'Payment in advance', 'c', 'cofo', 'NUMBER', 6);
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('revperiod', 'Review Period', 'The divided period of term of occupancy', 'c', 'cofo', 'NUMBER', 7);
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('dateCommenced', 'Date Commenced', 'Date in which the occupancy started', 'c', 'cofo', 'DATE', 4);
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('yearlyRent', 'Yearly Rent', 'Amount of yearly rent', 'c', 'cofo', 'NUMBER', 5);
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('advancePayment', 'Advance Payment', 'Payment in advance', 'c', 'cofo', 'NUMBER', 6);
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('reviewPeriod', 'Review Period', 'The divided period of term of occupancy', 'c', 'cofo', 'NUMBER', 7);
 INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('valueTodevelope', 'Value of the buildings/other works', 'the value of the buildings to be erected or the additional works to be completed in the specified period of time', 'c', 'cofo', 'NUMBER', 8);
 INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('yearsTodevelope', 'Years to develope', 'Within the specified number of years the piece of land has to be developed by erecting buildings or other works', 'c', 'cofo', 'NUMBER', 9);
 INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('location', 'Location', 'Location of the property', 'c', 'cofo', 'TEXT', 10);
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('plan', 'Layout Plan', 'Layout Plan', 'c', 'plan', 'TEXT', 11);
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('layoutPlan', 'Layout Plan', 'Layout Plan', 'c', 'plan', 'TEXT', 11);
 INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('block', 'Block', 'Block', 'c', 'plan', 'TEXT', 12);
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('plot', 'Plot Number', 'Plot number', 'c', 'plan', 'TEXT', 13);
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('dateregistered', 'Registration Date', 'Date when the CofO has been registered', 'c', 'cofo', 'DATE', 14);
-INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('dateissued', 'Date Signed', 'Date when governor signed', 'c', 'plan', 'DATE', 15);
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('plotNum', 'Plot Number', 'Plot number', 'c', 'plan', 'TEXT', 13);
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('dateRegistered', 'Registration Date', 'Date when the CofO has been registered', 'c', 'cofo', 'DATE', 14);
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('dateSigned', 'Date Signed', 'Date when governor signed', 'c', 'plan', 'DATE', 15);
 
  
 -- Completed on 2015-09-14 09:53:36
@@ -260,10 +261,9 @@ CREATE OR REPLACE VIEW application.systematic_registration_certificates AS
           WHERE config_map_layer_metadata.name_layer::text = 'orthophoto'::text 
           AND config_map_layer_metadata.name::text = 'data-source'::text) 			AS imagerysource, 
 
-
 --    	BA UNIT DETAIL TABLE
 --   	 lga 
-    administrative.get_baunit_detail(su.ba_unit_id, 'lga') 				AS lga, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'LGA') 				AS lga, 
 
 --   	 zone 
     administrative.get_baunit_detail(su.ba_unit_id, 'zone') 				AS zone, 
@@ -272,22 +272,22 @@ CREATE OR REPLACE VIEW application.systematic_registration_certificates AS
     administrative.get_baunit_detail(su.ba_unit_id, 'location') 			AS location, 
 
 --    	 plan        
-    administrative.get_baunit_detail(su.ba_unit_id, 'plan') 				AS plan, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'layoutPlan') 				AS plan, 
 
 -- 	 sheetnr  
     administrative.get_baunit_detail(su.ba_unit_id, 'sheetnr') 				AS sheetnr, 
 
 -- 	 date commenced
-    administrative.get_baunit_detail(su.ba_unit_id, 'startdate')  			AS commencingdate, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'dateCommenced')  			AS commencingdate, 
 
 --  	 purpose     
-    administrative.get_baunit_detail(su.ba_unit_id, 'purpose')   			AS purpose, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'cOfOtype')   			AS purpose, 
 
 --  	 term     
     administrative.get_baunit_detail(su.ba_unit_id, 'term')	              		AS term,
 
 --       rent
-    administrative.get_baunit_detail(su.ba_unit_id, 'rent')	              		AS  rent
+    administrative.get_baunit_detail(su.ba_unit_id, 'yearlyRent')	              		AS  rent
 
    FROM 
     --- cadastre.spatial_unit_group sg, 
@@ -382,10 +382,9 @@ CREATE OR REPLACE VIEW cadastre.parcel_plan AS
           WHERE config_map_layer_metadata.name_layer::text = 'orthophoto'::text 
           AND config_map_layer_metadata.name::text = 'data-source'::text) 			AS imagerysource, 
 
-
 --    	BA UNIT DETAIL TABLE
 --   	 lga 
-    administrative.get_baunit_detail(su.ba_unit_id, 'lga') 				AS lga, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'LGA') 				AS lga, 
 
 --   	 zone 
     administrative.get_baunit_detail(su.ba_unit_id, 'zone') 				AS zone, 
@@ -394,22 +393,22 @@ CREATE OR REPLACE VIEW cadastre.parcel_plan AS
     administrative.get_baunit_detail(su.ba_unit_id, 'location') 			AS proplocation, 
 
 --    	 plan        
-    administrative.get_baunit_detail(su.ba_unit_id, 'plan') 				AS title, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'layoutPlan') 				AS title, 
 
 -- 	 sheetnr  
     administrative.get_baunit_detail(su.ba_unit_id, 'sheetnr') 				AS sheetnr, 
 
 -- 	 date commenced
-    administrative.get_baunit_detail(su.ba_unit_id, 'startdate')  			AS commencingdate, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'dateCommenced')  			AS commencingdate, 
 
 --  	 purpose     
-    administrative.get_baunit_detail(su.ba_unit_id, 'purpose')   			AS landuse, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'cOfOtype')   			AS landuse, 
 
 --  	 term     
     administrative.get_baunit_detail(su.ba_unit_id, 'term')	              		AS term,
 
 --       rent
-    administrative.get_baunit_detail(su.ba_unit_id, 'rent')	              		AS  rent
+    administrative.get_baunit_detail(su.ba_unit_id, 'yearlyRent')	              		AS  rent
 
    FROM 
     --- cadastre.spatial_unit_group sg, 

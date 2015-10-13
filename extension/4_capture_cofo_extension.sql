@@ -1,4 +1,4 @@
--- Table: administrative.ba_unit_detail_type
+-- Table: administrative.condition_type
 ALTER TABLE administrative.condition_type
   ADD COLUMN is_for character varying(20);
 ALTER TABLE administrative.condition_type
@@ -6,15 +6,13 @@ ALTER TABLE administrative.condition_type
 ALTER TABLE administrative.condition_type
   ADD COLUMN order_view character varying(20);
 
-
-
 -- Table: administrative.ba_unit_detail_type
 
 -- DROP TABLE administrative.ba_unit_detail_type;
 
 CREATE TABLE IF NOT EXISTS   administrative.ba_unit_detail_type
 (
-  code character varying(20) NOT NULL, -- The code for the detail type.
+  code character varying(255) NOT NULL, -- The code for the detail type.
   display_value character varying(500) NOT NULL, -- Displayed value of the detail type.
   description character varying(10000) NOT NULL, -- The template text describing the detail.
   status character(1) NOT NULL, -- Status of the detail type.
@@ -47,7 +45,7 @@ CREATE TABLE IF NOT EXISTS  administrative.ba_unit_detail
 (
   id character varying(40) NOT NULL, -- Identifier for the detail.
   ba_unit_id character varying(40) NOT NULL, -- Identifier of the ba_unit the detail relates to.
-  detail_code character varying(20), -- The type of detail.
+  detail_code character varying(255), -- The type of detail.
   custom_detail_text character varying(500), -- User entered text describing the detail and/or updated or revised text obtained from the template detail text.
   detail_quantity integer, -- A quantity value associted to the detail.
   detail_unit character varying(15), -- The unit of measure applicable for the detail quantity.
@@ -143,7 +141,7 @@ CREATE TABLE IF NOT EXISTS  administrative.ba_unit_detail_historic
 (
   id character varying(40),
   ba_unit_id character varying(40),
-  detail_code character varying(20),
+  detail_code character varying(255),
   custom_detail_text character varying(500),
   detail_quantity integer,
   detail_unit character varying(15),
@@ -168,3 +166,6 @@ CREATE INDEX ba_unit_detail_historic_index_on_rowidentifier
   ON administrative.ba_unit_detail_historic
   USING btree
   (rowidentifier COLLATE pg_catalog."default");
+
+
+  
