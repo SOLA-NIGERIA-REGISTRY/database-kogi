@@ -1,7 +1,7 @@
 --
 -- PostgreSQL database dump
 --
- 
+
 SET statement_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
@@ -71,6 +71,7 @@ ALTER SCHEMA bulk_operation OWNER TO postgres;
 
 COMMENT ON SCHEMA bulk_operation IS 'Extension to the LADM used by SOLA to implement Bulk Operation functionality such as loading of shapefiles and documents.';
 
+
 --
 -- Name: cadastre; Type: SCHEMA; Schema: -; Owner: postgres
 --
@@ -101,6 +102,22 @@ ALTER SCHEMA document OWNER TO postgres;
 --
 
 COMMENT ON SCHEMA document IS 'Extension to the LADM used by SOLA to store electronic copies of documentation provided in support of land related dealings. Allows SOLA to support integration with external Document Management Systems (DMS) if required.';
+
+
+--
+-- Name: opentenure; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA opentenure;
+
+
+ALTER SCHEMA opentenure OWNER TO postgres;
+
+--
+-- Name: SCHEMA opentenure; Type: COMMENT; Schema: -; Owner: postgres
+--
+
+COMMENT ON SCHEMA opentenure IS 'This schema holds objects purely related to OpenTenure feature of SOLA';
 
 
 --
@@ -248,6 +265,37 @@ ALTER FUNCTION administrative.get_ba_unit_pending_action(baunit_id character var
 
 COMMENT ON FUNCTION get_ba_unit_pending_action(baunit_id character varying) IS 'Determines the action (New, Vary or Cancel) that applies to the BA Unit based on the service it is associated with.';
 
+
+--
+-- Name: get_baunit_detail(character varying, character varying); Type: FUNCTION; Schema: administrative; Owner: postgres
+--
+
+CREATE FUNCTION get_baunit_detail(baunitid character varying, detailcode character varying) RETURNS character varying
+    LANGUAGE plpgsql
+    AS $$
+declare
+  rec record;
+  result character varying;
+  i integer =0 ;
+BEGIN
+  result = '';
+             
+
+	SELECT bud.custom_detail_text 
+	INTO result
+	FROM administrative.ba_unit_detail bud
+	WHERE bud.ba_unit_id = baunitid 
+	AND bud.detail_code = detailcode;
+
+        if result = '' then
+	  result = 'No Result ';
+        end if;
+return result;
+END;
+$$;
+
+
+ALTER FUNCTION administrative.get_baunit_detail(baunitid character varying, detailcode character varying) OWNER TO postgres;
 
 --
 -- Name: get_calculated_area_size_action(character varying); Type: FUNCTION; Schema: administrative; Owner: postgres
@@ -602,6 +650,63 @@ ALTER FUNCTION administrative.get_parcel_ownernames(baunit_id character varying)
 
 COMMENT ON FUNCTION get_parcel_ownernames(baunit_id character varying) IS 'Returns a list of names of people associated to the BA Unit as an owner.';
 
+
+--
+-- Name: get_parcel_share(character varying); Type: FUNCTION; Schema: administrative; Owner: postgres
+--
+
+CREATE FUNCTION get_parcel_share(baunit_id character varying) RETURNS character varying
+    LANGUAGE plpgsql
+    AS $$
+declare
+  rec record;
+  rrr character varying;
+  i integer =0 ;
+BEGIN
+  rrr = '';
+             
+
+	for rec in 
+              select  (rrrt.display_value)  as tiporrr,
+              initcap(pp.name)||' '||initcap(pp.last_name) || ' ( '||rrrsh.nominator||'/'||rrrsh.denominator||' )'
+               as value,
+               rrrsh.nominator||'/'||rrrsh.denominator as shareFraction
+              from party.party pp,
+		     administrative.party_for_rrr  pr,
+		     administrative.rrr rrr,
+		     administrative.rrr_share  rrrsh,
+		     administrative.rrr_type  rrrt
+		where pp.id=pr.party_id
+		and   pr.rrr_id=rrr.id
+		and rrrsh.id = pr.share_id
+		AND rrr.type_code = rrrt.code
+		and   rrr.ba_unit_id= baunit_id
+	loop
+           rrr = rrr || ', ' || rec.value;
+           i = i+1;
+	end loop;
+
+        if rrr = '' then
+	  rrr = 'No rrr claimed ';
+       end if;
+
+        
+	if substr(rrr, 1, 1) = ',' then
+          rrr = substr(rrr,2);
+        end if;
+        if i = 2 then
+          rrr= replace(rrr, '( 1/1 )','Joint');
+        end if;
+        if i > 2 then
+          rrr= replace(rrr, '( 1/1 )','Undevided Share');
+        end if;
+        rrr= replace(rrr, '( 1/1 )','');
+return rrr;
+END;
+$$;
+
+
+ALTER FUNCTION administrative.get_parcel_share(baunit_id character varying) OWNER TO postgres;
 
 --
 -- Name: getsysregmanagement(character varying, character varying, character varying); Type: FUNCTION; Schema: administrative; Owner: postgres
@@ -2945,8 +3050,6 @@ ALTER FUNCTION application.getlodgetiming(fromdate date, todate date) OWNER TO p
 
 COMMENT ON FUNCTION getlodgetiming(fromdate date, todate date) IS 'Not used. Replaced by get_work_summary.';
 
-
-
 SET search_path = bulk_operation, pg_catalog;
 
 --
@@ -3190,10 +3293,6 @@ COMMENT ON FUNCTION move_spatial_units(transaction_id_v character varying, chang
 
 
 
-
-
-
-
 SET search_path = cadastre, pg_catalog;
 
 --
@@ -3256,8 +3355,8 @@ CREATE FUNCTION cadastre_object_name_is_valid(name_firstpart character varying, 
 begin
   if name_firstpart is null then return false; end if;
   if name_lastpart is null then return false; end if;
-  if not (name_firstpart similar to 'Lot [0-9]+' or name_firstpart similar to '[0-9]+') then return false;  end if;
-  if name_lastpart not similar to '(D|S)P [0-9 ]+' then return false;  end if;
+ -- if not (name_firstpart similar to 'Lot [0-9]+' or name_firstpart similar to '[0-9]+') then return false;  end if;
+ -- if name_lastpart not similar to '(D|S)P [0-9 ]+' then return false;  end if;
   return true;
 end;
 $$;
@@ -3593,6 +3692,45 @@ ALTER FUNCTION cadastre.snap_geometry_to_geometry(INOUT geom_to_snap public.geom
 --
 
 COMMENT ON FUNCTION snap_geometry_to_geometry(INOUT geom_to_snap public.geometry, INOUT target_geom public.geometry, snap_distance double precision, change_target_if_needed boolean, OUT snapped boolean, OUT target_is_changed boolean) IS 'Snaps one geometry to the other adding points if required. Not used by SOLA.';
+
+
+SET search_path = opentenure, pg_catalog;
+
+--
+-- Name: f_for_trg_set_default(); Type: FUNCTION; Schema: opentenure; Owner: postgres
+--
+
+CREATE FUNCTION f_for_trg_set_default() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN  
+  IF (TG_WHEN = 'AFTER') THEN
+    IF (TG_OP = 'UPDATE' OR TG_OP = 'INSERT') THEN
+        IF (NEW.is_default) THEN
+            UPDATE opentenure.form_template SET is_default = 'f' WHERE is_default = 't' AND name != NEW.name;
+        ELSE
+	    IF (TG_OP = 'UPDATE' AND (SELECT COUNT(1) FROM opentenure.form_template WHERE is_default = 't' AND name != OLD.name) < 1) THEN
+	         UPDATE opentenure.form_template SET is_default = 't' WHERE name = OLD.name;
+	    END IF;
+        END IF;
+    ELSIF (TG_OP = 'DELETE') THEN
+        IF ((SELECT COUNT(1) FROM opentenure.form_template WHERE is_default = 't' AND name != OLD.name) < 1) THEN
+	     UPDATE opentenure.form_template SET is_default = 't' WHERE name IN (SELECT name FROM opentenure.form_template WHERE name != OLD.name LIMIT 1);
+        END IF;
+    END IF;
+    RETURN NULL;
+  END IF;
+END;
+$$;
+
+
+ALTER FUNCTION opentenure.f_for_trg_set_default() OWNER TO postgres;
+
+--
+-- Name: FUNCTION f_for_trg_set_default(); Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON FUNCTION f_for_trg_set_default() IS 'This function is to set default flag and have at least 1 form as default.';
 
 
 SET search_path = party, pg_catalog;
@@ -4719,6 +4857,187 @@ CREATE TABLE ba_unit_contains_spatial_unit_historic (
 ALTER TABLE administrative.ba_unit_contains_spatial_unit_historic OWNER TO postgres;
 
 --
+-- Name: ba_unit_detail; Type: TABLE; Schema: administrative; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE ba_unit_detail (
+    id character varying(40) NOT NULL,
+    ba_unit_id character varying(40) NOT NULL,
+    detail_code character varying(20),
+    custom_detail_text character varying(500),
+    detail_quantity integer,
+    detail_unit character varying(15),
+    rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
+    change_user character varying(50),
+    change_time timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE administrative.ba_unit_detail OWNER TO postgres;
+
+--
+-- Name: TABLE ba_unit_detail; Type: COMMENT; Schema: administrative; Owner: postgres
+--
+
+COMMENT ON TABLE ba_unit_detail IS 'Captures any statutory or agreed details in relation to an ba_unit. E.g. details of lease, etc. An ba_unit can have multiple details associated to it.
+Tags: FLOSS SOLA Extension, Change History';
+
+
+--
+-- Name: COLUMN ba_unit_detail.id; Type: COMMENT; Schema: administrative; Owner: postgres
+--
+
+COMMENT ON COLUMN ba_unit_detail.id IS 'Identifier for the detail.';
+
+
+--
+-- Name: COLUMN ba_unit_detail.ba_unit_id; Type: COMMENT; Schema: administrative; Owner: postgres
+--
+
+COMMENT ON COLUMN ba_unit_detail.ba_unit_id IS 'Identifier of the ba_unit the detail relates to.';
+
+
+--
+-- Name: COLUMN ba_unit_detail.detail_code; Type: COMMENT; Schema: administrative; Owner: postgres
+--
+
+COMMENT ON COLUMN ba_unit_detail.detail_code IS 'The type of detail.';
+
+
+--
+-- Name: COLUMN ba_unit_detail.custom_detail_text; Type: COMMENT; Schema: administrative; Owner: postgres
+--
+
+COMMENT ON COLUMN ba_unit_detail.custom_detail_text IS 'User entered text describing the detail and/or updated or revised text obtained from the template detail text.';
+
+
+--
+-- Name: COLUMN ba_unit_detail.detail_quantity; Type: COMMENT; Schema: administrative; Owner: postgres
+--
+
+COMMENT ON COLUMN ba_unit_detail.detail_quantity IS 'A quantity value associted to the detail.';
+
+
+--
+-- Name: COLUMN ba_unit_detail.detail_unit; Type: COMMENT; Schema: administrative; Owner: postgres
+--
+
+COMMENT ON COLUMN ba_unit_detail.detail_unit IS 'The unit of measure applicable for the detail quantity.';
+
+
+--
+-- Name: COLUMN ba_unit_detail.rowidentifier; Type: COMMENT; Schema: administrative; Owner: postgres
+--
+
+COMMENT ON COLUMN ba_unit_detail.rowidentifier IS 'Identifies the all change records for the row in the ba_unit_detail_historic table';
+
+
+--
+-- Name: COLUMN ba_unit_detail.rowversion; Type: COMMENT; Schema: administrative; Owner: postgres
+--
+
+COMMENT ON COLUMN ba_unit_detail.rowversion IS 'Sequential value indicating the number of times this row has been modified.';
+
+
+--
+-- Name: COLUMN ba_unit_detail.change_action; Type: COMMENT; Schema: administrative; Owner: postgres
+--
+
+COMMENT ON COLUMN ba_unit_detail.change_action IS 'Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
+
+
+--
+-- Name: COLUMN ba_unit_detail.change_user; Type: COMMENT; Schema: administrative; Owner: postgres
+--
+
+COMMENT ON COLUMN ba_unit_detail.change_user IS 'The user id of the last person to modify the row.';
+
+
+--
+-- Name: COLUMN ba_unit_detail.change_time; Type: COMMENT; Schema: administrative; Owner: postgres
+--
+
+COMMENT ON COLUMN ba_unit_detail.change_time IS 'The date and time the row was last modified.';
+
+
+--
+-- Name: ba_unit_detail_historic; Type: TABLE; Schema: administrative; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE ba_unit_detail_historic (
+    id character varying(40),
+    ba_unit_id character varying(40),
+    detail_code character varying(20),
+    custom_detail_text character varying(500),
+    detail_quantity integer,
+    detail_unit character varying(15),
+    rowidentifier character varying(40),
+    rowversion integer,
+    change_action character(1),
+    change_user character varying(50),
+    change_time timestamp without time zone,
+    change_time_valid_until timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE administrative.ba_unit_detail_historic OWNER TO postgres;
+
+--
+-- Name: ba_unit_detail_type; Type: TABLE; Schema: administrative; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE ba_unit_detail_type (
+    code character varying(20) NOT NULL,
+    display_value character varying(500) NOT NULL,
+    description character varying(10000) NOT NULL,
+    status character(1) NOT NULL,
+    is_for character varying(20),
+    field_type character varying(20),
+    order_view integer
+);
+
+
+ALTER TABLE administrative.ba_unit_detail_type OWNER TO postgres;
+
+--
+-- Name: TABLE ba_unit_detail_type; Type: COMMENT; Schema: administrative; Owner: postgres
+--
+
+COMMENT ON TABLE ba_unit_detail_type IS 'Code list of detail types. 
+Tags: FLOSS SOLA Extension, Reference Table';
+
+
+--
+-- Name: COLUMN ba_unit_detail_type.code; Type: COMMENT; Schema: administrative; Owner: postgres
+--
+
+COMMENT ON COLUMN ba_unit_detail_type.code IS 'The code for the detail type.';
+
+
+--
+-- Name: COLUMN ba_unit_detail_type.display_value; Type: COMMENT; Schema: administrative; Owner: postgres
+--
+
+COMMENT ON COLUMN ba_unit_detail_type.display_value IS 'Displayed value of the detail type.';
+
+
+--
+-- Name: COLUMN ba_unit_detail_type.description; Type: COMMENT; Schema: administrative; Owner: postgres
+--
+
+COMMENT ON COLUMN ba_unit_detail_type.description IS 'The template text describing the detail.';
+
+
+--
+-- Name: COLUMN ba_unit_detail_type.status; Type: COMMENT; Schema: administrative; Owner: postgres
+--
+
+COMMENT ON COLUMN ba_unit_detail_type.status IS 'Status of the detail type.';
+
+
+--
 -- Name: ba_unit_first_name_part_seq; Type: SEQUENCE; Schema: administrative; Owner: postgres
 --
 
@@ -4982,6 +5301,28 @@ COMMENT ON COLUMN ba_unit_type.status IS 'SOLA Extension: Status of the BA Unit 
 
 
 --
+-- Name: cofo_nr_seq; Type: SEQUENCE; Schema: administrative; Owner: postgres
+--
+
+CREATE SEQUENCE cofo_nr_seq
+    START WITH 509
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 9999
+    CACHE 1
+    CYCLE;
+
+
+ALTER TABLE administrative.cofo_nr_seq OWNER TO postgres;
+
+--
+-- Name: SEQUENCE cofo_nr_seq; Type: COMMENT; Schema: administrative; Owner: postgres
+--
+
+COMMENT ON SEQUENCE cofo_nr_seq IS 'Sequence number used as the basis for the CofO numbering. This sequence is used by the generate-cofo-nr business rule.';
+
+
+--
 -- Name: condition_for_rrr; Type: TABLE; Schema: administrative; Owner: postgres; Tablespace: 
 --
 
@@ -5117,7 +5458,10 @@ CREATE TABLE condition_type (
     code character varying(20) NOT NULL,
     display_value character varying(500) NOT NULL,
     description character varying(10000) NOT NULL,
-    status character(1) NOT NULL
+    status character(1) NOT NULL,
+    is_for character varying(20),
+    field_type character varying(20),
+    order_view character varying(20)
 );
 
 
@@ -6407,7 +6751,7 @@ CREATE TABLE application (
     CONSTRAINT application_check_assigned CHECK ((((assignee_id IS NULL) AND (assigned_datetime IS NULL)) OR ((assignee_id IS NOT NULL) AND (assigned_datetime IS NOT NULL)))),
     CONSTRAINT enforce_dims_location CHECK ((public.st_ndims(location) = 2)),
     CONSTRAINT enforce_geotype_location CHECK (((public.geometrytype(location) = 'MULTIPOINT'::text) OR (location IS NULL))),
-    CONSTRAINT enforce_srid_location CHECK ((public.st_srid(location) = 2193)),
+    CONSTRAINT enforce_srid_location CHECK ((public.st_srid(location) = 32632)),
     CONSTRAINT enforce_valid_location CHECK (public.st_isvalid(location))
 );
 
@@ -6744,7 +7088,7 @@ CREATE TABLE cadastre_object (
     redact_code character varying(20),
     CONSTRAINT enforce_dims_geom_polygon CHECK ((public.st_ndims(geom_polygon) = 2)),
     CONSTRAINT enforce_geotype_geom_polygon CHECK (((public.geometrytype(geom_polygon) = 'POLYGON'::text) OR (geom_polygon IS NULL))),
-    CONSTRAINT enforce_srid_geom_polygon CHECK ((public.st_srid(geom_polygon) = 2193)),
+    CONSTRAINT enforce_srid_geom_polygon CHECK ((public.st_srid(geom_polygon) = 32632)),
     CONSTRAINT enforce_valid_geom_polygon CHECK (public.st_isvalid(geom_polygon))
 );
 
@@ -7493,7 +7837,7 @@ CREATE TABLE application_historic (
     redact_code character varying(20),
     CONSTRAINT enforce_dims_location CHECK ((public.st_ndims(location) = 2)),
     CONSTRAINT enforce_geotype_location CHECK (((public.geometrytype(location) = 'MULTIPOINT'::text) OR (location IS NULL))),
-    CONSTRAINT enforce_srid_location CHECK ((public.st_srid(location) = 2193)),
+    CONSTRAINT enforce_srid_location CHECK ((public.st_srid(location) = 32632)),
     CONSTRAINT enforce_valid_location CHECK (public.st_isvalid(location))
 );
 
@@ -7920,90 +8264,327 @@ CREATE TABLE application_uses_source_historic (
 
 ALTER TABLE application.application_uses_source_historic OWNER TO postgres;
 
-SET search_path = party, pg_catalog;
-
 --
--- Name: group_party; Type: TABLE; Schema: party; Owner: postgres; Tablespace: 
+-- Name: notify; Type: TABLE; Schema: application; Owner: postgres; Tablespace: 
 --
 
-CREATE TABLE group_party (
+CREATE TABLE notify (
     id character varying(40) NOT NULL,
-    type_code character varying(20) NOT NULL,
-    rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
-    rowversion integer DEFAULT 0 NOT NULL,
-    change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
-    change_user character varying(50),
-    change_time timestamp without time zone DEFAULT now() NOT NULL
-);
-
-
-ALTER TABLE party.group_party OWNER TO postgres;
-
---
--- Name: TABLE group_party; Type: COMMENT; Schema: party; Owner: postgres
---
-
-COMMENT ON TABLE group_party IS 'Groups any number of parties into a distinct entity. Implementation of the LADM LA_GroupParty class. Not used by SOLA
-Tags: LADM Reference Object, Change History, Not Used';
-
-
---
--- Name: COLUMN group_party.id; Type: COMMENT; Schema: party; Owner: postgres
---
-
-COMMENT ON COLUMN group_party.id IS 'LADM Definition: Identifier for the group party.';
-
-
---
--- Name: COLUMN group_party.type_code; Type: COMMENT; Schema: party; Owner: postgres
---
-
-COMMENT ON COLUMN group_party.type_code IS 'LADM Definition: The type of the group party. E.g. family, tribe, association, etc.';
-
-
---
--- Name: COLUMN group_party.rowidentifier; Type: COMMENT; Schema: party; Owner: postgres
---
-
-COMMENT ON COLUMN group_party.rowidentifier IS 'SOLA Extension: Identifies the all change records for the row in the group_party_historic table';
-
-
---
--- Name: COLUMN group_party.rowversion; Type: COMMENT; Schema: party; Owner: postgres
---
-
-COMMENT ON COLUMN group_party.rowversion IS 'SOLA Extension: Sequential value indicating the number of times this row has been modified.';
-
-
---
--- Name: COLUMN group_party.change_action; Type: COMMENT; Schema: party; Owner: postgres
---
-
-COMMENT ON COLUMN group_party.change_action IS 'SOLA Extension: Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
-
-
---
--- Name: COLUMN group_party.change_user; Type: COMMENT; Schema: party; Owner: postgres
---
-
-COMMENT ON COLUMN group_party.change_user IS 'SOLA Extension: The user id of the last person to modify the row.';
-
-
---
--- Name: COLUMN group_party.change_time; Type: COMMENT; Schema: party; Owner: postgres
---
-
-COMMENT ON COLUMN group_party.change_time IS 'SOLA Extension: The date and time the row was last modified.';
-
-
---
--- Name: party_member; Type: TABLE; Schema: party; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE party_member (
+    service_id character varying(40) NOT NULL,
     party_id character varying(40) NOT NULL,
-    group_id character varying(40) NOT NULL,
-    share double precision,
+    relationship_type_code character varying(20) DEFAULT 'owner'::character varying NOT NULL,
+    description text,
+    classification_code character varying(20),
+    redact_code character varying(20),
+    rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
+    change_user character varying(50),
+    change_time timestamp without time zone DEFAULT now() NOT NULL,
+    cancel_service_id character varying(40),
+    status character varying(40) DEFAULT 'c'::character varying NOT NULL
+);
+
+
+ALTER TABLE application.notify OWNER TO postgres;
+
+--
+-- Name: TABLE notify; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON TABLE notify IS 'Identifies parties to be notified in bulk as well as the relationship the party has with the land affected by the job.
+Tags: SOLA State Land Extension, Change History';
+
+
+--
+-- Name: COLUMN notify.id; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify.id IS 'Identifier for the notification.';
+
+
+--
+-- Name: COLUMN notify.service_id; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify.service_id IS 'Identifier for the service.';
+
+
+--
+-- Name: COLUMN notify.party_id; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify.party_id IS 'Identifier for the party.';
+
+
+--
+-- Name: COLUMN notify.relationship_type_code; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify.relationship_type_code IS 'The type of relationship between the party and the land affected by the job. One of Owner, Adjoining Owner, Occupier, Adjoining Occupier, Rightholder, Other, etc.';
+
+
+--
+-- Name: COLUMN notify.description; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify.description IS 'The description of the party to notify.';
+
+
+--
+-- Name: COLUMN notify.classification_code; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify.classification_code IS 'SOLA State Land Extension: The security classification for this Notification Party. Only users with the security classification (or a higher classification) will be able to view the record. If null, the record is considered unrestricted.';
+
+
+--
+-- Name: COLUMN notify.redact_code; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify.redact_code IS 'SOLA State Land Extension: The redact classification for this Notification Party. Only users with the redact classification (or a higher classification) will be able to view the record with un-redacted fields. If null, the record is considered unrestricted and no redaction to the record will occur unless bulk redaction classifications have been set for fields of the record.';
+
+
+--
+-- Name: COLUMN notify.rowidentifier; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify.rowidentifier IS 'Identifies the all change records for the row in the notify_historic table';
+
+
+--
+-- Name: COLUMN notify.rowversion; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify.rowversion IS 'Sequential value indicating the number of times this row has been modified.';
+
+
+--
+-- Name: COLUMN notify.change_action; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify.change_action IS 'Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
+
+
+--
+-- Name: COLUMN notify.change_user; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify.change_user IS 'The user id of the last person to modify the row.';
+
+
+--
+-- Name: COLUMN notify.change_time; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify.change_time IS 'The date and time the row was last modified.';
+
+
+--
+-- Name: notify_property; Type: TABLE; Schema: application; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE notify_property (
+    notify_id character varying(40) NOT NULL,
+    ba_unit_id character varying(40) NOT NULL,
+    rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
+    change_user character varying(50),
+    change_time timestamp without time zone DEFAULT now() NOT NULL,
+    cancel_service_id character varying(40),
+    status character varying(40) DEFAULT 'c'::character varying NOT NULL
+);
+
+
+ALTER TABLE application.notify_property OWNER TO postgres;
+
+--
+-- Name: TABLE notify_property; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON TABLE notify_property IS 'Identifies the properties (a.k.a. Ba Units) this notification party is related to. 
+Tags: FLOSS SOLA Extension, Change History';
+
+
+--
+-- Name: COLUMN notify_property.notify_id; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify_property.notify_id IS 'Identifier for the notification party the record is associated to.';
+
+
+--
+-- Name: COLUMN notify_property.ba_unit_id; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify_property.ba_unit_id IS 'Identifier of the property associated to the objection.';
+
+
+--
+-- Name: COLUMN notify_property.rowidentifier; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify_property.rowidentifier IS 'Identifies the all change records for the row in the notify_property_historic table';
+
+
+--
+-- Name: COLUMN notify_property.rowversion; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify_property.rowversion IS 'Sequential value indicating the number of times this row has been modified.';
+
+
+--
+-- Name: COLUMN notify_property.change_action; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify_property.change_action IS 'Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
+
+
+--
+-- Name: COLUMN notify_property.change_user; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify_property.change_user IS 'The user id of the last person to modify the row.';
+
+
+--
+-- Name: COLUMN notify_property.change_time; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify_property.change_time IS 'The date and time the row was last modified.';
+
+
+--
+-- Name: notifiable_party_for_baunit; Type: VIEW; Schema: application; Owner: postgres
+--
+
+CREATE VIEW notifiable_party_for_baunit AS
+    SELECT n.party_id, nt.party_id AS target_party_id, n.service_id, s.application_id, np.cancel_service_id, n.status, (((bu.name_firstpart)::text || '/'::text) || (bu.name_lastpart)::text) AS baunit_name, n.rowidentifier, n.rowversion, n.change_action, n.change_user, n.change_time, n.id AS notifyid, nt.id AS notifytargetid FROM service s, administrative.ba_unit bu, notify n, notify nt, notify_property np, administrative.party_for_rrr pr, administrative.rrr rrr WHERE ((((((((((n.service_id)::text = (s.id)::text) AND ((bu.id)::text = (np.ba_unit_id)::text)) AND ((np.notify_id)::text = (n.id)::text)) AND ((n.relationship_type_code)::text = 'safeguard'::text)) AND ((nt.service_id)::text = (s.id)::text)) AND ((nt.relationship_type_code)::text = 'owner'::text)) AND ((nt.party_id)::text = (pr.party_id)::text)) AND ((pr.rrr_id)::text = (rrr.id)::text)) AND ((rrr.ba_unit_id)::text = (bu.id)::text));
+
+
+ALTER TABLE application.notifiable_party_for_baunit OWNER TO postgres;
+
+--
+-- Name: cancel_notification; Type: VIEW; Schema: application; Owner: postgres
+--
+
+CREATE VIEW cancel_notification AS
+    SELECT pp.name AS partyname, pp.last_name AS partylastname, tpp.name AS targetpartyname, tpp.last_name AS targetpartylastname, npbu.party_id, npbu.target_party_id, npbu.baunit_name, npbu.service_id, npbu.cancel_service_id FROM party.party pp, party.party tpp, notifiable_party_for_baunit npbu, application aa, service s WHERE ((((((s.application_id)::text = (aa.id)::text) AND ((s.id)::text = (npbu.cancel_service_id)::text)) AND ((pp.id)::text = (npbu.party_id)::text)) AND ((tpp.id)::text = (npbu.target_party_id)::text)) AND ((s.request_type_code)::text = 'cancelRelationship'::text));
+
+
+ALTER TABLE application.cancel_notification OWNER TO postgres;
+
+--
+-- Name: notify_historic; Type: TABLE; Schema: application; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE notify_historic (
+    id character varying(40),
+    service_id character varying(40),
+    party_id character varying(40),
+    relationship_type_code character varying(20),
+    description text,
+    classification_code character varying(20),
+    redact_code character varying(20),
+    cancel_service_id character varying(40),
+    status character varying(40) DEFAULT 'c'::character varying NOT NULL,
+    rowidentifier character varying(40),
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1),
+    change_user character varying(50),
+    change_time timestamp without time zone,
+    change_time_valid_until timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE application.notify_historic OWNER TO postgres;
+
+--
+-- Name: TABLE notify_historic; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON TABLE notify_historic IS 'History table for the application.notify table';
+
+
+--
+-- Name: notify_property_historic; Type: TABLE; Schema: application; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE notify_property_historic (
+    notify_id character varying(40),
+    ba_unit_id character varying(40),
+    rowidentifier character varying(40),
+    rowversion integer,
+    change_action character(1),
+    change_user character varying(50),
+    change_time timestamp without time zone,
+    change_time_valid_until timestamp without time zone DEFAULT now() NOT NULL,
+    cancel_service_id character varying(40),
+    status character varying(40) DEFAULT 'c'::character varying NOT NULL
+);
+
+
+ALTER TABLE application.notify_property_historic OWNER TO postgres;
+
+--
+-- Name: notify_relationship_type; Type: TABLE; Schema: application; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE notify_relationship_type (
+    code character varying(20) NOT NULL,
+    display_value character varying(250) NOT NULL,
+    description text,
+    status character(1) NOT NULL
+);
+
+
+ALTER TABLE application.notify_relationship_type OWNER TO postgres;
+
+--
+-- Name: TABLE notify_relationship_type; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON TABLE notify_relationship_type IS 'Code list identifying the type of relationship a party has with land affected by a job. Used for bulk notification purposes. 
+Tags: SOLA State Land Extension, Reference Table';
+
+
+--
+-- Name: COLUMN notify_relationship_type.code; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify_relationship_type.code IS 'The code for the relationship type.';
+
+
+--
+-- Name: COLUMN notify_relationship_type.display_value; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify_relationship_type.display_value IS 'Displayed value of the relationship type.';
+
+
+--
+-- Name: COLUMN notify_relationship_type.description; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify_relationship_type.description IS 'Description of the relationship type.';
+
+
+--
+-- Name: COLUMN notify_relationship_type.status; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify_relationship_type.status IS 'Status of the relationship type (c - current, x - no longer valid).';
+
+
+--
+-- Name: notify_uses_source; Type: TABLE; Schema: application; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE notify_uses_source (
+    notify_id character varying(40) NOT NULL,
+    source_id character varying(40) NOT NULL,
     rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
     rowversion integer DEFAULT 0 NOT NULL,
     change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
@@ -8012,73 +8593,82 @@ CREATE TABLE party_member (
 );
 
 
-ALTER TABLE party.party_member OWNER TO postgres;
+ALTER TABLE application.notify_uses_source OWNER TO postgres;
 
 --
--- Name: TABLE party_member; Type: COMMENT; Schema: party; Owner: postgres
+-- Name: TABLE notify_uses_source; Type: COMMENT; Schema: application; Owner: postgres
 --
 
-COMMENT ON TABLE party_member IS 'Identifies the parties belonging to a group party. Implementation of the LADM LA_PartyMember class. Not used by SOLA.
-Tags: LADM Reference Object, Change History, Not Used';
-
-
---
--- Name: COLUMN party_member.party_id; Type: COMMENT; Schema: party; Owner: postgres
---
-
-COMMENT ON COLUMN party_member.party_id IS 'LADM Definition: Identifier for the party.';
+COMMENT ON TABLE notify_uses_source IS 'Links the notification parties to the sources (a.k.a. documents) genreated for the bulk notification. 
+Tags: FLOSS SOLA Extension, Change History';
 
 
 --
--- Name: COLUMN party_member.group_id; Type: COMMENT; Schema: party; Owner: postgres
+-- Name: COLUMN notify_uses_source.notify_id; Type: COMMENT; Schema: application; Owner: postgres
 --
 
-COMMENT ON COLUMN party_member.group_id IS 'LADM Definition: Identifier of the group party';
-
-
---
--- Name: COLUMN party_member.share; Type: COMMENT; Schema: party; Owner: postgres
---
-
-COMMENT ON COLUMN party_member.share IS 'LADM Definition: The share of a RRR held by a party member expressed as a fraction with a numerator and a denominator.';
+COMMENT ON COLUMN notify_uses_source.notify_id IS 'Identifier for the notification party the record is associated to.';
 
 
 --
--- Name: COLUMN party_member.rowidentifier; Type: COMMENT; Schema: party; Owner: postgres
+-- Name: COLUMN notify_uses_source.source_id; Type: COMMENT; Schema: application; Owner: postgres
 --
 
-COMMENT ON COLUMN party_member.rowidentifier IS 'SOLA Extension: Identifies the all change records for the row in the party_member_historic table';
-
-
---
--- Name: COLUMN party_member.rowversion; Type: COMMENT; Schema: party; Owner: postgres
---
-
-COMMENT ON COLUMN party_member.rowversion IS 'SOLA Extension: Sequential value indicating the number of times this row has been modified.';
+COMMENT ON COLUMN notify_uses_source.source_id IS 'Identifier of the source associated to the application.';
 
 
 --
--- Name: COLUMN party_member.change_action; Type: COMMENT; Schema: party; Owner: postgres
+-- Name: COLUMN notify_uses_source.rowidentifier; Type: COMMENT; Schema: application; Owner: postgres
 --
 
-COMMENT ON COLUMN party_member.change_action IS 'SOLA Extension: Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
-
-
---
--- Name: COLUMN party_member.change_user; Type: COMMENT; Schema: party; Owner: postgres
---
-
-COMMENT ON COLUMN party_member.change_user IS 'SOLA Extension: The user id of the last person to modify the row.';
+COMMENT ON COLUMN notify_uses_source.rowidentifier IS 'Identifies the all change records for the row in the objection_uses_source_historic table';
 
 
 --
--- Name: COLUMN party_member.change_time; Type: COMMENT; Schema: party; Owner: postgres
+-- Name: COLUMN notify_uses_source.rowversion; Type: COMMENT; Schema: application; Owner: postgres
 --
 
-COMMENT ON COLUMN party_member.change_time IS 'SOLA Extension: The date and time the row was last modified.';
+COMMENT ON COLUMN notify_uses_source.rowversion IS 'Sequential value indicating the number of times this row has been modified.';
 
 
-SET search_path = application, pg_catalog;
+--
+-- Name: COLUMN notify_uses_source.change_action; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify_uses_source.change_action IS 'Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
+
+
+--
+-- Name: COLUMN notify_uses_source.change_user; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify_uses_source.change_user IS 'The user id of the last person to modify the row.';
+
+
+--
+-- Name: COLUMN notify_uses_source.change_time; Type: COMMENT; Schema: application; Owner: postgres
+--
+
+COMMENT ON COLUMN notify_uses_source.change_time IS 'The date and time the row was last modified.';
+
+
+--
+-- Name: notify_uses_source_historic; Type: TABLE; Schema: application; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE notify_uses_source_historic (
+    notify_id character varying(40),
+    source_id character varying(40),
+    rowidentifier character varying(40),
+    rowversion integer,
+    change_action character(1),
+    change_user character varying(50),
+    change_time timestamp without time zone,
+    change_time_valid_until timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE application.notify_uses_source_historic OWNER TO postgres;
 
 --
 -- Name: request_category_type; Type: TABLE; Schema: application; Owner: postgres; Tablespace: 
@@ -8496,22 +9086,90 @@ COMMENT ON COLUMN service_status_type.status IS 'Status of the service status ty
 COMMENT ON COLUMN service_status_type.description IS 'Description of the service status type.';
 
 
+SET search_path = system, pg_catalog;
+
+--
+-- Name: config_map_layer_metadata; Type: TABLE; Schema: system; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE config_map_layer_metadata (
+    name_layer character varying(50) NOT NULL,
+    name character varying(50) NOT NULL,
+    value character varying(100) NOT NULL,
+    for_client boolean DEFAULT false
+);
+
+
+ALTER TABLE system.config_map_layer_metadata OWNER TO postgres;
+
+--
+-- Name: COLUMN config_map_layer_metadata.for_client; Type: COMMENT; Schema: system; Owner: postgres
+--
+
+COMMENT ON COLUMN config_map_layer_metadata.for_client IS 'Indicates whether an option is for use by the client or server. If true, it''s supposed to be used by the client map control, otherwise option is sent to the server.';
+
+
+--
+-- Name: setting; Type: TABLE; Schema: system; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE setting (
+    name character varying(50) NOT NULL,
+    vl character varying(2000) NOT NULL,
+    active boolean DEFAULT true NOT NULL,
+    description character varying(555) NOT NULL
+);
+
+
+ALTER TABLE system.setting OWNER TO postgres;
+
+--
+-- Name: TABLE setting; Type: COMMENT; Schema: system; Owner: postgres
+--
+
+COMMENT ON TABLE setting IS 'Contains global settings for the SOLA application. Refer to the Administration Guide or the ConfigConstants class in the Common Utilities project for a list of the recognized settings. Note that not all possible settings are listed in the settings table. Settings may be omitted from this table if the default value applies.
+Tags: FLOSS SOLA Extension, Reference Table, System Configuration';
+
+
+--
+-- Name: COLUMN setting.name; Type: COMMENT; Schema: system; Owner: postgres
+--
+
+COMMENT ON COLUMN setting.name IS 'Identifier/name for the setting';
+
+
+--
+-- Name: COLUMN setting.vl; Type: COMMENT; Schema: system; Owner: postgres
+--
+
+COMMENT ON COLUMN setting.vl IS 'The value for the setting.';
+
+
+--
+-- Name: COLUMN setting.active; Type: COMMENT; Schema: system; Owner: postgres
+--
+
+COMMENT ON COLUMN setting.active IS 'Indicates if the setting is active or not. If not active, the default value for the setting will apply.';
+
+
+--
+-- Name: COLUMN setting.description; Type: COMMENT; Schema: system; Owner: postgres
+--
+
+COMMENT ON COLUMN setting.description IS 'Description of the setting. ';
+
+
+SET search_path = application, pg_catalog;
+
 --
 -- Name: systematic_registration_certificates; Type: VIEW; Schema: application; Owner: postgres
 --
 
 CREATE VIEW systematic_registration_certificates AS
-    SELECT aa.nr, co.name_firstpart, co.name_lastpart, su.ba_unit_id FROM application_status_type ast, cadastre.cadastre_object co, administrative.ba_unit bu, cadastre.spatial_value_area sa, administrative.ba_unit_contains_spatial_unit su, application aa, service s, transaction.transaction t WHERE (((((((((((sa.spatial_unit_id)::text = (co.id)::text) AND ((sa.type_code)::text = 'officialArea'::text)) AND ((su.spatial_unit_id)::text = (sa.spatial_unit_id)::text)) AND ((su.ba_unit_id)::text = (bu.id)::text)) AND ((bu.transaction_id)::text = (t.id)::text)) AND ((t.from_service_id)::text = (s.id)::text)) AND ((s.application_id)::text = (aa.id)::text)) AND ((s.request_type_code)::text = 'systematicRegn'::text)) AND ((aa.status_code)::text = (ast.code)::text)) AND ((aa.status_code)::text = 'approved'::text));
+    SELECT DISTINCT co.id, co.name_firstpart, co.name_lastpart, su.ba_unit_id, round(sa.size) AS size, administrative.get_parcel_share(su.ba_unit_id) AS owners, (SELECT setting.vl FROM system.setting WHERE ((setting.name)::text = 'state'::text)) AS state, (SELECT setting.vl FROM system.setting WHERE ((setting.name)::text = 'surveyor'::text)) AS surveyor, (SELECT setting.vl FROM system.setting WHERE ((setting.name)::text = 'surveyorRank'::text)) AS rank, (SELECT config_map_layer_metadata.value FROM system.config_map_layer_metadata WHERE (((config_map_layer_metadata.name_layer)::text = 'orthophoto'::text) AND ((config_map_layer_metadata.name)::text = 'date'::text))) AS imagerydate, (SELECT config_map_layer_metadata.value FROM system.config_map_layer_metadata WHERE (((config_map_layer_metadata.name_layer)::text = 'orthophoto'::text) AND ((config_map_layer_metadata.name)::text = 'resolution'::text))) AS imageryresolution, (SELECT config_map_layer_metadata.value FROM system.config_map_layer_metadata WHERE (((config_map_layer_metadata.name_layer)::text = 'orthophoto'::text) AND ((config_map_layer_metadata.name)::text = 'data-source'::text))) AS imagerysource, administrative.get_baunit_detail(su.ba_unit_id, 'lga'::character varying) AS lga, administrative.get_baunit_detail(su.ba_unit_id, 'zone'::character varying) AS zone, administrative.get_baunit_detail(su.ba_unit_id, 'location'::character varying) AS location, administrative.get_baunit_detail(su.ba_unit_id, 'plan'::character varying) AS plan, administrative.get_baunit_detail(su.ba_unit_id, 'sheetnr'::character varying) AS sheetnr, administrative.get_baunit_detail(su.ba_unit_id, 'startdate'::character varying) AS commencingdate, administrative.get_baunit_detail(su.ba_unit_id, 'purpose'::character varying) AS purpose, administrative.get_baunit_detail(su.ba_unit_id, 'term'::character varying) AS term, administrative.get_baunit_detail(su.ba_unit_id, 'rent'::character varying) AS rent FROM cadastre.cadastre_object co, administrative.ba_unit bu, cadastre.spatial_value_area sa, administrative.ba_unit_contains_spatial_unit su WHERE (((((bu.id)::text = (su.ba_unit_id)::text) AND ((su.spatial_unit_id)::text = (sa.spatial_unit_id)::text)) AND ((sa.spatial_unit_id)::text = (co.id)::text)) AND ((sa.type_code)::text = 'officialArea'::text)) ORDER BY co.name_firstpart, co.name_lastpart;
 
 
 ALTER TABLE application.systematic_registration_certificates OWNER TO postgres;
-
---
--- Name: VIEW systematic_registration_certificates; Type: COMMENT; Schema: application; Owner: postgres
---
-
-COMMENT ON VIEW systematic_registration_certificates IS 'Used by systematic registration to identify parcels that require a certificate to be generated.';
-
 
 --
 -- Name: type_action; Type: TABLE; Schema: application; Owner: postgres; Tablespace: 
@@ -8561,6 +9219,7 @@ COMMENT ON COLUMN type_action.description IS 'Description of the request type ac
 --
 
 COMMENT ON COLUMN type_action.status IS 'Status of the request type action.';
+
 
 
 SET search_path = bulk_operation, pg_catalog;
@@ -8793,7 +9452,7 @@ CREATE TABLE cadastre_object_historic (
     redact_code character varying(20),
     CONSTRAINT enforce_dims_geom_polygon CHECK ((public.st_ndims(geom_polygon) = 2)),
     CONSTRAINT enforce_geotype_geom_polygon CHECK (((public.geometrytype(geom_polygon) = 'POLYGON'::text) OR (geom_polygon IS NULL))),
-    CONSTRAINT enforce_srid_geom_polygon CHECK ((public.st_srid(geom_polygon) = 2193)),
+    CONSTRAINT enforce_srid_geom_polygon CHECK ((public.st_srid(geom_polygon) = 32632)),
     CONSTRAINT enforce_valid_geom_polygon CHECK (public.st_isvalid(geom_polygon))
 );
 
@@ -8815,7 +9474,7 @@ CREATE TABLE cadastre_object_node_target (
     change_time timestamp without time zone DEFAULT now() NOT NULL,
     CONSTRAINT enforce_dims_geom CHECK ((public.st_ndims(geom) = 2)),
     CONSTRAINT enforce_geotype_geom CHECK (((public.geometrytype(geom) = 'POINT'::text) OR (geom IS NULL))),
-    CONSTRAINT enforce_srid_geom CHECK ((public.st_srid(geom) = 2193)),
+    CONSTRAINT enforce_srid_geom CHECK ((public.st_srid(geom) = 32632)),
     CONSTRAINT enforce_valid_geom CHECK (public.st_isvalid(geom))
 );
 
@@ -8902,7 +9561,7 @@ CREATE TABLE cadastre_object_node_target_historic (
     change_time_valid_until timestamp without time zone DEFAULT now() NOT NULL,
     CONSTRAINT enforce_dims_geom CHECK ((public.st_ndims(geom) = 2)),
     CONSTRAINT enforce_geotype_geom CHECK (((public.geometrytype(geom) = 'POINT'::text) OR (geom IS NULL))),
-    CONSTRAINT enforce_srid_geom CHECK ((public.st_srid(geom) = 2193)),
+    CONSTRAINT enforce_srid_geom CHECK ((public.st_srid(geom) = 32632)),
     CONSTRAINT enforce_valid_geom CHECK (public.st_isvalid(geom))
 );
 
@@ -8924,7 +9583,7 @@ CREATE TABLE cadastre_object_target (
     change_time timestamp without time zone DEFAULT now() NOT NULL,
     CONSTRAINT enforce_dims_geom_polygon CHECK ((public.st_ndims(geom_polygon) = 2)),
     CONSTRAINT enforce_geotype_geom_polygon CHECK (((public.geometrytype(geom_polygon) = 'POLYGON'::text) OR (geom_polygon IS NULL))),
-    CONSTRAINT enforce_srid_geom_polygon CHECK ((public.st_srid(geom_polygon) = 2193)),
+    CONSTRAINT enforce_srid_geom_polygon CHECK ((public.st_srid(geom_polygon) = 32632)),
     CONSTRAINT enforce_valid_geom_polygon CHECK (public.st_isvalid(geom_polygon))
 );
 
@@ -9011,7 +9670,7 @@ CREATE TABLE cadastre_object_target_historic (
     change_time_valid_until timestamp without time zone DEFAULT now() NOT NULL,
     CONSTRAINT enforce_dims_geom_polygon CHECK ((public.st_ndims(geom_polygon) = 2)),
     CONSTRAINT enforce_geotype_geom_polygon CHECK (((public.geometrytype(geom_polygon) = 'POLYGON'::text) OR (geom_polygon IS NULL))),
-    CONSTRAINT enforce_srid_geom_polygon CHECK ((public.st_srid(geom_polygon) = 2193)),
+    CONSTRAINT enforce_srid_geom_polygon CHECK ((public.st_srid(geom_polygon) = 32632)),
     CONSTRAINT enforce_valid_geom_polygon CHECK (public.st_isvalid(geom_polygon))
 );
 
@@ -9148,8 +9807,8 @@ CREATE TABLE spatial_unit_group (
     CONSTRAINT enforce_dims_reference_point CHECK ((public.st_ndims(reference_point) = 2)),
     CONSTRAINT enforce_geotype_geom CHECK (((public.geometrytype(geom) = 'POLYGON'::text) OR (geom IS NULL))),
     CONSTRAINT enforce_geotype_reference_point CHECK (((public.geometrytype(reference_point) = 'POINT'::text) OR (reference_point IS NULL))),
-    CONSTRAINT enforce_srid_geom CHECK ((public.st_srid(geom) = 2193)),
-    CONSTRAINT enforce_srid_reference_point CHECK ((public.st_srid(reference_point) = 2193)),
+    CONSTRAINT enforce_srid_geom CHECK ((public.st_srid(geom) = 32632)),
+    CONSTRAINT enforce_srid_reference_point CHECK ((public.st_srid(reference_point) = 32632)),
     CONSTRAINT enforce_valid_geom CHECK (public.st_isvalid(geom)),
     CONSTRAINT enforce_valid_reference_point CHECK (public.st_isvalid(reference_point))
 );
@@ -9659,6 +10318,26 @@ COMMENT ON COLUMN level_historic.editable IS 'It shows if the spatial units of t
 
 
 --
+-- Name: lga; Type: VIEW; Schema: cadastre; Owner: postgres
+--
+
+CREATE VIEW lga AS
+    SELECT s.id, s.label, s.geom FROM spatial_unit_group s WHERE (s.hierarchy_level = 2);
+
+
+ALTER TABLE cadastre.lga OWNER TO postgres;
+
+--
+-- Name: parcel_plan; Type: VIEW; Schema: cadastre; Owner: postgres
+--
+
+CREATE VIEW parcel_plan AS
+    SELECT DISTINCT co.name_firstpart, co.name_lastpart, co.id, su.ba_unit_id, round(sa.size) AS size, administrative.get_parcel_share(su.ba_unit_id) AS owners, (SELECT setting.vl FROM system.setting WHERE ((setting.name)::text = 'system-id'::text)) AS state, (SELECT setting.vl FROM system.setting WHERE ((setting.name)::text = 'surveyor'::text)) AS surveyor, (SELECT setting.vl FROM system.setting WHERE ((setting.name)::text = 'surveyorRank'::text)) AS rank, (SELECT config_map_layer_metadata.value FROM system.config_map_layer_metadata WHERE (((config_map_layer_metadata.name_layer)::text = 'orthophoto'::text) AND ((config_map_layer_metadata.name)::text = 'date'::text))) AS imagerydate, (SELECT config_map_layer_metadata.value FROM system.config_map_layer_metadata WHERE (((config_map_layer_metadata.name_layer)::text = 'orthophoto'::text) AND ((config_map_layer_metadata.name)::text = 'resolution'::text))) AS imageryresolution, (SELECT config_map_layer_metadata.value FROM system.config_map_layer_metadata WHERE (((config_map_layer_metadata.name_layer)::text = 'orthophoto'::text) AND ((config_map_layer_metadata.name)::text = 'data-source'::text))) AS imagerysource, administrative.get_baunit_detail(su.ba_unit_id, 'lga'::character varying) AS lga, administrative.get_baunit_detail(su.ba_unit_id, 'zone'::character varying) AS zone, administrative.get_baunit_detail(su.ba_unit_id, 'location'::character varying) AS proplocation, administrative.get_baunit_detail(su.ba_unit_id, 'plan'::character varying) AS title, administrative.get_baunit_detail(su.ba_unit_id, 'sheetnr'::character varying) AS sheetnr, administrative.get_baunit_detail(su.ba_unit_id, 'startdate'::character varying) AS commencingdate, administrative.get_baunit_detail(su.ba_unit_id, 'purpose'::character varying) AS landuse, administrative.get_baunit_detail(su.ba_unit_id, 'term'::character varying) AS term, administrative.get_baunit_detail(su.ba_unit_id, 'rent'::character varying) AS rent FROM cadastre_object co, administrative.ba_unit bu, spatial_value_area sa, administrative.ba_unit_contains_spatial_unit su WHERE (((((bu.id)::text = (su.ba_unit_id)::text) AND ((su.spatial_unit_id)::text = (sa.spatial_unit_id)::text)) AND ((sa.spatial_unit_id)::text = (co.id)::text)) AND ((sa.type_code)::text = 'officialArea'::text)) ORDER BY co.name_firstpart, co.name_lastpart;
+
+
+ALTER TABLE cadastre.parcel_plan OWNER TO postgres;
+
+--
 -- Name: spatial_unit; Type: TABLE; Schema: cadastre; Owner: postgres; Tablespace: 
 --
 
@@ -9680,8 +10359,8 @@ CREATE TABLE spatial_unit (
     CONSTRAINT enforce_dims_geom CHECK ((public.st_ndims(geom) = 2)),
     CONSTRAINT enforce_dims_reference_point CHECK ((public.st_ndims(reference_point) = 2)),
     CONSTRAINT enforce_geotype_reference_point CHECK (((public.geometrytype(reference_point) = 'POINT'::text) OR (reference_point IS NULL))),
-    CONSTRAINT enforce_srid_geom CHECK ((public.st_srid(geom) = 2193)),
-    CONSTRAINT enforce_srid_reference_point CHECK ((public.st_srid(reference_point) = 2193)),
+    CONSTRAINT enforce_srid_geom CHECK ((public.st_srid(geom) = 32632)),
+    CONSTRAINT enforce_srid_reference_point CHECK ((public.st_srid(reference_point) = 32632)),
     CONSTRAINT enforce_valid_geom CHECK (public.st_isvalid(geom)),
     CONSTRAINT enforce_valid_reference_point CHECK (public.st_isvalid(reference_point))
 );
@@ -9995,8 +10674,8 @@ CREATE TABLE spatial_unit_group_historic (
     CONSTRAINT enforce_dims_reference_point CHECK ((public.st_ndims(reference_point) = 2)),
     CONSTRAINT enforce_geotype_geom CHECK (((public.geometrytype(geom) = 'POLYGON'::text) OR (geom IS NULL))),
     CONSTRAINT enforce_geotype_reference_point CHECK (((public.geometrytype(reference_point) = 'POINT'::text) OR (reference_point IS NULL))),
-    CONSTRAINT enforce_srid_geom CHECK ((public.st_srid(geom) = 2193)),
-    CONSTRAINT enforce_srid_reference_point CHECK ((public.st_srid(reference_point) = 2193)),
+    CONSTRAINT enforce_srid_geom CHECK ((public.st_srid(geom) = 32632)),
+    CONSTRAINT enforce_srid_reference_point CHECK ((public.st_srid(reference_point) = 32632)),
     CONSTRAINT enforce_valid_geom CHECK (public.st_isvalid(geom)),
     CONSTRAINT enforce_valid_reference_point CHECK (public.st_isvalid(reference_point))
 );
@@ -10027,8 +10706,8 @@ CREATE TABLE spatial_unit_historic (
     CONSTRAINT enforce_dims_geom CHECK ((public.st_ndims(geom) = 2)),
     CONSTRAINT enforce_dims_reference_point CHECK ((public.st_ndims(reference_point) = 2)),
     CONSTRAINT enforce_geotype_reference_point CHECK (((public.geometrytype(reference_point) = 'POINT'::text) OR (reference_point IS NULL))),
-    CONSTRAINT enforce_srid_geom CHECK ((public.st_srid(geom) = 2193)),
-    CONSTRAINT enforce_srid_reference_point CHECK ((public.st_srid(reference_point) = 2193)),
+    CONSTRAINT enforce_srid_geom CHECK ((public.st_srid(geom) = 32632)),
+    CONSTRAINT enforce_srid_reference_point CHECK ((public.st_srid(reference_point) = 32632)),
     CONSTRAINT enforce_valid_geom CHECK (public.st_isvalid(geom)),
     CONSTRAINT enforce_valid_reference_point CHECK (public.st_isvalid(reference_point))
 );
@@ -10285,8 +10964,8 @@ CREATE TABLE survey_point (
     CONSTRAINT enforce_dims_original_geom CHECK ((public.st_ndims(original_geom) = 2)),
     CONSTRAINT enforce_geotype_geom CHECK (((public.geometrytype(geom) = 'POINT'::text) OR (geom IS NULL))),
     CONSTRAINT enforce_geotype_original_geom CHECK (((public.geometrytype(original_geom) = 'POINT'::text) OR (original_geom IS NULL))),
-    CONSTRAINT enforce_srid_geom CHECK ((public.st_srid(geom) = 2193)),
-    CONSTRAINT enforce_srid_original_geom CHECK ((public.st_srid(original_geom) = 2193)),
+    CONSTRAINT enforce_srid_geom CHECK ((public.st_srid(geom) = 32632)),
+    CONSTRAINT enforce_srid_original_geom CHECK ((public.st_srid(original_geom) = 32632)),
     CONSTRAINT enforce_valid_geom CHECK (public.st_isvalid(geom)),
     CONSTRAINT enforce_valid_original_geom CHECK (public.st_isvalid(original_geom))
 );
@@ -10400,8 +11079,8 @@ CREATE TABLE survey_point_historic (
     CONSTRAINT enforce_dims_original_geom CHECK ((public.st_ndims(original_geom) = 2)),
     CONSTRAINT enforce_geotype_geom CHECK (((public.geometrytype(geom) = 'POINT'::text) OR (geom IS NULL))),
     CONSTRAINT enforce_geotype_original_geom CHECK (((public.geometrytype(original_geom) = 'POINT'::text) OR (original_geom IS NULL))),
-    CONSTRAINT enforce_srid_geom CHECK ((public.st_srid(geom) = 2193)),
-    CONSTRAINT enforce_srid_original_geom CHECK ((public.st_srid(original_geom) = 2193)),
+    CONSTRAINT enforce_srid_geom CHECK ((public.st_srid(geom) = 32632)),
+    CONSTRAINT enforce_srid_original_geom CHECK ((public.st_srid(original_geom) = 32632)),
     CONSTRAINT enforce_valid_geom CHECK (public.st_isvalid(geom)),
     CONSTRAINT enforce_valid_original_geom CHECK (public.st_isvalid(original_geom))
 );
@@ -10510,6 +11189,16 @@ COMMENT ON COLUMN utility_network_type.description IS 'LADM Definition: Descript
 
 COMMENT ON COLUMN utility_network_type.status IS 'SOLA Extension: Status of the utility network type';
 
+
+--
+-- Name: ward; Type: VIEW; Schema: cadastre; Owner: postgres
+--
+
+CREATE VIEW ward AS
+    SELECT s.id, s.label, s.geom FROM spatial_unit_group s WHERE (s.hierarchy_level = 3);
+
+
+ALTER TABLE cadastre.ward OWNER TO postgres;
 
 SET search_path = document, pg_catalog;
 
@@ -10752,6 +11441,2680 @@ ALTER TABLE document.document_nr_seq OWNER TO postgres;
 COMMENT ON SEQUENCE document_nr_seq IS 'Sequence number used as the basis for the document Nr field. This sequence is used by the Digital Archive EJB.';
 
 
+SET search_path = opentenure, pg_catalog;
+
+--
+-- Name: attachment; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE attachment (
+    id character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    type_code character varying(20) NOT NULL,
+    reference_nr character varying(255),
+    document_date date,
+    description character varying(255),
+    body bytea NOT NULL,
+    size bigint NOT NULL,
+    mime_type character varying(255) NOT NULL,
+    file_name character varying(255) NOT NULL,
+    file_extension character varying(5) NOT NULL,
+    user_name character varying(50) NOT NULL,
+    rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
+    change_user character varying(50),
+    change_time timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE opentenure.attachment OWNER TO postgres;
+
+--
+-- Name: TABLE attachment; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE attachment IS 'Extension to the LADM used by SOLA to store claim files attachments.';
+
+
+--
+-- Name: COLUMN attachment.id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment.id IS 'Identifier for the attachment.';
+
+
+--
+-- Name: COLUMN attachment.type_code; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment.type_code IS 'Attached document type code.';
+
+
+--
+-- Name: COLUMN attachment.reference_nr; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment.reference_nr IS 'Document reference number.';
+
+
+--
+-- Name: COLUMN attachment.document_date; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment.document_date IS 'Document date.';
+
+
+--
+-- Name: COLUMN attachment.description; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment.description IS 'Short document description.';
+
+
+--
+-- Name: COLUMN attachment.body; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment.body IS 'Binary content of the attachment.';
+
+
+--
+-- Name: COLUMN attachment.size; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment.size IS 'File size.';
+
+
+--
+-- Name: COLUMN attachment.mime_type; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment.mime_type IS 'Mime type of the attachment.';
+
+
+--
+-- Name: COLUMN attachment.file_name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment.file_name IS 'Actual file name of the attachment.';
+
+
+--
+-- Name: COLUMN attachment.file_extension; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment.file_extension IS 'File extension of the attachment. E.g. pdf, tiff, doc, etc';
+
+
+--
+-- Name: COLUMN attachment.user_name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment.user_name IS 'User''s ID, who has created the attachment.';
+
+
+--
+-- Name: COLUMN attachment.rowidentifier; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment.rowidentifier IS 'Identifies the all change records for the row in the document_historic table';
+
+
+--
+-- Name: COLUMN attachment.rowversion; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment.rowversion IS 'Sequential value indicating the number of times this row has been modified.';
+
+
+--
+-- Name: COLUMN attachment.change_action; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment.change_action IS 'Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
+
+
+--
+-- Name: COLUMN attachment.change_user; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment.change_user IS 'The user id of the last person to modify the row.';
+
+
+--
+-- Name: COLUMN attachment.change_time; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment.change_time IS 'The date and time the row was last modified.';
+
+
+--
+-- Name: attachment_chunk; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE attachment_chunk (
+    id character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    attachment_id character varying(40) NOT NULL,
+    claim_id character varying(40),
+    start_position bigint NOT NULL,
+    size bigint NOT NULL,
+    body bytea NOT NULL,
+    md5 character varying(50),
+    creation_time timestamp without time zone DEFAULT now() NOT NULL,
+    user_name character varying(50) NOT NULL
+);
+
+
+ALTER TABLE opentenure.attachment_chunk OWNER TO postgres;
+
+--
+-- Name: TABLE attachment_chunk; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE attachment_chunk IS 'Holds temporary pieces of attachment uploaded on the server. In case of large files, document can be split into smaller pieces (chunks) allowing reliable upload. After all pieces uploaded, client will instruct server to create a document and remove temporary files stored in this table.';
+
+
+--
+-- Name: COLUMN attachment_chunk.id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment_chunk.id IS 'Unique ID of the chunk';
+
+
+--
+-- Name: COLUMN attachment_chunk.attachment_id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment_chunk.attachment_id IS 'Attachment ID, which will be used to create final document object. Used to group all chunks together.';
+
+
+--
+-- Name: COLUMN attachment_chunk.claim_id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment_chunk.claim_id IS 'Claim ID. Used to clean the table when saving claim. It will guarantee that no orphan chunks left in the table.';
+
+
+--
+-- Name: COLUMN attachment_chunk.start_position; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment_chunk.start_position IS 'Staring position of the byte in the source/destination document';
+
+
+--
+-- Name: COLUMN attachment_chunk.size; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment_chunk.size IS 'Size of the chunk in bytes.';
+
+
+--
+-- Name: COLUMN attachment_chunk.body; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment_chunk.body IS 'The content of the chunk.';
+
+
+--
+-- Name: COLUMN attachment_chunk.md5; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment_chunk.md5 IS 'Checksum of the chunk, calculated using MD5.';
+
+
+--
+-- Name: COLUMN attachment_chunk.creation_time; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment_chunk.creation_time IS 'Date and time when chuck was created.';
+
+
+--
+-- Name: COLUMN attachment_chunk.user_name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN attachment_chunk.user_name IS 'User''s id (name), who has loaded the chunk';
+
+
+--
+-- Name: attachment_historic; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE attachment_historic (
+    id character varying(40),
+    type_code character varying(20),
+    reference_nr character varying(255),
+    document_date date,
+    description character varying(255),
+    body bytea,
+    size bigint,
+    mime_type character varying(255),
+    file_name character varying(255),
+    file_extension character varying(5),
+    user_name character varying(50),
+    rowidentifier character varying(40),
+    rowversion integer,
+    change_action character(1),
+    change_user character varying(50),
+    change_time timestamp without time zone,
+    change_time_valid_until timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE opentenure.attachment_historic OWNER TO postgres;
+
+--
+-- Name: TABLE attachment_historic; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE attachment_historic IS 'Historic table for opentenure.attachment. Keeps all changes done to the main table.';
+
+
+--
+-- Name: claim; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE claim (
+    id character varying(40) NOT NULL,
+    nr character varying(15) NOT NULL,
+    lodgement_date timestamp without time zone,
+    challenge_expiry_date timestamp without time zone,
+    decision_date timestamp without time zone,
+    description character varying(250),
+    challenged_claim_id character varying(40),
+    claimant_id character varying(40) NOT NULL,
+    mapped_geometry public.geometry,
+    gps_geometry public.geometry,
+    status_code character varying(20) DEFAULT 'created'::character varying NOT NULL,
+    recorder_name character varying(50) NOT NULL,
+    rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
+    change_user character varying(50),
+    change_time timestamp without time zone DEFAULT now() NOT NULL,
+    type_code character varying(20),
+    start_date date,
+    land_use_code character varying(20),
+    notes character varying(1000),
+    north_adjacency character varying(500),
+    south_adjacency character varying(500),
+    east_adjacency character varying(500),
+    west_adjacency character varying(500),
+    assignee_name character varying(50),
+    rejection_reason_code character varying(20),
+    claim_area bigint DEFAULT 0,
+    CONSTRAINT enforce_geotype_gps_geometry CHECK ((((public.geometrytype(gps_geometry) = 'POLYGON'::text) OR (public.geometrytype(gps_geometry) = 'POINT'::text)) OR (gps_geometry IS NULL))),
+    CONSTRAINT enforce_geotype_mapped_geometry CHECK ((((public.geometrytype(mapped_geometry) = 'POLYGON'::text) OR (public.geometrytype(mapped_geometry) = 'POINT'::text)) OR (mapped_geometry IS NULL))),
+    CONSTRAINT enforce_valid_gps_geometry CHECK (public.st_isvalid(gps_geometry)),
+    CONSTRAINT enforce_valid_mapped_geometry CHECK (public.st_isvalid(mapped_geometry))
+);
+
+
+ALTER TABLE opentenure.claim OWNER TO postgres;
+
+--
+-- Name: TABLE claim; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE claim IS 'Main table to store claim and claim challenge information submitted by the community recorders. SOLA Open Tenure extention.';
+
+
+--
+-- Name: COLUMN claim.id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.id IS 'Identifier for the claim.';
+
+
+--
+-- Name: COLUMN claim.nr; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.nr IS 'Auto generated claim number. Generated by the generate-claim-nr business rule when the claim record is initially saved.';
+
+
+--
+-- Name: COLUMN claim.lodgement_date; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.lodgement_date IS 'The lodgement date and time of the claim.';
+
+
+--
+-- Name: COLUMN claim.challenge_expiry_date; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.challenge_expiry_date IS 'Expiration date when challenge claim can be submitted.';
+
+
+--
+-- Name: COLUMN claim.decision_date; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.decision_date IS 'The decision date on the claim by the authority.';
+
+
+--
+-- Name: COLUMN claim.description; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.description IS 'Free description of the claim.';
+
+
+--
+-- Name: COLUMN claim.challenged_claim_id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.challenged_claim_id IS 'The identifier of the challenged claim. If this value is provided, it means the record is a claim challenge type.';
+
+
+--
+-- Name: COLUMN claim.claimant_id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.claimant_id IS 'The identifier of the claimant.';
+
+
+--
+-- Name: COLUMN claim.mapped_geometry; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.mapped_geometry IS 'Claimed property geometry calculated using system SRID';
+
+
+--
+-- Name: COLUMN claim.gps_geometry; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.gps_geometry IS 'Claimed property geometry in Lat/Long format';
+
+
+--
+-- Name: COLUMN claim.status_code; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.status_code IS 'The status of the claim.';
+
+
+--
+-- Name: COLUMN claim.recorder_name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.recorder_name IS 'User''s ID, who has created the claim.';
+
+
+--
+-- Name: COLUMN claim.rowidentifier; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.rowidentifier IS 'Identifies the all change records for the row in the claim_historic table.';
+
+
+--
+-- Name: COLUMN claim.rowversion; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.rowversion IS 'Sequential value indicating the number of times this row has been modified.';
+
+
+--
+-- Name: COLUMN claim.change_action; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.change_action IS 'Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
+
+
+--
+-- Name: COLUMN claim.change_user; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.change_user IS 'The user id of the last person to modify the row.';
+
+
+--
+-- Name: COLUMN claim.change_time; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.change_time IS 'The date and time the row was last modified.';
+
+
+--
+-- Name: COLUMN claim.type_code; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.type_code IS 'Type of claim (e.g. ownership, usufruct, occupation).';
+
+
+--
+-- Name: COLUMN claim.start_date; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.start_date IS 'Start date of right (occupation)';
+
+
+--
+-- Name: COLUMN claim.land_use_code; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.land_use_code IS 'Land use code';
+
+
+--
+-- Name: COLUMN claim.notes; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.notes IS 'Any note that could be usefully stored as part of the claim';
+
+
+--
+-- Name: COLUMN claim.north_adjacency; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.north_adjacency IS 'Optional information about adjacency on the north';
+
+
+--
+-- Name: COLUMN claim.south_adjacency; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.south_adjacency IS 'Optional information about adjacency on the south';
+
+
+--
+-- Name: COLUMN claim.east_adjacency; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.east_adjacency IS 'Optional information about adjacency on the east';
+
+
+--
+-- Name: COLUMN claim.west_adjacency; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.west_adjacency IS 'Optional information about adjacency on the west';
+
+
+--
+-- Name: COLUMN claim.assignee_name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.assignee_name IS 'User name who is assigned to work with claim';
+
+
+--
+-- Name: COLUMN claim.rejection_reason_code; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.rejection_reason_code IS 'Rejection reason code.';
+
+
+--
+-- Name: COLUMN claim.claim_area; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim.claim_area IS 'Claim area in square meters.';
+
+
+--
+-- Name: claim_comment; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE claim_comment (
+    id character varying(40) NOT NULL,
+    claim_id character varying(40) NOT NULL,
+    comment character varying(500) NOT NULL,
+    comment_user character varying(50) NOT NULL,
+    creation_time timestamp without time zone DEFAULT now() NOT NULL,
+    rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
+    change_user character varying(50),
+    change_time timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE opentenure.claim_comment OWNER TO postgres;
+
+--
+-- Name: COLUMN claim_comment.id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_comment.id IS 'Identifier for the claim comment.';
+
+
+--
+-- Name: COLUMN claim_comment.claim_id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_comment.claim_id IS 'Identifier for the claim.';
+
+
+--
+-- Name: COLUMN claim_comment.comment; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_comment.comment IS 'Comment text.';
+
+
+--
+-- Name: COLUMN claim_comment.comment_user; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_comment.comment_user IS 'The user id who has created comment.';
+
+
+--
+-- Name: COLUMN claim_comment.creation_time; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_comment.creation_time IS 'The date and time when comment was created.';
+
+
+--
+-- Name: COLUMN claim_comment.rowidentifier; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_comment.rowidentifier IS 'Identifies the all change records for the row in the claim_historic table.';
+
+
+--
+-- Name: COLUMN claim_comment.rowversion; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_comment.rowversion IS 'Sequential value indicating the number of times this row has been modified.';
+
+
+--
+-- Name: COLUMN claim_comment.change_action; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_comment.change_action IS 'Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
+
+
+--
+-- Name: COLUMN claim_comment.change_user; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_comment.change_user IS 'The user id of the last person to modify the row.';
+
+
+--
+-- Name: COLUMN claim_comment.change_time; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_comment.change_time IS 'The date and time the row was last modified.';
+
+
+--
+-- Name: claim_comment_historic; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE claim_comment_historic (
+    id character varying(40),
+    claim_id character varying(40),
+    comment character varying(500),
+    comment_user character varying(50),
+    creation_time timestamp without time zone,
+    rowidentifier character varying(40),
+    rowversion integer,
+    change_action character(1),
+    change_user character varying(50),
+    change_time timestamp without time zone,
+    change_time_valid_until timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE opentenure.claim_comment_historic OWNER TO postgres;
+
+--
+-- Name: claim_historic; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE claim_historic (
+    id character varying(40),
+    nr character varying(15),
+    lodgement_date timestamp without time zone,
+    challenge_expiry_date timestamp without time zone,
+    decision_date timestamp without time zone,
+    description character varying(250),
+    challenged_claim_id character varying(40),
+    claimant_id character varying(40),
+    mapped_geometry public.geometry,
+    gps_geometry public.geometry,
+    status_code character varying(20),
+    recorder_name character varying(50),
+    rowidentifier character varying(40),
+    rowversion integer,
+    change_action character(1),
+    change_user character varying(50),
+    change_time timestamp without time zone,
+    change_time_valid_until timestamp without time zone DEFAULT now() NOT NULL,
+    type_code character varying(20),
+    notes character varying(1000),
+    start_date date,
+    north_adjacency character varying(500),
+    south_adjacency character varying(500),
+    east_adjacency character varying(500),
+    west_adjacency character varying(500),
+    assignee_name character varying(50),
+    land_use_code character varying(20),
+    rejection_reason_code character varying(20),
+    claim_area bigint
+);
+
+
+ALTER TABLE opentenure.claim_historic OWNER TO postgres;
+
+--
+-- Name: TABLE claim_historic; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE claim_historic IS 'Historic table for the main table with claims opentenure.claim. Keeps all changes done to the main table.';
+
+
+--
+-- Name: claim_location; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE claim_location (
+    id character varying(40) NOT NULL,
+    claim_id character varying(40) NOT NULL,
+    mapped_location public.geometry NOT NULL,
+    gps_location public.geometry,
+    description character varying(500),
+    rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
+    change_user character varying(50),
+    change_time timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT enforce_geotype_gps_location CHECK ((((public.geometrytype(gps_location) = 'POLYGON'::text) OR (public.geometrytype(gps_location) = 'POINT'::text)) OR (gps_location IS NULL))),
+    CONSTRAINT enforce_geotype_mapped_location CHECK (((public.geometrytype(mapped_location) = 'POLYGON'::text) OR (public.geometrytype(mapped_location) = 'POINT'::text))),
+    CONSTRAINT enforce_valid_gps_location CHECK (public.st_isvalid(gps_location)),
+    CONSTRAINT enforce_valid_mapped_location CHECK (public.st_isvalid(mapped_location))
+);
+
+
+ALTER TABLE opentenure.claim_location OWNER TO postgres;
+
+--
+-- Name: COLUMN claim_location.id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_location.id IS 'Identifier for the claim location.';
+
+
+--
+-- Name: COLUMN claim_location.claim_id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_location.claim_id IS 'Identifier for the claim.';
+
+
+--
+-- Name: COLUMN claim_location.mapped_location; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_location.mapped_location IS 'Additional claim location geometry.';
+
+
+--
+-- Name: COLUMN claim_location.gps_location; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_location.gps_location IS 'Additional claim location geometry in Lat/Long format.';
+
+
+--
+-- Name: COLUMN claim_location.description; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_location.description IS 'Claim location description.';
+
+
+--
+-- Name: COLUMN claim_location.rowidentifier; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_location.rowidentifier IS 'Identifies the all change records for the row in the claim_historic table.';
+
+
+--
+-- Name: COLUMN claim_location.rowversion; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_location.rowversion IS 'Sequential value indicating the number of times this row has been modified.';
+
+
+--
+-- Name: COLUMN claim_location.change_action; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_location.change_action IS 'Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
+
+
+--
+-- Name: COLUMN claim_location.change_user; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_location.change_user IS 'The user id of the last person to modify the row.';
+
+
+--
+-- Name: COLUMN claim_location.change_time; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_location.change_time IS 'The date and time the row was last modified.';
+
+
+--
+-- Name: claim_location_historic; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE claim_location_historic (
+    id character varying(40),
+    claim_id character varying(40),
+    mapped_location public.geometry,
+    gps_location public.geometry,
+    description character varying(500),
+    rowidentifier character varying(40),
+    rowversion integer NOT NULL,
+    change_action character(1),
+    change_user character varying(50),
+    change_time timestamp without time zone,
+    change_time_valid_until timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE opentenure.claim_location_historic OWNER TO postgres;
+
+--
+-- Name: claim_nr_seq; Type: SEQUENCE; Schema: opentenure; Owner: postgres
+--
+
+CREATE SEQUENCE claim_nr_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    MAXVALUE 9999
+    CACHE 1
+    CYCLE;
+
+
+ALTER TABLE opentenure.claim_nr_seq OWNER TO postgres;
+
+--
+-- Name: SEQUENCE claim_nr_seq; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON SEQUENCE claim_nr_seq IS 'Sequence number used as the basis for the claim nr field. This sequence is used by the generate-claim-nr business rule.';
+
+
+--
+-- Name: claim_share; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE claim_share (
+    id character varying(40) NOT NULL,
+    claim_id character varying(40) NOT NULL,
+    nominator smallint,
+    denominator smallint,
+    rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
+    change_user character varying(50),
+    change_time timestamp without time zone DEFAULT now() NOT NULL,
+    percentage double precision
+);
+
+
+ALTER TABLE opentenure.claim_share OWNER TO postgres;
+
+--
+-- Name: TABLE claim_share; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE claim_share IS 'Identifies the share a party has in a claim.';
+
+
+--
+-- Name: COLUMN claim_share.id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_share.id IS 'Identifier for the claim share.';
+
+
+--
+-- Name: COLUMN claim_share.claim_id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_share.claim_id IS 'Identifier of the claim the share is assocaited with.';
+
+
+--
+-- Name: COLUMN claim_share.nominator; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_share.nominator IS 'Nominiator part of the share (i.e. top number of fraction)';
+
+
+--
+-- Name: COLUMN claim_share.denominator; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_share.denominator IS 'Denominator part of the share (i.e. bottom number of fraction)';
+
+
+--
+-- Name: COLUMN claim_share.rowidentifier; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_share.rowidentifier IS 'Identifies the all change records for the row in the claim_share_historic table';
+
+
+--
+-- Name: COLUMN claim_share.rowversion; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_share.rowversion IS 'Sequential value indicating the number of times this row has been modified.';
+
+
+--
+-- Name: COLUMN claim_share.change_action; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_share.change_action IS 'Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
+
+
+--
+-- Name: COLUMN claim_share.change_user; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_share.change_user IS 'The user id of the last person to modify the row.';
+
+
+--
+-- Name: COLUMN claim_share.change_time; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_share.change_time IS 'The date and time the row was last modified.';
+
+
+--
+-- Name: COLUMN claim_share.percentage; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_share.percentage IS 'Percentage of the share. Another form of nominator/denominator presentation.';
+
+
+--
+-- Name: claim_share_historic; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE claim_share_historic (
+    id character varying(40),
+    claim_id character varying(40),
+    nominator smallint,
+    denominator smallint,
+    rowidentifier character varying(40),
+    rowversion integer,
+    change_action character(1),
+    change_user character varying(50),
+    change_time timestamp without time zone,
+    change_time_valid_until timestamp without time zone DEFAULT now() NOT NULL,
+    percentage double precision
+);
+
+
+ALTER TABLE opentenure.claim_share_historic OWNER TO postgres;
+
+--
+-- Name: claim_status; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE claim_status (
+    code character varying(20) NOT NULL,
+    display_value character varying(500) NOT NULL,
+    status character(1) DEFAULT 't'::bpchar NOT NULL,
+    description character varying(1000)
+);
+
+
+ALTER TABLE opentenure.claim_status OWNER TO postgres;
+
+--
+-- Name: TABLE claim_status; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE claim_status IS 'Code list of claim status.';
+
+
+--
+-- Name: COLUMN claim_status.code; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_status.code IS 'The code for the claim status.';
+
+
+--
+-- Name: COLUMN claim_status.display_value; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_status.display_value IS 'Displayed value of the claim status.';
+
+
+--
+-- Name: COLUMN claim_status.status; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_status.status IS 'Status of the service claim.';
+
+
+--
+-- Name: COLUMN claim_status.description; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_status.description IS 'Description of the claim status.';
+
+
+--
+-- Name: claim_uses_attachment; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE claim_uses_attachment (
+    claim_id character varying(40) NOT NULL,
+    attachment_id character varying(40) NOT NULL,
+    rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
+    change_user character varying(50),
+    change_time timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE opentenure.claim_uses_attachment OWNER TO postgres;
+
+--
+-- Name: TABLE claim_uses_attachment; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE claim_uses_attachment IS 'Links the claim to the attachment submitted with the claim. SOLA Open Tenure extension.';
+
+
+--
+-- Name: COLUMN claim_uses_attachment.claim_id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_uses_attachment.claim_id IS 'Identifier for the claim the record is associated to.';
+
+
+--
+-- Name: COLUMN claim_uses_attachment.attachment_id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_uses_attachment.attachment_id IS 'Identifier of the attachment associated to the claim.';
+
+
+--
+-- Name: COLUMN claim_uses_attachment.rowidentifier; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_uses_attachment.rowidentifier IS 'Unique row identifier.';
+
+
+--
+-- Name: COLUMN claim_uses_attachment.rowversion; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_uses_attachment.rowversion IS 'Sequential value indicating the number of times this row has been modified.';
+
+
+--
+-- Name: COLUMN claim_uses_attachment.change_action; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_uses_attachment.change_action IS 'Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
+
+
+--
+-- Name: COLUMN claim_uses_attachment.change_user; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_uses_attachment.change_user IS 'The user id of the last person to modify the row.';
+
+
+--
+-- Name: COLUMN claim_uses_attachment.change_time; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN claim_uses_attachment.change_time IS 'The date and time the row was last modified.';
+
+
+--
+-- Name: claim_uses_attachment_historic; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE claim_uses_attachment_historic (
+    claim_id character varying(40),
+    attachment_id character varying(40),
+    rowidentifier character varying(40),
+    rowversion integer NOT NULL,
+    change_action character(1),
+    change_user character varying(50),
+    change_time timestamp without time zone,
+    change_time_valid_until timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE opentenure.claim_uses_attachment_historic OWNER TO postgres;
+
+--
+-- Name: TABLE claim_uses_attachment_historic; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE claim_uses_attachment_historic IS 'Historic table for opentenure.claim_uses_attachment. Keeps all changes done to the main table.';
+
+
+--
+-- Name: field_constraint; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE field_constraint (
+    id character varying(40) NOT NULL,
+    name character varying(255) NOT NULL,
+    display_name character varying(255) NOT NULL,
+    error_msg character varying(255) NOT NULL,
+    format character varying(255),
+    min_value numeric(20,10),
+    max_value numeric(20,10),
+    field_constraint_type character varying(255) NOT NULL,
+    field_template_id character varying(40) NOT NULL,
+    rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
+    change_user character varying(50),
+    change_time timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE opentenure.field_constraint OWNER TO postgres;
+
+--
+-- Name: TABLE field_constraint; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE field_constraint IS 'Dynamic form field constraint.';
+
+
+--
+-- Name: COLUMN field_constraint.id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_constraint.id IS 'Primary key.';
+
+
+--
+-- Name: COLUMN field_constraint.name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_constraint.name IS 'Field name to be used as UI component name.';
+
+
+--
+-- Name: COLUMN field_constraint.display_name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_constraint.display_name IS 'Value to be used as a visible text (header) of UI component.';
+
+
+--
+-- Name: COLUMN field_constraint.error_msg; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_constraint.error_msg IS 'Error message to display in case of constraint violation.';
+
+
+--
+-- Name: COLUMN field_constraint.format; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_constraint.format IS 'Regular expression, used to check field value';
+
+
+--
+-- Name: COLUMN field_constraint.min_value; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_constraint.min_value IS 'Minimum field value, used in range constraint.';
+
+
+--
+-- Name: COLUMN field_constraint.max_value; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_constraint.max_value IS 'Maximum field value, used in range constraint.';
+
+
+--
+-- Name: COLUMN field_constraint.field_constraint_type; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_constraint.field_constraint_type IS 'Type of constraint.';
+
+
+--
+-- Name: COLUMN field_constraint.field_template_id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_constraint.field_template_id IS 'Field template id, which constraint relates to.';
+
+
+--
+-- Name: field_constraint_historic; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE field_constraint_historic (
+    id character varying(40),
+    name character varying(255),
+    display_name character varying(255),
+    error_msg character varying(255),
+    format character varying(255),
+    min_value numeric(20,10),
+    max_value numeric(20,10),
+    field_constraint_type character varying(255),
+    field_template_id character varying(40),
+    rowidentifier character varying(40),
+    rowversion integer,
+    change_action character(1),
+    change_user character varying(50),
+    change_time timestamp without time zone,
+    change_time_valid_until timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE opentenure.field_constraint_historic OWNER TO postgres;
+
+--
+-- Name: field_constraint_option; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE field_constraint_option (
+    id character varying(40) NOT NULL,
+    name character varying(255) NOT NULL,
+    display_name character varying(255) NOT NULL,
+    field_constraint_id character varying(40) NOT NULL,
+    rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
+    change_user character varying(50),
+    change_time timestamp without time zone DEFAULT now() NOT NULL,
+    item_order integer DEFAULT 1 NOT NULL
+);
+
+
+ALTER TABLE opentenure.field_constraint_option OWNER TO postgres;
+
+--
+-- Name: TABLE field_constraint_option; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE field_constraint_option IS 'Dynamic form field constraint option, used to limit field values.';
+
+
+--
+-- Name: COLUMN field_constraint_option.id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_constraint_option.id IS 'Primary key.';
+
+
+--
+-- Name: COLUMN field_constraint_option.name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_constraint_option.name IS 'Field name to be used as UI component name.';
+
+
+--
+-- Name: COLUMN field_constraint_option.display_name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_constraint_option.display_name IS 'Value to be used as a visible text of UI component.';
+
+
+--
+-- Name: COLUMN field_constraint_option.field_constraint_id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_constraint_option.field_constraint_id IS 'Field constraint ID.';
+
+
+--
+-- Name: COLUMN field_constraint_option.rowidentifier; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_constraint_option.rowidentifier IS 'Identifies the all change records for the row in the form historic table.';
+
+
+--
+-- Name: COLUMN field_constraint_option.rowversion; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_constraint_option.rowversion IS 'Sequential value indicating the number of times this row has been modified.';
+
+
+--
+-- Name: COLUMN field_constraint_option.change_action; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_constraint_option.change_action IS 'Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
+
+
+--
+-- Name: COLUMN field_constraint_option.change_user; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_constraint_option.change_user IS 'The user id of the last person to modify the row.';
+
+
+--
+-- Name: COLUMN field_constraint_option.change_time; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_constraint_option.change_time IS 'The date and time the row was last modified.';
+
+
+--
+-- Name: COLUMN field_constraint_option.item_order; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_constraint_option.item_order IS 'Field constraint option ordering number.';
+
+
+--
+-- Name: field_constraint_option_historic; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE field_constraint_option_historic (
+    id character varying(40),
+    name character varying(255),
+    display_name character varying(255),
+    field_constraint_id character varying(40),
+    rowidentifier character varying(40),
+    rowversion integer,
+    change_action character(1),
+    change_user character varying(50),
+    change_time timestamp without time zone,
+    change_time_valid_until timestamp without time zone DEFAULT now() NOT NULL,
+    item_order integer
+);
+
+
+ALTER TABLE opentenure.field_constraint_option_historic OWNER TO postgres;
+
+--
+-- Name: field_constraint_type; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE field_constraint_type (
+    code character varying(255) NOT NULL,
+    display_value character varying(500) NOT NULL,
+    status character(1) DEFAULT 'c'::bpchar NOT NULL,
+    description character varying(1000)
+);
+
+
+ALTER TABLE opentenure.field_constraint_type OWNER TO postgres;
+
+--
+-- Name: TABLE field_constraint_type; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE field_constraint_type IS 'Reference table for the field constraint types, used in dynamic forms.';
+
+
+--
+-- Name: COLUMN field_constraint_type.code; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_constraint_type.code IS 'The code for the constraint type.';
+
+
+--
+-- Name: COLUMN field_constraint_type.display_value; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_constraint_type.display_value IS 'Displayed value of the constraint type.';
+
+
+--
+-- Name: COLUMN field_constraint_type.status; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_constraint_type.status IS 'Status of the constraint type.';
+
+
+--
+-- Name: COLUMN field_constraint_type.description; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_constraint_type.description IS 'Description of the constraint type.';
+
+
+--
+-- Name: field_payload; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE field_payload (
+    id character varying(40) NOT NULL,
+    name character varying(255) NOT NULL,
+    display_name character varying(255) NOT NULL,
+    field_type character varying(255) NOT NULL,
+    section_element_payload_id character varying(40) NOT NULL,
+    string_payload character varying(2048),
+    big_decimal_payload numeric(20,10),
+    boolean_payload boolean,
+    field_value_type character varying(255) NOT NULL,
+    rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
+    change_user character varying(50),
+    change_time timestamp without time zone DEFAULT now() NOT NULL,
+    item_order integer DEFAULT 1 NOT NULL
+);
+
+
+ALTER TABLE opentenure.field_payload OWNER TO postgres;
+
+--
+-- Name: TABLE field_payload; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE field_payload IS 'Dynamic form field payload.';
+
+
+--
+-- Name: COLUMN field_payload.id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_payload.id IS 'Primary key.';
+
+
+--
+-- Name: COLUMN field_payload.name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_payload.name IS 'Field name to be used as UI component name.';
+
+
+--
+-- Name: COLUMN field_payload.display_name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_payload.display_name IS 'Value to be used as a visible text of UI component.';
+
+
+--
+-- Name: COLUMN field_payload.field_type; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_payload.field_type IS 'Field type code.';
+
+
+--
+-- Name: COLUMN field_payload.section_element_payload_id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_payload.section_element_payload_id IS 'Section element id.';
+
+
+--
+-- Name: COLUMN field_payload.string_payload; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_payload.string_payload IS 'String field value.';
+
+
+--
+-- Name: COLUMN field_payload.big_decimal_payload; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_payload.big_decimal_payload IS 'Decimal or integer field value.';
+
+
+--
+-- Name: COLUMN field_payload.boolean_payload; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_payload.boolean_payload IS 'Boolean field value.';
+
+
+--
+-- Name: COLUMN field_payload.rowidentifier; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_payload.rowidentifier IS 'Identifies the all change records for the row in the form historic table.';
+
+
+--
+-- Name: COLUMN field_payload.rowversion; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_payload.rowversion IS 'Sequential value indicating the number of times this row has been modified.';
+
+
+--
+-- Name: COLUMN field_payload.change_action; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_payload.change_action IS 'Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
+
+
+--
+-- Name: COLUMN field_payload.change_user; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_payload.change_user IS 'The user id of the last person to modify the row.';
+
+
+--
+-- Name: COLUMN field_payload.change_time; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_payload.change_time IS 'The date and time the row was last modified.';
+
+
+--
+-- Name: COLUMN field_payload.item_order; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_payload.item_order IS 'Field ordering number.';
+
+
+--
+-- Name: field_payload_historic; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE field_payload_historic (
+    id character varying(40),
+    name character varying(255),
+    display_name character varying(255),
+    field_type character varying(255),
+    section_element_payload_id character varying(40),
+    string_payload character varying(2048),
+    big_decimal_payload numeric(20,10),
+    boolean_payload boolean,
+    field_value_type character varying(255),
+    rowidentifier character varying(40),
+    rowversion integer,
+    change_action character(1),
+    change_user character varying(50),
+    change_time timestamp without time zone,
+    change_time_valid_until timestamp without time zone DEFAULT now() NOT NULL,
+    item_order integer
+);
+
+
+ALTER TABLE opentenure.field_payload_historic OWNER TO postgres;
+
+--
+-- Name: field_template; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE field_template (
+    id character varying(40) NOT NULL,
+    name character varying(255) NOT NULL,
+    display_name character varying(255) NOT NULL,
+    hint character varying(255),
+    field_type character varying(255) NOT NULL,
+    section_template_id character varying(40) NOT NULL,
+    rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
+    change_user character varying(50),
+    change_time timestamp without time zone DEFAULT now() NOT NULL,
+    item_order integer DEFAULT 1 NOT NULL
+);
+
+
+ALTER TABLE opentenure.field_template OWNER TO postgres;
+
+--
+-- Name: TABLE field_template; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE field_template IS 'Dynamic form field template.';
+
+
+--
+-- Name: COLUMN field_template.id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_template.id IS 'Primary key.';
+
+
+--
+-- Name: COLUMN field_template.name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_template.name IS 'Field name to be used as UI component name.';
+
+
+--
+-- Name: COLUMN field_template.display_name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_template.display_name IS 'Value to be used as a visible text (header) of UI component.';
+
+
+--
+-- Name: COLUMN field_template.hint; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_template.hint IS 'Field hint to be used for UI component.';
+
+
+--
+-- Name: COLUMN field_template.field_type; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_template.field_type IS 'Field type code.';
+
+
+--
+-- Name: COLUMN field_template.section_template_id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_template.section_template_id IS 'Section template ID.';
+
+
+--
+-- Name: COLUMN field_template.rowidentifier; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_template.rowidentifier IS 'Identifies the all change records for the row in the form historic table.';
+
+
+--
+-- Name: COLUMN field_template.rowversion; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_template.rowversion IS 'Sequential value indicating the number of times this row has been modified.';
+
+
+--
+-- Name: COLUMN field_template.change_action; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_template.change_action IS 'Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
+
+
+--
+-- Name: COLUMN field_template.change_user; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_template.change_user IS 'The user id of the last person to modify the row.';
+
+
+--
+-- Name: COLUMN field_template.change_time; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_template.change_time IS 'The date and time the row was last modified.';
+
+
+--
+-- Name: COLUMN field_template.item_order; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_template.item_order IS 'Field ordering number.';
+
+
+--
+-- Name: field_template_historic; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE field_template_historic (
+    id character varying(40),
+    name character varying(255),
+    display_name character varying(255),
+    hint character varying(255),
+    field_type character varying(255),
+    section_template_id character varying(40),
+    rowidentifier character varying(40),
+    rowversion integer,
+    change_action character(1),
+    change_user character varying(50),
+    change_time timestamp without time zone,
+    change_time_valid_until timestamp without time zone DEFAULT now() NOT NULL,
+    item_order integer
+);
+
+
+ALTER TABLE opentenure.field_template_historic OWNER TO postgres;
+
+--
+-- Name: field_type; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE field_type (
+    code character varying(255) NOT NULL,
+    display_value character varying(500) NOT NULL,
+    status character(1) DEFAULT 'c'::bpchar NOT NULL,
+    description character varying(1000)
+);
+
+
+ALTER TABLE opentenure.field_type OWNER TO postgres;
+
+--
+-- Name: TABLE field_type; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE field_type IS 'Reference table for the field types, used in dynamic forms.';
+
+
+--
+-- Name: COLUMN field_type.code; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_type.code IS 'The code for the field type.';
+
+
+--
+-- Name: COLUMN field_type.display_value; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_type.display_value IS 'Displayed value of the field type.';
+
+
+--
+-- Name: COLUMN field_type.status; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_type.status IS 'Status of the field type.';
+
+
+--
+-- Name: COLUMN field_type.description; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_type.description IS 'Description of the field type.';
+
+
+--
+-- Name: field_value_type; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE field_value_type (
+    code character varying(255) NOT NULL,
+    display_value character varying(500) NOT NULL,
+    status character(1) DEFAULT 'c'::bpchar NOT NULL,
+    description character varying(1000)
+);
+
+
+ALTER TABLE opentenure.field_value_type OWNER TO postgres;
+
+--
+-- Name: TABLE field_value_type; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE field_value_type IS 'Reference table for the field value types, used in dynamic forms.';
+
+
+--
+-- Name: COLUMN field_value_type.code; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_value_type.code IS 'The code for the field value type.';
+
+
+--
+-- Name: COLUMN field_value_type.display_value; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_value_type.display_value IS 'Displayed value of the field value type.';
+
+
+--
+-- Name: COLUMN field_value_type.status; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_value_type.status IS 'Status of the field value type.';
+
+
+--
+-- Name: COLUMN field_value_type.description; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN field_value_type.description IS 'Description of the field value type.';
+
+
+--
+-- Name: form_payload; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE form_payload (
+    id character varying(40) NOT NULL,
+    claim_id character varying(40) NOT NULL,
+    form_template_name character varying(255) NOT NULL,
+    rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
+    change_user character varying(50),
+    change_time timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE opentenure.form_payload OWNER TO postgres;
+
+--
+-- Name: TABLE form_payload; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE form_payload IS 'Dynamic form payload.';
+
+
+--
+-- Name: COLUMN form_payload.id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN form_payload.id IS 'Primary key.';
+
+
+--
+-- Name: COLUMN form_payload.claim_id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN form_payload.claim_id IS 'Foreign key to the parent claim object.';
+
+
+--
+-- Name: COLUMN form_payload.form_template_name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN form_payload.form_template_name IS 'Foreign key to relevant dynamic form template.';
+
+
+--
+-- Name: COLUMN form_payload.rowidentifier; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN form_payload.rowidentifier IS 'Identifies the all change records for the row in the form historic table.';
+
+
+--
+-- Name: COLUMN form_payload.rowversion; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN form_payload.rowversion IS 'Sequential value indicating the number of times this row has been modified.';
+
+
+--
+-- Name: COLUMN form_payload.change_action; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN form_payload.change_action IS 'Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
+
+
+--
+-- Name: COLUMN form_payload.change_user; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN form_payload.change_user IS 'The user id of the last person to modify the row.';
+
+
+--
+-- Name: COLUMN form_payload.change_time; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN form_payload.change_time IS 'The date and time the row was last modified.';
+
+
+--
+-- Name: form_payload_historic; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE form_payload_historic (
+    id character varying(40),
+    claim_id character varying(40),
+    form_template_name character varying(255),
+    rowidentifier character varying(40),
+    rowversion integer,
+    change_action character(1),
+    change_user character varying(50),
+    change_time timestamp without time zone,
+    change_time_valid_until timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE opentenure.form_payload_historic OWNER TO postgres;
+
+--
+-- Name: form_template; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE form_template (
+    name character varying(255) NOT NULL,
+    display_name character varying(255) NOT NULL,
+    is_default boolean DEFAULT false NOT NULL,
+    rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
+    change_user character varying(50),
+    change_time timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE opentenure.form_template OWNER TO postgres;
+
+--
+-- Name: TABLE form_template; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE form_template IS 'Dynamic form template.';
+
+
+--
+-- Name: COLUMN form_template.display_name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN form_template.display_name IS 'Form name, which can be used for displaying on the UI.';
+
+
+--
+-- Name: COLUMN form_template.is_default; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN form_template.is_default IS 'Indicates whether form is default for all new claims.';
+
+
+--
+-- Name: COLUMN form_template.rowidentifier; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN form_template.rowidentifier IS 'Identifies the all change records for the row in the form historic table.';
+
+
+--
+-- Name: COLUMN form_template.rowversion; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN form_template.rowversion IS 'Sequential value indicating the number of times this row has been modified.';
+
+
+--
+-- Name: COLUMN form_template.change_action; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN form_template.change_action IS 'Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
+
+
+--
+-- Name: COLUMN form_template.change_user; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN form_template.change_user IS 'The user id of the last person to modify the row.';
+
+
+--
+-- Name: COLUMN form_template.change_time; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN form_template.change_time IS 'The date and time the row was last modified.';
+
+
+--
+-- Name: form_template_historic; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE form_template_historic (
+    name character varying(255),
+    display_name character varying(255),
+    is_default boolean,
+    rowidentifier character varying(40),
+    rowversion integer,
+    change_action character(1),
+    change_user character varying(50),
+    change_time timestamp without time zone,
+    change_time_valid_until timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE opentenure.form_template_historic OWNER TO postgres;
+
+--
+-- Name: party; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE party (
+    id character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    name character varying(255) NOT NULL,
+    last_name character varying(50),
+    id_type_code character varying(20),
+    id_number character varying(20),
+    birth_date date,
+    gender_code character varying(20),
+    mobile_phone character varying(15),
+    phone character varying(15),
+    email character varying(50),
+    address character varying(255),
+    user_name character varying(50) NOT NULL,
+    rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
+    change_user character varying(50),
+    change_time timestamp without time zone DEFAULT now() NOT NULL,
+    is_person boolean DEFAULT true NOT NULL
+);
+
+
+ALTER TABLE opentenure.party OWNER TO postgres;
+
+--
+-- Name: TABLE party; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE party IS 'Extension to the LADM used by SOLA to store party information (cliamant or owner).';
+
+
+--
+-- Name: COLUMN party.id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party.id IS 'Unique identifier for the party.';
+
+
+--
+-- Name: COLUMN party.name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party.name IS 'First name of party.';
+
+
+--
+-- Name: COLUMN party.last_name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party.last_name IS 'Last name of claimant.';
+
+
+--
+-- Name: COLUMN party.id_type_code; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party.id_type_code IS 'ID document type code';
+
+
+--
+-- Name: COLUMN party.id_number; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party.id_number IS 'ID document number.';
+
+
+--
+-- Name: COLUMN party.birth_date; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party.birth_date IS 'Date of birth of the party.';
+
+
+--
+-- Name: COLUMN party.gender_code; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party.gender_code IS 'Gender code of the party.';
+
+
+--
+-- Name: COLUMN party.mobile_phone; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party.mobile_phone IS 'Mobile phone number of the party.';
+
+
+--
+-- Name: COLUMN party.phone; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party.phone IS 'Landline phone number of the party.';
+
+
+--
+-- Name: COLUMN party.email; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party.email IS 'Email address of the party.';
+
+
+--
+-- Name: COLUMN party.address; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party.address IS 'Living address of the party.';
+
+
+--
+-- Name: COLUMN party.user_name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party.user_name IS 'User name who has created the record.';
+
+
+--
+-- Name: COLUMN party.rowidentifier; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party.rowidentifier IS 'Identifies the all change records for the row in the document_historic table';
+
+
+--
+-- Name: COLUMN party.rowversion; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party.rowversion IS 'Sequential value indicating the number of times this row has been modified.';
+
+
+--
+-- Name: COLUMN party.change_action; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party.change_action IS 'Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
+
+
+--
+-- Name: COLUMN party.change_user; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party.change_user IS 'The user id of the last person to modify the row.';
+
+
+--
+-- Name: COLUMN party.change_time; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party.change_time IS 'The date and time the row was last modified.';
+
+
+--
+-- Name: COLUMN party.is_person; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party.is_person IS 'Indicates if record is for individual or company (legal entity)';
+
+
+--
+-- Name: party_for_claim_share; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE party_for_claim_share (
+    party_id character varying(40) NOT NULL,
+    claim_share_id character varying(40) NOT NULL,
+    rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
+    change_user character varying(50),
+    change_time timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE opentenure.party_for_claim_share OWNER TO postgres;
+
+--
+-- Name: TABLE party_for_claim_share; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE party_for_claim_share IS 'Identifies parties involved in the claim share.';
+
+
+--
+-- Name: COLUMN party_for_claim_share.party_id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party_for_claim_share.party_id IS 'Identifier for the party.';
+
+
+--
+-- Name: COLUMN party_for_claim_share.claim_share_id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party_for_claim_share.claim_share_id IS 'Identifier of the claim share.';
+
+
+--
+-- Name: COLUMN party_for_claim_share.rowidentifier; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party_for_claim_share.rowidentifier IS 'Identifies the all change records for the row in the party_for_claim_share_historic table';
+
+
+--
+-- Name: COLUMN party_for_claim_share.rowversion; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party_for_claim_share.rowversion IS 'Sequential value indicating the number of times this row has been modified.';
+
+
+--
+-- Name: COLUMN party_for_claim_share.change_action; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party_for_claim_share.change_action IS 'Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
+
+
+--
+-- Name: COLUMN party_for_claim_share.change_user; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party_for_claim_share.change_user IS 'The user id of the last person to modify the row.';
+
+
+--
+-- Name: COLUMN party_for_claim_share.change_time; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN party_for_claim_share.change_time IS 'The date and time the row was last modified.';
+
+
+--
+-- Name: party_for_claim_share_historic; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE party_for_claim_share_historic (
+    party_id character varying(40),
+    claim_share_id character varying(40),
+    rowidentifier character varying(40),
+    rowversion integer,
+    change_action character(1),
+    change_user character varying(50),
+    change_time timestamp without time zone,
+    change_time_valid_until timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE opentenure.party_for_claim_share_historic OWNER TO postgres;
+
+--
+-- Name: party_historic; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE party_historic (
+    id character varying(40),
+    name character varying(255),
+    last_name character varying(50),
+    id_type_code character varying(20),
+    id_number character varying(20),
+    birth_date date,
+    gender_code character varying(20),
+    mobile_phone character varying(15),
+    phone character varying(15),
+    email character varying(50),
+    address character varying(255),
+    user_name character varying(50),
+    rowidentifier character varying(40),
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1),
+    change_user character varying(50),
+    change_time timestamp without time zone,
+    change_time_valid_until timestamp without time zone DEFAULT now() NOT NULL,
+    is_person boolean
+);
+
+
+ALTER TABLE opentenure.party_historic OWNER TO postgres;
+
+--
+-- Name: TABLE party_historic; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE party_historic IS 'Historic table for opentenure.party. Keeps all changes done to the main table.';
+
+
+--
+-- Name: rejection_reason; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE rejection_reason (
+    code character varying(20) NOT NULL,
+    display_value character varying(2000) NOT NULL,
+    status character(1) DEFAULT 't'::bpchar NOT NULL,
+    description character varying(1000)
+);
+
+
+ALTER TABLE opentenure.rejection_reason OWNER TO postgres;
+
+--
+-- Name: TABLE rejection_reason; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE rejection_reason IS 'Rejection reason codes';
+
+
+--
+-- Name: COLUMN rejection_reason.code; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN rejection_reason.code IS 'The code for the rejection reason.';
+
+
+--
+-- Name: COLUMN rejection_reason.display_value; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN rejection_reason.display_value IS 'Displayed value of the rejection reason.';
+
+
+--
+-- Name: COLUMN rejection_reason.status; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN rejection_reason.status IS 'Status of the rejection reason.';
+
+
+--
+-- Name: COLUMN rejection_reason.description; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN rejection_reason.description IS 'Description of the rejection reason.';
+
+
+--
+-- Name: section_element_payload; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE section_element_payload (
+    id character varying(40) NOT NULL,
+    section_payload_id character varying(40) NOT NULL,
+    rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
+    change_user character varying(50),
+    change_time timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE opentenure.section_element_payload OWNER TO postgres;
+
+--
+-- Name: TABLE section_element_payload; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE section_element_payload IS 'Dynamic form section element payload.';
+
+
+--
+-- Name: COLUMN section_element_payload.section_payload_id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_element_payload.section_payload_id IS 'Section payload ID.';
+
+
+--
+-- Name: COLUMN section_element_payload.rowidentifier; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_element_payload.rowidentifier IS 'Identifies the all change records for the row in the form historic table.';
+
+
+--
+-- Name: COLUMN section_element_payload.rowversion; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_element_payload.rowversion IS 'Sequential value indicating the number of times this row has been modified.';
+
+
+--
+-- Name: COLUMN section_element_payload.change_action; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_element_payload.change_action IS 'Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
+
+
+--
+-- Name: COLUMN section_element_payload.change_user; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_element_payload.change_user IS 'The user id of the last person to modify the row.';
+
+
+--
+-- Name: COLUMN section_element_payload.change_time; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_element_payload.change_time IS 'The date and time the row was last modified.';
+
+
+--
+-- Name: section_element_payload_historic; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE section_element_payload_historic (
+    id character varying(40),
+    section_payload_id character varying(40),
+    rowidentifier character varying(40),
+    rowversion integer,
+    change_action character(1),
+    change_user character varying(50),
+    change_time timestamp without time zone,
+    change_time_valid_until timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE opentenure.section_element_payload_historic OWNER TO postgres;
+
+--
+-- Name: section_payload; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE section_payload (
+    id character varying(40) NOT NULL,
+    name character varying(255) NOT NULL,
+    display_name character varying(255) NOT NULL,
+    element_name character varying(255) NOT NULL,
+    element_display_name character varying(255) NOT NULL,
+    min_occurrences integer NOT NULL,
+    max_occurrences integer NOT NULL,
+    form_payload_id character varying(40) NOT NULL,
+    rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
+    change_user character varying(50),
+    change_time timestamp without time zone DEFAULT now() NOT NULL,
+    item_order integer DEFAULT 1 NOT NULL
+);
+
+
+ALTER TABLE opentenure.section_payload OWNER TO postgres;
+
+--
+-- Name: TABLE section_payload; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE section_payload IS 'Dynamic form section payload.';
+
+
+--
+-- Name: COLUMN section_payload.id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_payload.id IS 'Primary key.';
+
+
+--
+-- Name: COLUMN section_payload.name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_payload.name IS 'Section name to be used as UI component name.';
+
+
+--
+-- Name: COLUMN section_payload.display_name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_payload.display_name IS 'Value to be used as a visible text (header) of UI component.';
+
+
+--
+-- Name: COLUMN section_payload.element_name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_payload.element_name IS 'Section element name to be used as UI component name.';
+
+
+--
+-- Name: COLUMN section_payload.element_display_name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_payload.element_display_name IS 'Text value to be used as a visible label of the section element UI component.';
+
+
+--
+-- Name: COLUMN section_payload.min_occurrences; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_payload.min_occurrences IS 'Minimum occurane of the section elements on the form.';
+
+
+--
+-- Name: COLUMN section_payload.max_occurrences; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_payload.max_occurrences IS 'Maximum occurane of the section elements on the form. If max > 1, UI will be shown as a table.';
+
+
+--
+-- Name: COLUMN section_payload.form_payload_id; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_payload.form_payload_id IS 'Foreign key reference to form payload.';
+
+
+--
+-- Name: COLUMN section_payload.rowidentifier; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_payload.rowidentifier IS 'Identifies the all change records for the row in the form historic table.';
+
+
+--
+-- Name: COLUMN section_payload.rowversion; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_payload.rowversion IS 'Sequential value indicating the number of times this row has been modified.';
+
+
+--
+-- Name: COLUMN section_payload.change_action; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_payload.change_action IS 'Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
+
+
+--
+-- Name: COLUMN section_payload.change_user; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_payload.change_user IS 'The user id of the last person to modify the row.';
+
+
+--
+-- Name: COLUMN section_payload.change_time; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_payload.change_time IS 'The date and time the row was last modified.';
+
+
+--
+-- Name: COLUMN section_payload.item_order; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_payload.item_order IS 'Section ordering number.';
+
+
+--
+-- Name: section_payload_historic; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE section_payload_historic (
+    id character varying(40),
+    name character varying(255),
+    display_name character varying(255),
+    element_name character varying(255),
+    element_display_name character varying(255),
+    min_occurrences integer,
+    max_occurrences integer,
+    form_payload_id character varying(40),
+    rowidentifier character varying(40),
+    rowversion integer,
+    change_action character(1),
+    change_user character varying(50),
+    change_time timestamp without time zone,
+    change_time_valid_until timestamp without time zone DEFAULT now() NOT NULL,
+    item_order integer
+);
+
+
+ALTER TABLE opentenure.section_payload_historic OWNER TO postgres;
+
+--
+-- Name: section_template; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE section_template (
+    id character varying(40) NOT NULL,
+    name character varying(255) NOT NULL,
+    display_name character varying(255) NOT NULL,
+    error_msg character varying(255) NOT NULL,
+    min_occurrences integer NOT NULL,
+    max_occurrences integer NOT NULL,
+    form_template_name character varying(255) NOT NULL,
+    element_name character varying(255) NOT NULL,
+    element_display_name character varying(255) NOT NULL,
+    rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
+    change_user character varying(50),
+    change_time timestamp without time zone DEFAULT now() NOT NULL,
+    item_order integer DEFAULT 1 NOT NULL
+);
+
+
+ALTER TABLE opentenure.section_template OWNER TO postgres;
+
+--
+-- Name: TABLE section_template; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON TABLE section_template IS 'Sections of dynamic form template.';
+
+
+--
+-- Name: COLUMN section_template.name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_template.name IS 'Section name to be used as UI component name.';
+
+
+--
+-- Name: COLUMN section_template.display_name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_template.display_name IS 'Value to be used as a visible text (header) of UI component.';
+
+
+--
+-- Name: COLUMN section_template.error_msg; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_template.error_msg IS 'Error message to show when min/max conditions are not met.';
+
+
+--
+-- Name: COLUMN section_template.min_occurrences; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_template.min_occurrences IS 'Minimum occurane of the section elements on the form.';
+
+
+--
+-- Name: COLUMN section_template.max_occurrences; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_template.max_occurrences IS 'Maximum occurane of the section elements on the form. If max > 1, UI will be shown as a table.';
+
+
+--
+-- Name: COLUMN section_template.form_template_name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_template.form_template_name IS 'Foreign key reference to form template.';
+
+
+--
+-- Name: COLUMN section_template.element_name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_template.element_name IS 'Section element name to be used as UI component name.';
+
+
+--
+-- Name: COLUMN section_template.element_display_name; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_template.element_display_name IS 'Text value to be used as a visible label of the section element UI component.';
+
+
+--
+-- Name: COLUMN section_template.rowidentifier; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_template.rowidentifier IS 'Identifies the all change records for the row in the form historic table.';
+
+
+--
+-- Name: COLUMN section_template.rowversion; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_template.rowversion IS 'Sequential value indicating the number of times this row has been modified.';
+
+
+--
+-- Name: COLUMN section_template.change_action; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_template.change_action IS 'Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
+
+
+--
+-- Name: COLUMN section_template.change_user; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_template.change_user IS 'The user id of the last person to modify the row.';
+
+
+--
+-- Name: COLUMN section_template.change_time; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_template.change_time IS 'The date and time the row was last modified.';
+
+
+--
+-- Name: COLUMN section_template.item_order; Type: COMMENT; Schema: opentenure; Owner: postgres
+--
+
+COMMENT ON COLUMN section_template.item_order IS 'Section ordering number.';
+
+
+--
+-- Name: section_template_historic; Type: TABLE; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE section_template_historic (
+    id character varying(40),
+    name character varying(255),
+    display_name character varying(255),
+    error_msg character varying(255),
+    min_occurrences integer,
+    max_occurrences integer,
+    form_template_name character varying(255),
+    element_name character varying(255),
+    element_display_name character varying(255),
+    rowidentifier character varying(40),
+    rowversion integer,
+    change_action character(1),
+    change_user character varying(50),
+    change_time timestamp without time zone,
+    change_time_valid_until timestamp without time zone DEFAULT now() NOT NULL,
+    item_order integer
+);
+
+
+ALTER TABLE opentenure.section_template_historic OWNER TO postgres;
+
 SET search_path = party, pg_catalog;
 
 --
@@ -10852,6 +14215,80 @@ COMMENT ON COLUMN gender_type.status IS 'Status of the gender type';
 --
 
 COMMENT ON COLUMN gender_type.description IS 'Description of the gender type.';
+
+
+--
+-- Name: group_party; Type: TABLE; Schema: party; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE group_party (
+    id character varying(40) NOT NULL,
+    type_code character varying(20) NOT NULL,
+    rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
+    change_user character varying(50),
+    change_time timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE party.group_party OWNER TO postgres;
+
+--
+-- Name: TABLE group_party; Type: COMMENT; Schema: party; Owner: postgres
+--
+
+COMMENT ON TABLE group_party IS 'Groups any number of parties into a distinct entity. Implementation of the LADM LA_GroupParty class. Not used by SOLA
+Tags: LADM Reference Object, Change History, Not Used';
+
+
+--
+-- Name: COLUMN group_party.id; Type: COMMENT; Schema: party; Owner: postgres
+--
+
+COMMENT ON COLUMN group_party.id IS 'LADM Definition: Identifier for the group party.';
+
+
+--
+-- Name: COLUMN group_party.type_code; Type: COMMENT; Schema: party; Owner: postgres
+--
+
+COMMENT ON COLUMN group_party.type_code IS 'LADM Definition: The type of the group party. E.g. family, tribe, association, etc.';
+
+
+--
+-- Name: COLUMN group_party.rowidentifier; Type: COMMENT; Schema: party; Owner: postgres
+--
+
+COMMENT ON COLUMN group_party.rowidentifier IS 'SOLA Extension: Identifies the all change records for the row in the group_party_historic table';
+
+
+--
+-- Name: COLUMN group_party.rowversion; Type: COMMENT; Schema: party; Owner: postgres
+--
+
+COMMENT ON COLUMN group_party.rowversion IS 'SOLA Extension: Sequential value indicating the number of times this row has been modified.';
+
+
+--
+-- Name: COLUMN group_party.change_action; Type: COMMENT; Schema: party; Owner: postgres
+--
+
+COMMENT ON COLUMN group_party.change_action IS 'SOLA Extension: Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
+
+
+--
+-- Name: COLUMN group_party.change_user; Type: COMMENT; Schema: party; Owner: postgres
+--
+
+COMMENT ON COLUMN group_party.change_user IS 'SOLA Extension: The user id of the last person to modify the row.';
+
+
+--
+-- Name: COLUMN group_party.change_time; Type: COMMENT; Schema: party; Owner: postgres
+--
+
+COMMENT ON COLUMN group_party.change_time IS 'SOLA Extension: The date and time the row was last modified.';
 
 
 --
@@ -11007,6 +14444,88 @@ CREATE TABLE party_historic (
 
 
 ALTER TABLE party.party_historic OWNER TO postgres;
+
+--
+-- Name: party_member; Type: TABLE; Schema: party; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE party_member (
+    party_id character varying(40) NOT NULL,
+    group_id character varying(40) NOT NULL,
+    share double precision,
+    rowidentifier character varying(40) DEFAULT public.uuid_generate_v1() NOT NULL,
+    rowversion integer DEFAULT 0 NOT NULL,
+    change_action character(1) DEFAULT 'i'::bpchar NOT NULL,
+    change_user character varying(50),
+    change_time timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE party.party_member OWNER TO postgres;
+
+--
+-- Name: TABLE party_member; Type: COMMENT; Schema: party; Owner: postgres
+--
+
+COMMENT ON TABLE party_member IS 'Identifies the parties belonging to a group party. Implementation of the LADM LA_PartyMember class. Not used by SOLA.
+Tags: LADM Reference Object, Change History, Not Used';
+
+
+--
+-- Name: COLUMN party_member.party_id; Type: COMMENT; Schema: party; Owner: postgres
+--
+
+COMMENT ON COLUMN party_member.party_id IS 'LADM Definition: Identifier for the party.';
+
+
+--
+-- Name: COLUMN party_member.group_id; Type: COMMENT; Schema: party; Owner: postgres
+--
+
+COMMENT ON COLUMN party_member.group_id IS 'LADM Definition: Identifier of the group party';
+
+
+--
+-- Name: COLUMN party_member.share; Type: COMMENT; Schema: party; Owner: postgres
+--
+
+COMMENT ON COLUMN party_member.share IS 'LADM Definition: The share of a RRR held by a party member expressed as a fraction with a numerator and a denominator.';
+
+
+--
+-- Name: COLUMN party_member.rowidentifier; Type: COMMENT; Schema: party; Owner: postgres
+--
+
+COMMENT ON COLUMN party_member.rowidentifier IS 'SOLA Extension: Identifies the all change records for the row in the party_member_historic table';
+
+
+--
+-- Name: COLUMN party_member.rowversion; Type: COMMENT; Schema: party; Owner: postgres
+--
+
+COMMENT ON COLUMN party_member.rowversion IS 'SOLA Extension: Sequential value indicating the number of times this row has been modified.';
+
+
+--
+-- Name: COLUMN party_member.change_action; Type: COMMENT; Schema: party; Owner: postgres
+--
+
+COMMENT ON COLUMN party_member.change_action IS 'SOLA Extension: Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
+
+
+--
+-- Name: COLUMN party_member.change_user; Type: COMMENT; Schema: party; Owner: postgres
+--
+
+COMMENT ON COLUMN party_member.change_user IS 'SOLA Extension: The user id of the last person to modify the row.';
+
+
+--
+-- Name: COLUMN party_member.change_time; Type: COMMENT; Schema: party; Owner: postgres
+--
+
+COMMENT ON COLUMN party_member.change_time IS 'SOLA Extension: The date and time the row was last modified.';
+
 
 --
 -- Name: party_member_historic; Type: TABLE; Schema: party; Owner: postgres; Tablespace: 
@@ -12388,56 +15907,6 @@ CREATE TABLE appuser_historic (
 ALTER TABLE system.appuser_historic OWNER TO postgres;
 
 --
--- Name: setting; Type: TABLE; Schema: system; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE setting (
-    name character varying(50) NOT NULL,
-    vl character varying(2000) NOT NULL,
-    active boolean DEFAULT true NOT NULL,
-    description character varying(555) NOT NULL
-);
-
-
-ALTER TABLE system.setting OWNER TO postgres;
-
---
--- Name: TABLE setting; Type: COMMENT; Schema: system; Owner: postgres
---
-
-COMMENT ON TABLE setting IS 'Contains global settings for the SOLA application. Refer to the Administration Guide or the ConfigConstants class in the Common Utilities project for a list of the recognized settings. Note that not all possible settings are listed in the settings table. Settings may be omitted from this table if the default value applies.
-Tags: FLOSS SOLA Extension, Reference Table, System Configuration';
-
-
---
--- Name: COLUMN setting.name; Type: COMMENT; Schema: system; Owner: postgres
---
-
-COMMENT ON COLUMN setting.name IS 'Identifier/name for the setting';
-
-
---
--- Name: COLUMN setting.vl; Type: COMMENT; Schema: system; Owner: postgres
---
-
-COMMENT ON COLUMN setting.vl IS 'The value for the setting.';
-
-
---
--- Name: COLUMN setting.active; Type: COMMENT; Schema: system; Owner: postgres
---
-
-COMMENT ON COLUMN setting.active IS 'Indicates if the setting is active or not. If not active, the default value for the setting will apply.';
-
-
---
--- Name: COLUMN setting.description; Type: COMMENT; Schema: system; Owner: postgres
---
-
-COMMENT ON COLUMN setting.description IS 'Description of the setting. ';
-
-
---
 -- Name: user_roles; Type: VIEW; Schema: system; Owner: postgres
 --
 
@@ -13255,19 +16724,6 @@ COMMENT ON COLUMN config_map_layer.use_in_public_display IS 'Flag to indicate if
 
 COMMENT ON COLUMN config_map_layer.use_for_ot IS 'Flag to indicate if the layer must be visible on open tenure map.';
 
-
---
--- Name: config_map_layer_metadata; Type: TABLE; Schema: system; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE config_map_layer_metadata (
-    name_layer character varying(50) NOT NULL,
-    name character varying(50) NOT NULL,
-    value character varying(100) NOT NULL
-);
-
-
-ALTER TABLE system.config_map_layer_metadata OWNER TO postgres;
 
 --
 -- Name: config_map_layer_type; Type: TABLE; Schema: system; Owner: postgres; Tablespace: 
@@ -14268,6 +17724,30 @@ ALTER TABLE ONLY ba_unit_contains_spatial_unit
 
 
 --
+-- Name: ba_unit_detail_pkey; Type: CONSTRAINT; Schema: administrative; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY ba_unit_detail
+    ADD CONSTRAINT ba_unit_detail_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: ba_unit_detail_type_display_value_unique; Type: CONSTRAINT; Schema: administrative; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY ba_unit_detail_type
+    ADD CONSTRAINT ba_unit_detail_type_display_value_unique UNIQUE (display_value);
+
+
+--
+-- Name: ba_unit_detail_type_pkey; Type: CONSTRAINT; Schema: administrative; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY ba_unit_detail_type
+    ADD CONSTRAINT ba_unit_detail_type_pkey PRIMARY KEY (code);
+
+
+--
 -- Name: ba_unit_pkey; Type: CONSTRAINT; Schema: administrative; Owner: postgres; Tablespace: 
 --
 
@@ -14369,7 +17849,6 @@ ALTER TABLE ONLY mortgage_type
 
 ALTER TABLE ONLY notation
     ADD CONSTRAINT notation_pkey PRIMARY KEY (id);
-
 
 
 --
@@ -14527,6 +18006,46 @@ ALTER TABLE ONLY application_uses_source
 
 
 --
+-- Name: notifiy_property_pkey; Type: CONSTRAINT; Schema: application; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY notify_property
+    ADD CONSTRAINT notifiy_property_pkey PRIMARY KEY (notify_id, ba_unit_id);
+
+
+--
+-- Name: notify_pkey; Type: CONSTRAINT; Schema: application; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY notify
+    ADD CONSTRAINT notify_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: notify_relationship_type_display_value_unique; Type: CONSTRAINT; Schema: application; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY notify_relationship_type
+    ADD CONSTRAINT notify_relationship_type_display_value_unique UNIQUE (display_value);
+
+
+--
+-- Name: notify_relationship_type_pkey; Type: CONSTRAINT; Schema: application; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY notify_relationship_type
+    ADD CONSTRAINT notify_relationship_type_pkey PRIMARY KEY (code);
+
+
+--
+-- Name: notify_uses_source_pkey; Type: CONSTRAINT; Schema: application; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY notify_uses_source
+    ADD CONSTRAINT notify_uses_source_pkey PRIMARY KEY (notify_id, source_id);
+
+
+--
 -- Name: request_category_type_display_value_unique; Type: CONSTRAINT; Schema: application; Owner: postgres; Tablespace: 
 --
 
@@ -14638,7 +18157,6 @@ ALTER TABLE ONLY type_action
     ADD CONSTRAINT type_action_pkey PRIMARY KEY (code);
 
 
-
 SET search_path = bulk_operation, pg_catalog;
 
 --
@@ -14647,9 +18165,8 @@ SET search_path = bulk_operation, pg_catalog;
 
 ALTER TABLE ONLY spatial_unit_temporary
     ADD CONSTRAINT spatial_unit_temporary_pkey PRIMARY KEY (id);
-
-
-
+	
+	
 
 SET search_path = cadastre, pg_catalog;
 
@@ -14981,6 +18498,240 @@ ALTER TABLE ONLY document_chunk
 
 ALTER TABLE ONLY document_chunk
     ADD CONSTRAINT start_unique_document_chunk UNIQUE (document_id, start_position);
+
+
+SET search_path = opentenure, pg_catalog;
+
+--
+-- Name: attachment_pkey; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY attachment
+    ADD CONSTRAINT attachment_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: claim_comment_pkey; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY claim_comment
+    ADD CONSTRAINT claim_comment_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: claim_location_pkey; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY claim_location
+    ADD CONSTRAINT claim_location_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: claim_pkey; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY claim
+    ADD CONSTRAINT claim_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: claim_share_pkey; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY claim_share
+    ADD CONSTRAINT claim_share_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: claim_status_display_value_unique; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY claim_status
+    ADD CONSTRAINT claim_status_display_value_unique UNIQUE (display_value);
+
+
+--
+-- Name: claim_status_pkey; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY claim_status
+    ADD CONSTRAINT claim_status_pkey PRIMARY KEY (code);
+
+
+--
+-- Name: claim_uses_attachment_pkey; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY claim_uses_attachment
+    ADD CONSTRAINT claim_uses_attachment_pkey PRIMARY KEY (claim_id, attachment_id);
+
+
+--
+-- Name: claimant_pkey; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY party
+    ADD CONSTRAINT claimant_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_constraint_option_pkey; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY field_constraint_option
+    ADD CONSTRAINT field_constraint_option_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_constraint_pkey; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY field_constraint
+    ADD CONSTRAINT field_constraint_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_constraint_type_display_value_unique; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY field_constraint_type
+    ADD CONSTRAINT field_constraint_type_display_value_unique UNIQUE (display_value);
+
+
+--
+-- Name: field_constraint_type_pkey; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY field_constraint_type
+    ADD CONSTRAINT field_constraint_type_pkey PRIMARY KEY (code);
+
+
+--
+-- Name: field_payload_pkey; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY field_payload
+    ADD CONSTRAINT field_payload_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_template_pkey; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY field_template
+    ADD CONSTRAINT field_template_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: field_type_display_value_unique; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY field_type
+    ADD CONSTRAINT field_type_display_value_unique UNIQUE (display_value);
+
+
+--
+-- Name: field_type_pkey; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY field_type
+    ADD CONSTRAINT field_type_pkey PRIMARY KEY (code);
+
+
+--
+-- Name: field_value_type_display_value_unique; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY field_value_type
+    ADD CONSTRAINT field_value_type_display_value_unique UNIQUE (display_value);
+
+
+--
+-- Name: field_value_type_pkey; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY field_value_type
+    ADD CONSTRAINT field_value_type_pkey PRIMARY KEY (code);
+
+
+--
+-- Name: form_payload_pkey; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY form_payload
+    ADD CONSTRAINT form_payload_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: form_template_pkey; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY form_template
+    ADD CONSTRAINT form_template_pkey PRIMARY KEY (name);
+
+
+--
+-- Name: id_pkey_document_chunk; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY attachment_chunk
+    ADD CONSTRAINT id_pkey_document_chunk PRIMARY KEY (id);
+
+
+--
+-- Name: party_for_claim_share_pkey; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY party_for_claim_share
+    ADD CONSTRAINT party_for_claim_share_pkey PRIMARY KEY (party_id, claim_share_id);
+
+
+--
+-- Name: rejection_reason_display_value_unique; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY rejection_reason
+    ADD CONSTRAINT rejection_reason_display_value_unique UNIQUE (display_value);
+
+
+--
+-- Name: rejection_reason_pkey; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY rejection_reason
+    ADD CONSTRAINT rejection_reason_pkey PRIMARY KEY (code);
+
+
+--
+-- Name: section_element_payload_pkey; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY section_element_payload
+    ADD CONSTRAINT section_element_payload_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: section_payload_pkey; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY section_payload
+    ADD CONSTRAINT section_payload_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: section_template_pkey; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY section_template
+    ADD CONSTRAINT section_template_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: start_unique_document_chunk; Type: CONSTRAINT; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY attachment_chunk
+    ADD CONSTRAINT start_unique_document_chunk UNIQUE (attachment_id, start_position);
 
 
 SET search_path = party, pg_catalog;
@@ -15759,6 +19510,34 @@ CREATE INDEX ba_unit_contains_spatial_unit_spatial_unit_id_fk70_ind ON ba_unit_c
 
 
 --
+-- Name: ba_unit_detail_ba_unit_id_fk86_ind; Type: INDEX; Schema: administrative; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX ba_unit_detail_ba_unit_id_fk86_ind ON ba_unit_detail USING btree (ba_unit_id);
+
+
+--
+-- Name: ba_unit_detail_detail_code_fk85_ind; Type: INDEX; Schema: administrative; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX ba_unit_detail_detail_code_fk85_ind ON ba_unit_detail USING btree (detail_code);
+
+
+--
+-- Name: ba_unit_detail_historic_index_on_rowidentifier; Type: INDEX; Schema: administrative; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX ba_unit_detail_historic_index_on_rowidentifier ON ba_unit_detail_historic USING btree (rowidentifier);
+
+
+--
+-- Name: ba_unit_detail_index_on_rowidentifier; Type: INDEX; Schema: administrative; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX ba_unit_detail_index_on_rowidentifier ON ba_unit_detail USING btree (rowidentifier);
+
+
+--
 -- Name: ba_unit_historic_index_on_rowidentifier; Type: INDEX; Schema: administrative; Owner: postgres; Tablespace: 
 --
 
@@ -16304,6 +20083,90 @@ CREATE INDEX application_uses_source_index_on_rowidentifier ON application_uses_
 --
 
 CREATE INDEX application_uses_source_source_id_fk127_ind ON application_uses_source USING btree (source_id);
+
+
+--
+-- Name: notify_historic_index_on_rowidentifier; Type: INDEX; Schema: application; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX notify_historic_index_on_rowidentifier ON notify_historic USING btree (rowidentifier);
+
+
+--
+-- Name: notify_index_on_party_id; Type: INDEX; Schema: application; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX notify_index_on_party_id ON notify USING btree (party_id);
+
+
+--
+-- Name: notify_index_on_rowidentifier; Type: INDEX; Schema: application; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX notify_index_on_rowidentifier ON notify USING btree (rowidentifier);
+
+
+--
+-- Name: notify_index_on_service_id; Type: INDEX; Schema: application; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX notify_index_on_service_id ON notify USING btree (service_id);
+
+
+--
+-- Name: notify_property_ba_unit_id_fk_ind; Type: INDEX; Schema: application; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX notify_property_ba_unit_id_fk_ind ON notify_property USING btree (ba_unit_id);
+
+
+--
+-- Name: notify_property_historic_index_on_rowidentifier; Type: INDEX; Schema: application; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX notify_property_historic_index_on_rowidentifier ON notify_property_historic USING btree (rowidentifier);
+
+
+--
+-- Name: notify_property_index_on_rowidentifier; Type: INDEX; Schema: application; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX notify_property_index_on_rowidentifier ON notify_property USING btree (rowidentifier);
+
+
+--
+-- Name: notify_property_notify_id_fk_ind; Type: INDEX; Schema: application; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX notify_property_notify_id_fk_ind ON notify_property USING btree (notify_id);
+
+
+--
+-- Name: notify_uses_source_historic_index_on_rowidentifier; Type: INDEX; Schema: application; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX notify_uses_source_historic_index_on_rowidentifier ON notify_uses_source_historic USING btree (rowidentifier);
+
+
+--
+-- Name: notify_uses_source_index_on_rowidentifier; Type: INDEX; Schema: application; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX notify_uses_source_index_on_rowidentifier ON notify_uses_source USING btree (rowidentifier);
+
+
+--
+-- Name: notify_uses_source_notify_id_fk_ind; Type: INDEX; Schema: application; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX notify_uses_source_notify_id_fk_ind ON notify_uses_source USING btree (notify_id);
+
+
+--
+-- Name: notify_uses_source_source_id_fk_ind; Type: INDEX; Schema: application; Owner: postgres; Tablespace: 
+--
+
+CREATE INDEX notify_uses_source_source_id_fk_ind ON notify_uses_source USING btree (source_id);
 
 
 --
@@ -16942,6 +20805,50 @@ CREATE INDEX document_historic_index_on_rowidentifier ON document_historic USING
 --
 
 CREATE INDEX document_index_on_rowidentifier ON document USING btree (rowidentifier);
+
+
+SET search_path = opentenure, pg_catalog;
+
+--
+-- Name: unique_field_constraint_name_idx; Type: INDEX; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE UNIQUE INDEX unique_field_constraint_name_idx ON field_constraint USING btree (name, field_template_id);
+
+
+--
+-- Name: unique_field_constraint_option_name_idx; Type: INDEX; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE UNIQUE INDEX unique_field_constraint_option_name_idx ON field_constraint_option USING btree (name, field_constraint_id);
+
+
+--
+-- Name: unique_field_payload_name_idx; Type: INDEX; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE UNIQUE INDEX unique_field_payload_name_idx ON field_payload USING btree (name, section_element_payload_id);
+
+
+--
+-- Name: unique_field_template_name_idx; Type: INDEX; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE UNIQUE INDEX unique_field_template_name_idx ON field_template USING btree (name, section_template_id);
+
+
+--
+-- Name: unique_section_payload_name_idx; Type: INDEX; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE UNIQUE INDEX unique_section_payload_name_idx ON section_payload USING btree (name, form_payload_id);
+
+
+--
+-- Name: unique_section_template_name_idx; Type: INDEX; Schema: opentenure; Owner: postgres; Tablespace: 
+--
+
+CREATE UNIQUE INDEX unique_section_template_name_idx ON section_template USING btree (name, form_template_name);
 
 
 SET search_path = party, pg_catalog;
@@ -17600,6 +21507,12 @@ CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON source_describes_ba_un
 CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON source_describes_rrr FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_changes();
 
 
+--
+-- Name: __track_changes; Type: TRIGGER; Schema: administrative; Owner: postgres
+--
+
+CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON ba_unit_detail FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_changes();
+
 
 --
 -- Name: __track_history; Type: TRIGGER; Schema: administrative; Owner: postgres
@@ -17693,6 +21606,13 @@ CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON source_describes_rrr FO
 
 
 --
+-- Name: __track_history; Type: TRIGGER; Schema: administrative; Owner: postgres
+--
+
+CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON ba_unit_detail FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_history();
+
+
+--
 -- Name: trg_change_from_pending; Type: TRIGGER; Schema: administrative; Owner: postgres
 --
 
@@ -17737,6 +21657,27 @@ CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON service FOR EACH ROW E
 
 
 --
+-- Name: __track_changes; Type: TRIGGER; Schema: application; Owner: postgres
+--
+
+CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON notify FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_changes();
+
+
+--
+-- Name: __track_changes; Type: TRIGGER; Schema: application; Owner: postgres
+--
+
+CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON notify_property FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_changes();
+
+
+--
+-- Name: __track_changes; Type: TRIGGER; Schema: application; Owner: postgres
+--
+
+CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON notify_uses_source FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_changes();
+
+
+--
 -- Name: __track_history; Type: TRIGGER; Schema: application; Owner: postgres
 --
 
@@ -17771,6 +21712,27 @@ CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON application_uses_source
 CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON service FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_history();
 
 
+--
+-- Name: __track_history; Type: TRIGGER; Schema: application; Owner: postgres
+--
+
+CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON notify FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_history();
+
+
+--
+-- Name: __track_history; Type: TRIGGER; Schema: application; Owner: postgres
+--
+
+CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON notify_property FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_history();
+
+
+--
+-- Name: __track_history; Type: TRIGGER; Schema: application; Owner: postgres
+--
+
+CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON notify_uses_source FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_history();
+
+
 SET search_path = bulk_operation, pg_catalog;
 
 --
@@ -17778,8 +21740,6 @@ SET search_path = bulk_operation, pg_catalog;
 --
 
 CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON spatial_unit_temporary FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_changes();
-
-
 
 
 SET search_path = cadastre, pg_catalog;
@@ -17973,6 +21933,253 @@ CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON document FOR EACH ROW 
 --
 
 CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON document FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_history();
+
+
+SET search_path = opentenure, pg_catalog;
+
+--
+-- Name: __track_changes; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON party FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_changes();
+
+
+--
+-- Name: __track_changes; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON claim FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_changes();
+
+
+--
+-- Name: __track_changes; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON attachment FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_changes();
+
+
+--
+-- Name: __track_changes; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON claim_uses_attachment FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_changes();
+
+
+--
+-- Name: __track_changes; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON claim_share FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_changes();
+
+
+--
+-- Name: __track_changes; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON party_for_claim_share FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_changes();
+
+
+--
+-- Name: __track_changes; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON claim_location FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_changes();
+
+
+--
+-- Name: __track_changes; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON claim_comment FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_changes();
+
+
+--
+-- Name: __track_changes; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON form_template FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_changes();
+
+
+--
+-- Name: __track_changes; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON section_template FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_changes();
+
+
+--
+-- Name: __track_changes; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON form_payload FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_changes();
+
+
+--
+-- Name: __track_changes; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON section_payload FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_changes();
+
+
+--
+-- Name: __track_changes; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON field_template FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_changes();
+
+
+--
+-- Name: __track_changes; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON field_constraint FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_changes();
+
+
+--
+-- Name: __track_changes; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON field_constraint_option FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_changes();
+
+
+--
+-- Name: __track_changes; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON section_element_payload FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_changes();
+
+
+--
+-- Name: __track_changes; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_changes BEFORE INSERT OR UPDATE ON field_payload FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_changes();
+
+
+--
+-- Name: __track_history; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON party FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_history();
+
+
+--
+-- Name: __track_history; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON claim FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_history();
+
+
+--
+-- Name: __track_history; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON attachment FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_history();
+
+
+--
+-- Name: __track_history; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON claim_uses_attachment FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_history();
+
+
+--
+-- Name: __track_history; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON claim_share FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_history();
+
+
+--
+-- Name: __track_history; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON party_for_claim_share FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_history();
+
+
+--
+-- Name: __track_history; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON claim_location FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_history();
+
+
+--
+-- Name: __track_history; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON claim_comment FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_history();
+
+
+--
+-- Name: __track_history; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON form_template FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_history();
+
+
+--
+-- Name: __track_history; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON section_template FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_history();
+
+
+--
+-- Name: __track_history; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON form_payload FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_history();
+
+
+--
+-- Name: __track_history; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON section_payload FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_history();
+
+
+--
+-- Name: __track_history; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON field_template FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_history();
+
+
+--
+-- Name: __track_history; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON field_constraint FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_history();
+
+
+--
+-- Name: __track_history; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON field_constraint_option FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_history();
+
+
+--
+-- Name: __track_history; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON section_element_payload FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_history();
+
+
+--
+-- Name: __track_history; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER __track_history AFTER DELETE OR UPDATE ON field_payload FOR EACH ROW EXECUTE PROCEDURE public.f_for_trg_track_history();
+
+
+--
+-- Name: set_default; Type: TRIGGER; Schema: opentenure; Owner: postgres
+--
+
+CREATE TRIGGER set_default AFTER INSERT OR DELETE OR UPDATE ON form_template FOR EACH ROW EXECUTE PROCEDURE f_for_trg_set_default();
 
 
 SET search_path = party, pg_catalog;
@@ -18256,6 +22463,22 @@ ALTER TABLE ONLY ba_unit_contains_spatial_unit
 
 ALTER TABLE ONLY ba_unit_contains_spatial_unit
     ADD CONSTRAINT ba_unit_contains_spatial_unit_spatial_unit_id_fk70 FOREIGN KEY (spatial_unit_id) REFERENCES cadastre.cadastre_object(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: ba_unit_detail_ba_unit_id_fk86; Type: FK CONSTRAINT; Schema: administrative; Owner: postgres
+--
+
+ALTER TABLE ONLY ba_unit_detail
+    ADD CONSTRAINT ba_unit_detail_ba_unit_id_fk86 FOREIGN KEY (ba_unit_id) REFERENCES ba_unit(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: ba_unit_detail_detail_code_fk85; Type: FK CONSTRAINT; Schema: administrative; Owner: postgres
+--
+
+ALTER TABLE ONLY ba_unit_detail
+    ADD CONSTRAINT ba_unit_detail_detail_code_fk85 FOREIGN KEY (detail_code) REFERENCES ba_unit_detail_type(code) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
 --
@@ -18613,6 +22836,62 @@ ALTER TABLE ONLY application_uses_source
 
 
 --
+-- Name: notify_party_id_fk; Type: FK CONSTRAINT; Schema: application; Owner: postgres
+--
+
+ALTER TABLE ONLY notify
+    ADD CONSTRAINT notify_party_id_fk FOREIGN KEY (party_id) REFERENCES party.party(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: notify_property_ba_unit_id_fk; Type: FK CONSTRAINT; Schema: application; Owner: postgres
+--
+
+ALTER TABLE ONLY notify_property
+    ADD CONSTRAINT notify_property_ba_unit_id_fk FOREIGN KEY (ba_unit_id) REFERENCES administrative.ba_unit(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: notify_property_notify_id_fk; Type: FK CONSTRAINT; Schema: application; Owner: postgres
+--
+
+ALTER TABLE ONLY notify_property
+    ADD CONSTRAINT notify_property_notify_id_fk FOREIGN KEY (notify_id) REFERENCES notify(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: notify_service_id_fk; Type: FK CONSTRAINT; Schema: application; Owner: postgres
+--
+
+ALTER TABLE ONLY notify
+    ADD CONSTRAINT notify_service_id_fk FOREIGN KEY (service_id) REFERENCES service(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: notify_type_code_fk; Type: FK CONSTRAINT; Schema: application; Owner: postgres
+--
+
+ALTER TABLE ONLY notify
+    ADD CONSTRAINT notify_type_code_fk FOREIGN KEY (relationship_type_code) REFERENCES notify_relationship_type(code);
+
+
+--
+-- Name: notify_uses_source_notify_id_fk; Type: FK CONSTRAINT; Schema: application; Owner: postgres
+--
+
+ALTER TABLE ONLY notify_uses_source
+    ADD CONSTRAINT notify_uses_source_notify_id_fk FOREIGN KEY (notify_id) REFERENCES notify(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: notify_uses_source_source_id_fk; Type: FK CONSTRAINT; Schema: application; Owner: postgres
+--
+
+ALTER TABLE ONLY notify_uses_source
+    ADD CONSTRAINT notify_uses_source_source_id_fk FOREIGN KEY (source_id) REFERENCES source.source(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
 -- Name: request_type_config_panel_launcher_fkey; Type: FK CONSTRAINT; Schema: application; Owner: postgres
 --
 
@@ -18709,7 +22988,6 @@ ALTER TABLE ONLY service
 
 
 
-
 SET search_path = bulk_operation, pg_catalog;
 
 --
@@ -18726,8 +23004,7 @@ ALTER TABLE ONLY spatial_unit_temporary
 
 ALTER TABLE ONLY spatial_unit_temporary
     ADD CONSTRAINT spatial_unit_temporary_transaction_id_fk132 FOREIGN KEY (transaction_id) REFERENCES transaction.transaction(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
+	
 
 SET search_path = cadastre, pg_catalog;
 
@@ -18961,6 +23238,216 @@ ALTER TABLE ONLY spatial_value_area
 
 ALTER TABLE ONLY survey_point
     ADD CONSTRAINT survey_point_transaction_id_fk99 FOREIGN KEY (transaction_id) REFERENCES transaction.transaction(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+SET search_path = opentenure, pg_catalog;
+
+--
+-- Name: claim_claimant_id_fk8; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY claim
+    ADD CONSTRAINT claim_claimant_id_fk8 FOREIGN KEY (claimant_id) REFERENCES party(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: claim_comment_claim_id_fk8; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY claim_comment
+    ADD CONSTRAINT claim_comment_claim_id_fk8 FOREIGN KEY (claim_id) REFERENCES claim(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: claim_fk_type_code; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY claim
+    ADD CONSTRAINT claim_fk_type_code FOREIGN KEY (type_code) REFERENCES administrative.rrr_type(code);
+
+
+--
+-- Name: claim_location_claim_id_fk8; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY claim_location
+    ADD CONSTRAINT claim_location_claim_id_fk8 FOREIGN KEY (claim_id) REFERENCES claim(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: claim_share_claim_id_fk12; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY claim_share
+    ADD CONSTRAINT claim_share_claim_id_fk12 FOREIGN KEY (claim_id) REFERENCES claim(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: claim_status_code_fk18; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY claim
+    ADD CONSTRAINT claim_status_code_fk18 FOREIGN KEY (status_code) REFERENCES claim_status(code) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: claim_uses_attachment_claim_id_fk126; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY claim_uses_attachment
+    ADD CONSTRAINT claim_uses_attachment_claim_id_fk126 FOREIGN KEY (claim_id) REFERENCES claim(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: field_constraint_field_constraint_type_fkey; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY field_constraint
+    ADD CONSTRAINT field_constraint_field_constraint_type_fkey FOREIGN KEY (field_constraint_type) REFERENCES field_constraint_type(code) ON DELETE CASCADE;
+
+
+--
+-- Name: field_constraint_field_template_id_fkey; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY field_constraint
+    ADD CONSTRAINT field_constraint_field_template_id_fkey FOREIGN KEY (field_template_id) REFERENCES field_template(id) ON DELETE CASCADE;
+
+
+--
+-- Name: field_constraint_option_field_constraint_id_fkey; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY field_constraint_option
+    ADD CONSTRAINT field_constraint_option_field_constraint_id_fkey FOREIGN KEY (field_constraint_id) REFERENCES field_constraint(id) ON DELETE CASCADE;
+
+
+--
+-- Name: field_payload_field_type_fkey; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY field_payload
+    ADD CONSTRAINT field_payload_field_type_fkey FOREIGN KEY (field_type) REFERENCES field_type(code) ON DELETE CASCADE;
+
+
+--
+-- Name: field_payload_field_value_type_fkey; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY field_payload
+    ADD CONSTRAINT field_payload_field_value_type_fkey FOREIGN KEY (field_value_type) REFERENCES field_value_type(code) ON DELETE CASCADE;
+
+
+--
+-- Name: field_payload_section_element_payload_id_fkey; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY field_payload
+    ADD CONSTRAINT field_payload_section_element_payload_id_fkey FOREIGN KEY (section_element_payload_id) REFERENCES section_element_payload(id) ON DELETE CASCADE;
+
+
+--
+-- Name: field_template_field_type_fkey; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY field_template
+    ADD CONSTRAINT field_template_field_type_fkey FOREIGN KEY (field_type) REFERENCES field_type(code) ON DELETE CASCADE;
+
+
+--
+-- Name: field_template_section_template_id_fkey; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY field_template
+    ADD CONSTRAINT field_template_section_template_id_fkey FOREIGN KEY (section_template_id) REFERENCES section_template(id) ON DELETE CASCADE;
+
+
+--
+-- Name: fk_challenged_claim; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY claim
+    ADD CONSTRAINT fk_challenged_claim FOREIGN KEY (challenged_claim_id) REFERENCES claim(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: fk_claim_land_use_type; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY claim
+    ADD CONSTRAINT fk_claim_land_use_type FOREIGN KEY (land_use_code) REFERENCES cadastre.land_use_type(code) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: fk_claim_rejection_reason_code; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY claim
+    ADD CONSTRAINT fk_claim_rejection_reason_code FOREIGN KEY (rejection_reason_code) REFERENCES rejection_reason(code);
+
+
+--
+-- Name: fk_document_type_code; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY attachment
+    ADD CONSTRAINT fk_document_type_code FOREIGN KEY (type_code) REFERENCES source.administrative_source_type(code);
+
+
+--
+-- Name: form_payload_claim_id_fkey; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY form_payload
+    ADD CONSTRAINT form_payload_claim_id_fkey FOREIGN KEY (claim_id) REFERENCES claim(id) ON DELETE CASCADE;
+
+
+--
+-- Name: form_payload_form_template_name_fkey; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY form_payload
+    ADD CONSTRAINT form_payload_form_template_name_fkey FOREIGN KEY (form_template_name) REFERENCES form_template(name) ON DELETE CASCADE;
+
+
+--
+-- Name: party_for_claim_share_claim_id_fk43; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY party_for_claim_share
+    ADD CONSTRAINT party_for_claim_share_claim_id_fk43 FOREIGN KEY (claim_share_id) REFERENCES claim_share(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: party_for_claim_share_party_id_fk23; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY party_for_claim_share
+    ADD CONSTRAINT party_for_claim_share_party_id_fk23 FOREIGN KEY (party_id) REFERENCES party(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: section_element_payload_section_payload_id_fkey; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY section_element_payload
+    ADD CONSTRAINT section_element_payload_section_payload_id_fkey FOREIGN KEY (section_payload_id) REFERENCES section_payload(id) ON DELETE CASCADE;
+
+
+--
+-- Name: section_payload_form_payload_id_fkey; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY section_payload
+    ADD CONSTRAINT section_payload_form_payload_id_fkey FOREIGN KEY (form_payload_id) REFERENCES form_payload(id) ON DELETE CASCADE;
+
+
+--
+-- Name: section_template_form_template_name_fkey; Type: FK CONSTRAINT; Schema: opentenure; Owner: postgres
+--
+
+ALTER TABLE ONLY section_template
+    ADD CONSTRAINT section_template_form_template_name_fkey FOREIGN KEY (form_template_name) REFERENCES form_template(name) ON DELETE CASCADE;
 
 
 SET search_path = party, pg_catalog;
@@ -19278,7 +23765,7 @@ ALTER TABLE ONLY br_validation
 --
 
 ALTER TABLE ONLY config_map_layer_metadata
-    ADD CONSTRAINT config_map_layer_metadata_name_fk FOREIGN KEY (name_layer) REFERENCES config_map_layer(name) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ADD CONSTRAINT config_map_layer_metadata_name_fk FOREIGN KEY (name_layer) REFERENCES config_map_layer(name) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -19361,464 +23848,6 @@ ALTER TABLE ONLY transaction_source
 
 ALTER TABLE ONLY transaction
     ADD CONSTRAINT transaction_status_code_fk27 FOREIGN KEY (status_code) REFERENCES transaction_status_type(code) ON UPDATE CASCADE ON DELETE RESTRICT;
-
-SET search_path = application, pg_catalog;
-
-
--- TABLES  -------------------------------------------------------------------------------------
-
--- Table: application.notify_relationship_type
-
--- DROP TABLE application.notify_relationship_type;
-
-CREATE TABLE application.notify_relationship_type
-(
-  code character varying(20) NOT NULL, -- The code for the relationship type.
-  display_value character varying(250) NOT NULL, -- Displayed value of the relationship type.
-  description text, -- Description of the relationship type.
-  status character(1) NOT NULL, -- Status of the relationship type (c - current, x - no longer valid).
-  CONSTRAINT notify_relationship_type_pkey PRIMARY KEY (code),
-  CONSTRAINT notify_relationship_type_display_value_unique UNIQUE (display_value)
-);
-ALTER TABLE application.notify_relationship_type
-  OWNER TO postgres;
-COMMENT ON TABLE application.notify_relationship_type
-  IS 'Code list identifying the type of relationship a party has with land affected by a job. Used for bulk notification purposes. 
-Tags: SOLA State Land Extension, Reference Table';
-COMMENT ON COLUMN application.notify_relationship_type.code IS 'The code for the relationship type.';
-COMMENT ON COLUMN application.notify_relationship_type.display_value IS 'Displayed value of the relationship type.';
-COMMENT ON COLUMN application.notify_relationship_type.description IS 'Description of the relationship type.';
-COMMENT ON COLUMN application.notify_relationship_type.status IS 'Status of the relationship type (c - current, x - no longer valid).';
-
-
-
-
-
-
--- Table: application.notify
-
--- DROP TABLE application.notify;
-
-CREATE TABLE application.notify
-(
-  id character varying(40) NOT NULL, -- Identifier for the notification.
-  service_id character varying(40) NOT NULL, -- Identifier for the service.
-  party_id character varying(40) NOT NULL, -- Identifier for the party.
-  relationship_type_code character varying(20) NOT NULL DEFAULT 'owner'::character varying, -- The type of relationship between the party and the land affected by the job. One of Owner, Adjoining Owner, Occupier, Adjoining Occupier, Rightholder, Other, etc.
-  description text, -- The description of the party to notify.
-  classification_code character varying(20), -- SOLA State Land Extension: The security classification for this Notification Party. Only users with the security classification (or a higher classification) will be able to view the record. If null, the record is considered unrestricted.
-  redact_code character varying(20), -- SOLA State Land Extension: The redact classification for this Notification Party. Only users with the redact classification (or a higher classification) will be able to view the record with un-redacted fields. If null, the record is considered unrestricted and no redaction to the record will occur unless bulk redaction classifications have been set for fields of the record.
-  rowidentifier character varying(40) NOT NULL DEFAULT  public.uuid_generate_v1(), -- Identifies the all change records for the row in the notify_historic table
-  rowversion integer NOT NULL DEFAULT 0, -- Sequential value indicating the number of times this row has been modified.
-  change_action character(1) NOT NULL DEFAULT 'i'::bpchar, -- Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).
-  change_user character varying(50), -- The user id of the last person to modify the row.
-  change_time timestamp without time zone NOT NULL DEFAULT now(), -- The date and time the row was last modified.
-  cancel_service_id character varying(40),  -- Identifier for the cancelaation service if requested.
-  status character varying(40) NOT NULL DEFAULT 'c'::character varying, -- status of the notification if still enabled (c) or waiting for cancellation (x).
-  CONSTRAINT notify_pkey PRIMARY KEY (id),
-  CONSTRAINT notify_party_id_fk FOREIGN KEY (party_id)
-      REFERENCES party.party (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT notify_service_id_fk FOREIGN KEY (service_id)
-      REFERENCES application.service (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT notify_type_code_fk FOREIGN KEY (relationship_type_code)
-      REFERENCES application.notify_relationship_type (code) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
-);
-ALTER TABLE application.notify
-  OWNER TO postgres;
-COMMENT ON TABLE application.notify
-  IS 'Identifies parties to be notified in bulk as well as the relationship the party has with the land affected by the job.
-Tags: SOLA State Land Extension, Change History';
-COMMENT ON COLUMN application.notify.id IS 'Identifier for the notification.';
-COMMENT ON COLUMN application.notify.service_id IS 'Identifier for the service.';
-COMMENT ON COLUMN application.notify.party_id IS 'Identifier for the party.';
-COMMENT ON COLUMN application.notify.relationship_type_code IS 'The type of relationship between the party and the land affected by the job. One of Owner, Adjoining Owner, Occupier, Adjoining Occupier, Rightholder, Other, etc.';
-COMMENT ON COLUMN application.notify.description IS 'The description of the party to notify.';
-COMMENT ON COLUMN application.notify.classification_code IS 'SOLA State Land Extension: The security classification for this Notification Party. Only users with the security classification (or a higher classification) will be able to view the record. If null, the record is considered unrestricted.';
-COMMENT ON COLUMN application.notify.redact_code IS 'SOLA State Land Extension: The redact classification for this Notification Party. Only users with the redact classification (or a higher classification) will be able to view the record with un-redacted fields. If null, the record is considered unrestricted and no redaction to the record will occur unless bulk redaction classifications have been set for fields of the record.';
-COMMENT ON COLUMN application.notify.rowidentifier IS 'Identifies the all change records for the row in the notify_historic table';
-COMMENT ON COLUMN application.notify.rowversion IS 'Sequential value indicating the number of times this row has been modified.';
-COMMENT ON COLUMN application.notify.change_action IS 'Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
-COMMENT ON COLUMN application.notify.change_user IS 'The user id of the last person to modify the row.';
-COMMENT ON COLUMN application.notify.change_time IS 'The date and time the row was last modified.';
-
-
--- Index: application.notify_index_on_party_id
-
--- DROP INDEX application.notify_index_on_party_id;
-
-CREATE INDEX notify_index_on_party_id
-  ON application.notify
-  USING btree
-  (party_id COLLATE pg_catalog."default");
-
--- Index: application.notify_index_on_rowidentifier
-
--- DROP INDEX application.notify_index_on_rowidentifier;
-
-CREATE INDEX notify_index_on_rowidentifier
-  ON application.notify
-  USING btree
-  (rowidentifier COLLATE pg_catalog."default");
-
--- Index: application.notify_index_on_service_id
-
--- DROP INDEX application.notify_index_on_service_id;
-
-CREATE INDEX notify_index_on_service_id
-  ON application.notify
-  USING btree
-  (service_id COLLATE pg_catalog."default");
-
-
--- Trigger: __track_changes on application.notify
-
--- DROP TRIGGER __track_changes ON application.notify;
-
-CREATE TRIGGER __track_changes
-  BEFORE INSERT OR UPDATE
-  ON application.notify
-  FOR EACH ROW
-  EXECUTE PROCEDURE public.f_for_trg_track_changes();
-
--- Trigger: __track_history on application.notify
-
--- DROP TRIGGER __track_history ON application.notify;
-
-CREATE TRIGGER __track_history
-  AFTER UPDATE OR DELETE
-  ON application.notify
-  FOR EACH ROW
-  EXECUTE PROCEDURE public.f_for_trg_track_history();
-
-
-
-
--- Table: application.notify_property
-
--- DROP TABLE application.notify_property;
-
-CREATE TABLE application.notify_property
-(
-  notify_id character varying(40) NOT NULL, -- Identifier for the notification party the record is associated to.
-  ba_unit_id character varying(40) NOT NULL, -- Identifier of the property associated to the objection.
-  rowidentifier character varying(40) NOT NULL DEFAULT  public.uuid_generate_v1(), -- Identifies the all change records for the row in the notify_property_historic table
-  rowversion integer NOT NULL DEFAULT 0, -- Sequential value indicating the number of times this row has been modified.
-  change_action character(1) NOT NULL DEFAULT 'i'::bpchar, -- Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).
-  change_user character varying(50), -- The user id of the last person to modify the row.
-  change_time timestamp without time zone NOT NULL DEFAULT now(), -- The date and time the row was last modified.
-  cancel_service_id character varying(40),  -- Identifier for the cancelaation service if requested.
-  status character varying(40) NOT NULL DEFAULT 'c'::character varying, -- status of the notification if still enabled (c) or waiting for cancellation (x).
-  CONSTRAINT notifiy_property_pkey PRIMARY KEY (notify_id, ba_unit_id),
-  CONSTRAINT notify_property_ba_unit_id_fk FOREIGN KEY (ba_unit_id)
-      REFERENCES administrative.ba_unit (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT notify_property_notify_id_fk FOREIGN KEY (notify_id)
-      REFERENCES application.notify (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE
-);
-ALTER TABLE application.notify_property
-  OWNER TO postgres;
-COMMENT ON TABLE application.notify_property
-  IS 'Identifies the properties (a.k.a. Ba Units) this notification party is related to. 
-Tags: FLOSS SOLA Extension, Change History';
-COMMENT ON COLUMN application.notify_property.notify_id IS 'Identifier for the notification party the record is associated to.';
-COMMENT ON COLUMN application.notify_property.ba_unit_id IS 'Identifier of the property associated to the objection.';
-COMMENT ON COLUMN application.notify_property.rowidentifier IS 'Identifies the all change records for the row in the notify_property_historic table';
-COMMENT ON COLUMN application.notify_property.rowversion IS 'Sequential value indicating the number of times this row has been modified.';
-COMMENT ON COLUMN application.notify_property.change_action IS 'Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
-COMMENT ON COLUMN application.notify_property.change_user IS 'The user id of the last person to modify the row.';
-COMMENT ON COLUMN application.notify_property.change_time IS 'The date and time the row was last modified.';
-
-
--- Index: application.notify_property_ba_unit_id_fk_ind
-
--- DROP INDEX application.notify_property_ba_unit_id_fk_ind;
-
-CREATE INDEX notify_property_ba_unit_id_fk_ind
-  ON application.notify_property
-  USING btree
-  (ba_unit_id COLLATE pg_catalog."default");
-
--- Index: application.notify_property_index_on_rowidentifier
-
--- DROP INDEX application.notify_property_index_on_rowidentifier;
-
-CREATE INDEX notify_property_index_on_rowidentifier
-  ON application.notify_property
-  USING btree
-  (rowidentifier COLLATE pg_catalog."default");
-
--- Index: application.notify_property_notify_id_fk_ind
-
--- DROP INDEX application.notify_property_notify_id_fk_ind;
-
-CREATE INDEX notify_property_notify_id_fk_ind
-  ON application.notify_property
-  USING btree
-  (notify_id COLLATE pg_catalog."default");
-
-
--- Trigger: __track_changes on application.notify_property
-
--- DROP TRIGGER __track_changes ON application.notify_property;
-
-CREATE TRIGGER __track_changes
-  BEFORE INSERT OR UPDATE
-  ON application.notify_property
-  FOR EACH ROW
-  EXECUTE PROCEDURE public.f_for_trg_track_changes();
-
--- Trigger: __track_history on application.notify_property
-
--- DROP TRIGGER __track_history ON application.notify_property;
-
-CREATE TRIGGER __track_history
-  AFTER UPDATE OR DELETE
-  ON application.notify_property
-  FOR EACH ROW
-  EXECUTE PROCEDURE public.f_for_trg_track_history();
-
--- Table: application.notify_property_historic
-
--- DROP TABLE application.notify_property_historic;
-
-CREATE TABLE application.notify_property_historic
-(
-  notify_id character varying(40),
-  ba_unit_id character varying(40),
-  rowidentifier character varying(40),
-  rowversion integer,
-  change_action character(1),
-  change_user character varying(50),
-  change_time timestamp without time zone,
-  change_time_valid_until timestamp without time zone NOT NULL DEFAULT now(),
-  cancel_service_id character varying(40),  -- Identifier for the cancelaation service if requested.
-  status character varying(40) NOT NULL DEFAULT 'c'::character varying -- status of the notification if still enabled (c) or waiting for cancellation (x)
-);
-ALTER TABLE application.notify_property_historic
-  OWNER TO postgres;
-
--- Index: application.notify_property_historic_index_on_rowidentifier
-
--- DROP INDEX application.notify_property_historic_index_on_rowidentifier;
-
-CREATE INDEX notify_property_historic_index_on_rowidentifier
-  ON application.notify_property_historic
-  USING btree
-  (rowidentifier COLLATE pg_catalog."default");
-
-  
--- Table: application.notify_uses_source
-
--- DROP TABLE application.notify_uses_source;
-
-CREATE TABLE application.notify_uses_source
-(
-  notify_id character varying(40) NOT NULL, -- Identifier for the notification party the record is associated to.
-  source_id character varying(40) NOT NULL, -- Identifier of the source associated to the application.
-  rowidentifier character varying(40) NOT NULL DEFAULT  public.uuid_generate_v1(), -- Identifies the all change records for the row in the objection_uses_source_historic table
-  rowversion integer NOT NULL DEFAULT 0, -- Sequential value indicating the number of times this row has been modified.
-  change_action character(1) NOT NULL DEFAULT 'i'::bpchar, -- Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).
-  change_user character varying(50), -- The user id of the last person to modify the row.
-  change_time timestamp without time zone NOT NULL DEFAULT now(), -- The date and time the row was last modified.
-  CONSTRAINT notify_uses_source_pkey PRIMARY KEY (notify_id, source_id),
-  CONSTRAINT notify_uses_source_notify_id_fk FOREIGN KEY (notify_id)
-      REFERENCES application.notify (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE,
-  CONSTRAINT notify_uses_source_source_id_fk FOREIGN KEY (source_id)
-      REFERENCES source.source (id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE
-);
-ALTER TABLE application.notify_uses_source
-  OWNER TO postgres;
-COMMENT ON TABLE application.notify_uses_source
-  IS 'Links the notification parties to the sources (a.k.a. documents) genreated for the bulk notification. 
-Tags: FLOSS SOLA Extension, Change History';
-COMMENT ON COLUMN application.notify_uses_source.notify_id IS 'Identifier for the notification party the record is associated to.';
-COMMENT ON COLUMN application.notify_uses_source.source_id IS 'Identifier of the source associated to the application.';
-COMMENT ON COLUMN application.notify_uses_source.rowidentifier IS 'Identifies the all change records for the row in the objection_uses_source_historic table';
-COMMENT ON COLUMN application.notify_uses_source.rowversion IS 'Sequential value indicating the number of times this row has been modified.';
-COMMENT ON COLUMN application.notify_uses_source.change_action IS 'Indicates if the last data modification action that occurred to the row was insert (i), update (u) or delete (d).';
-COMMENT ON COLUMN application.notify_uses_source.change_user IS 'The user id of the last person to modify the row.';
-COMMENT ON COLUMN application.notify_uses_source.change_time IS 'The date and time the row was last modified.';
-
-
--- Index: application.notify_uses_source_index_on_rowidentifier
-
--- DROP INDEX application.notify_uses_source_index_on_rowidentifier;
-
-CREATE INDEX notify_uses_source_index_on_rowidentifier
-  ON application.notify_uses_source
-  USING btree
-  (rowidentifier COLLATE pg_catalog."default");
-
--- Index: application.notify_uses_source_notify_id_fk_ind
-
--- DROP INDEX application.notify_uses_source_notify_id_fk_ind;
-
-CREATE INDEX notify_uses_source_notify_id_fk_ind
-  ON application.notify_uses_source
-  USING btree
-  (notify_id COLLATE pg_catalog."default");
-
--- Index: application.notify_uses_source_source_id_fk_ind
-
--- DROP INDEX application.notify_uses_source_source_id_fk_ind;
-
-CREATE INDEX notify_uses_source_source_id_fk_ind
-  ON application.notify_uses_source
-  USING btree
-  (source_id COLLATE pg_catalog."default");
-
-
--- Trigger: __track_changes on application.notify_uses_source
-
--- DROP TRIGGER __track_changes ON application.notify_uses_source;
-
-CREATE TRIGGER __track_changes
-  BEFORE INSERT OR UPDATE
-  ON application.notify_uses_source
-  FOR EACH ROW
-  EXECUTE PROCEDURE public.f_for_trg_track_changes();
-
--- Trigger: __track_history on application.notify_uses_source
-
--- DROP TRIGGER __track_history ON application.notify_uses_source;
-
-CREATE TRIGGER __track_history
-  AFTER UPDATE OR DELETE
-  ON application.notify_uses_source
-  FOR EACH ROW
-  EXECUTE PROCEDURE public.f_for_trg_track_history();
-
-
----- HISTORIC -----
-
--- Table: application.notify_historic
-
--- DROP TABLE application.notify_historic;
-
-CREATE TABLE application.notify_historic
-(
-  id character varying(40),
-  service_id character varying(40),
-  party_id character varying(40),
-  relationship_type_code character varying(20),
-  description text,
-  classification_code character varying(20),
-  redact_code character varying(20),
-  cancel_service_id character varying(40),
-  status character varying(40) NOT NULL DEFAULT 'c'::character varying,
-  rowidentifier character varying(40), 
-  rowversion integer NOT NULL DEFAULT 0,
-  change_action character(1),
-  change_user character varying(50),
-  change_time timestamp without time zone,
-  change_time_valid_until timestamp without time zone NOT NULL DEFAULT now()
-);
-ALTER TABLE application.notify_historic
-  OWNER TO postgres;
-COMMENT ON TABLE application.notify_historic
-  IS 'History table for the application.notify table';
-
--- Index: application.notify_historic_index_on_rowidentifier
-
--- DROP INDEX application.notify_historic_index_on_rowidentifier;
-
-CREATE INDEX notify_historic_index_on_rowidentifier
-  ON application.notify_historic
-  USING btree
-  (rowidentifier COLLATE pg_catalog."default");
-
--- Table: application.notify_uses_source_historic
-
--- DROP TABLE application.notify_uses_source_historic;
-
-CREATE TABLE application.notify_uses_source_historic
-(
-  notify_id character varying(40),
-  source_id character varying(40),
-  rowidentifier character varying(40),
-  rowversion integer,
-  change_action character(1),
-  change_user character varying(50),
-  change_time timestamp without time zone,
-  change_time_valid_until timestamp without time zone NOT NULL DEFAULT now()
-)
-WITH (
-  OIDS=FALSE
-);
-ALTER TABLE application.notify_uses_source_historic
-  OWNER TO postgres;
-
--- Index: application.notify_uses_source_historic_index_on_rowidentifier
-
--- DROP INDEX application.notify_uses_source_historic_index_on_rowidentifier;
-
-CREATE INDEX notify_uses_source_historic_index_on_rowidentifier
-  ON application.notify_uses_source_historic
-  USING btree
-  (rowidentifier COLLATE pg_catalog."default");
-
-
-
-
-
--- View: application.notifiable_party_for_baunit
-
--- DROP VIEW application.notifiable_party_for_baunit;
-
- 
-CREATE OR REPLACE VIEW application.notifiable_party_for_baunit AS 
-SELECT n.party_id, 
-    nt.party_id AS target_party_id, 
-    n.service_id, 
-    s.application_id, 
-    np.cancel_service_id, 
-    n.status, 
-    (bu.name_firstpart::text || '/'::text) || bu.name_lastpart::text AS baunit_name, 
-    n.rowidentifier, n.rowversion, n.change_action, n.change_user, 
-    n.change_time, n.id AS notifyid, nt.id AS notifytargetid
-  FROM application.service s, 
-    administrative.ba_unit bu, 
-    application.notify n, 
-    application.notify nt, 
-    application.notify_property np,
-    administrative.party_for_rrr  pr,
-    administrative.rrr rrr
-  WHERE n.service_id::text = s.id::text AND bu.id::text = np.ba_unit_id::text AND np.notify_id::text = n.id::text AND n.relationship_type_code::text = 'safeguard'::text 
-    AND nt.service_id::text = s.id::text AND nt.relationship_type_code::text = 'owner'::text 
-    AND nt.party_id=pr.party_id  
-    AND pr.rrr_id=rrr.id 
-    AND rrr.ba_unit_id= bu.id ;
-
--- View: application.cancel_notification
-
--- DROP VIEW application.cancel_notification;
-
-CREATE OR REPLACE VIEW application.cancel_notification AS 
- SELECT pp.name AS partyname,
-  pp.last_name AS partylastname, 
-    tpp.name AS targetpartyname, 
-    tpp.last_name AS targetpartylastname, 
-    npbu.party_id, 
-    npbu.target_party_id, 
-    npbu.baunit_name,
-    npbu.service_id, 
-    npbu.cancel_service_id 
-   FROM party.party pp, party.party tpp, 
-    application.notifiable_party_for_baunit npbu, 
-    application.application aa, application.service s
-  WHERE s.application_id::text = aa.id::text 
-  AND s.id::text = npbu.cancel_service_id::text 
-  AND pp.id::text = npbu.party_id::text AND tpp.id::text = npbu.target_party_id::text 
- AND s.request_type_code::text = 'cancelRelationship'::text;
-
-
-
 
 
 --
