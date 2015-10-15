@@ -1,5 +1,14 @@
 -- Table: administrative.condition_type
 ALTER TABLE administrative.condition_type
+  DROP COLUMN is_for;
+ALTER TABLE administrative.condition_type
+  DROP COLUMN field_type;
+ALTER TABLE administrative.condition_type
+  DROP COLUMN order_view;
+
+
+-- Table: administrative.condition_type
+ALTER TABLE administrative.condition_type
   ADD COLUMN is_for character varying(20);
 ALTER TABLE administrative.condition_type
   ADD COLUMN field_type character varying(20);

@@ -77,11 +77,19 @@ ALTER TABLE ba_unit_detail_type ENABLE TRIGGER ALL;
 
 
 --- METADATA AND SETTINGS  
+DELETE FROM system.config_map_layer_metadata  where name_layer = 'orthophoto' and "name" = 'date';
+DELETE FROM system.config_map_layer_metadata  where name_layer = 'orthophoto' and "name" = 'sheet-number';
+DELETE FROM system.config_map_layer_metadata  where name_layer = 'orthophoto' and "name" = 'resolution';
+DELETE FROM system.config_map_layer_metadata  where name_layer = 'orthophoto' and "name" = 'data-source';
 
 insert into system.config_map_layer_metadata (name_layer ,"name" , "value") values ('orthophoto', 'date', 'TBU DATE ??');
 insert into system.config_map_layer_metadata (name_layer ,"name" , "value") values ('orthophoto', 'sheet-number', 'TBU ?? NW, SE, SW');
 insert into system.config_map_layer_metadata (name_layer ,"name" , "value") values ('orthophoto', 'resolution', 'TBU 50 cm ??');
 insert into system.config_map_layer_metadata (name_layer ,"name" , "value") values ('orthophoto', 'data-source', 'TBU DATUM ??');
+
+DELETE FROM system.setting  where  "name" = 'surveyor';
+DELETE FROM system.setting  where  "name" = 'surveyorRank';
+DELETE FROM system.setting  where  "name" = 'state';
 
 insert into system.setting(name, vl, active, description) values('surveyor', 'TBU SURVEYOR NAME', true, 'Name of Surveyor');
 insert into system.setting(name, vl, active, description) values('surveyorRank', 'TBU SURVEYOR RANK', true, 'The rank of the Surveyor');
@@ -92,6 +100,7 @@ insert into system.setting(name, vl, active, description) values('state', 'Katsi
 --insert into system.setting(name, vl, active, description) values('featureBack', 'images/sola/back.svg', true, 'svg for the background element in back page');
 
 
+DELETE FROM source.administrative_source_type  where  code" = 'parcelPlan';
 
 --- source type
 INSERT INTO source.administrative_source_type (code, display_value, status, description, is_for_registration) VALUES ('parcelPlan', 'Title Deeds Plan', 'x', '...::::::::...::::...::::...::::...::::...', false);

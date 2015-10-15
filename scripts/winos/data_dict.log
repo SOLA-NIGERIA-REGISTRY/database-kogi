@@ -1,0 +1,1380 @@
+Starting at 12:25:14.75 
+### Generating dictionary... 
+Analyzing schemas:
+ address administrative application bulk_operation cadastre document party source system transaction public
+Analyzing address
+Using database properties:
+  C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\common\pgsql.properties
+Gathering schema details....(2sec)
+Writing/graphing summary............(0sec)
+Writing/diagramming details.(0sec)
+Wrote relationship details of 1 tables/views to directory 'C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\address' in 4 seconds.
+View the results by opening C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\address\index.html
+Analyzing administrative
+Using database properties:
+  C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\common\pgsql.properties
+Gathering schema details..............................12:25:25.562 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "administrative.Function: ba_unit_name_is_valid" does not exist
+  Position: 15
+12:25:25.563 WARNING: Table.initColumnAutoUpdate - SQL: select * from administrative."Function: ba_unit_name_is_valid" where 0 = 1
+12:25:25.583 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "administrative.Function: get_ba_unit_pending_action" does not exist
+  Position: 15
+12:25:25.583 WARNING: Table.initColumnAutoUpdate - SQL: select * from administrative."Function: get_ba_unit_pending_action" where 0 = 1
+12:25:25.592 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "administrative.Function: get_calculated_area_size_action" does not exist
+  Position: 15
+12:25:25.592 WARNING: Table.initColumnAutoUpdate - SQL: select * from administrative."Function: get_calculated_area_size_action" where 0 = 1
+12:25:25.601 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "administrative.Function: get_concatenated_name" does not exist
+  Position: 15
+12:25:25.602 WARNING: Table.initColumnAutoUpdate - SQL: select * from administrative."Function: get_concatenated_name" where 0 = 1
+12:25:25.616 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "administrative.Function: get_objections" does not exist
+  Position: 15
+12:25:25.616 WARNING: Table.initColumnAutoUpdate - SQL: select * from administrative."Function: get_objections" where 0 = 1
+12:25:25.628 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "administrative.Function: get_parcel_ownernames" does not exist
+  Position: 15
+12:25:25.628 WARNING: Table.initColumnAutoUpdate - SQL: select * from administrative."Function: get_parcel_ownernames" where 0 = 1
+12:25:25.639 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "administrative.Function: getsysregmanagement" does not exist
+  Position: 15
+12:25:25.640 WARNING: Table.initColumnAutoUpdate - SQL: select * from administrative."Function: getsysregmanagement" where 0 = 1
+12:25:25.648 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "administrative.Function: getsysregprogress" does not exist
+  Position: 15
+12:25:25.649 WARNING: Table.initColumnAutoUpdate - SQL: select * from administrative."Function: getsysregprogress" where 0 = 1
+12:25:25.659 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "administrative.Function: getsysregstatus" does not exist
+  Position: 15
+12:25:25.660 WARNING: Table.initColumnAutoUpdate - SQL: select * from administrative."Function: getsysregstatus" where 0 = 1
+12:25:25.668 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "administrative.Sequence: ba_unit_first_name_part_seq" does not exist
+  Position: 15
+12:25:25.669 WARNING: Table.initColumnAutoUpdate - SQL: select * from administrative."Sequence: ba_unit_first_name_part_seq" where 0 = 1
+12:25:25.682 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "administrative.Sequence: ba_unit_last_name_part_seq" does not exist
+  Position: 15
+12:25:25.682 WARNING: Table.initColumnAutoUpdate - SQL: select * from administrative."Sequence: ba_unit_last_name_part_seq" where 0 = 1
+12:25:25.691 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "administrative.Sequence: notation_reference_nr_seq" does not exist
+  Position: 15
+12:25:25.691 WARNING: Table.initColumnAutoUpdate - SQL: select * from administrative."Sequence: notation_reference_nr_seq" where 0 = 1
+12:25:25.703 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "administrative.Sequence: rrr_nr_seq" does not exist
+  Position: 15
+12:25:25.703 WARNING: Table.initColumnAutoUpdate - SQL: select * from administrative."Sequence: rrr_nr_seq" where 0 = 1
+12:25:25.719 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "administrative.Trigger Function: f_for_tbl_rrr_trg_change_from_pending" does not exist
+  Position: 15
+12:25:25.719 WARNING: Table.initColumnAutoUpdate - SQL: select * from administrative."Trigger Function: f_for_tbl_rrr_trg_change_from_pending" where 0 = 1
+(3sec)
+Writing/graphing summary............(3sec)
+Writing/diagramming details.........................................(16sec)
+Wrote relationship details of 41 tables/views to directory 'C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\administrative' in 23 seconds.
+View the results by opening C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\administrative\index.html
+Analyzing application
+Using database properties:
+  C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\common\pgsql.properties
+Gathering schema details........................12:25:48.876 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "application.Function: get_concatenated_name" does not exist
+  Position: 15
+12:25:48.877 WARNING: Table.initColumnAutoUpdate - SQL: select * from application."Function: get_concatenated_name" where 0 = 1
+12:25:48.896 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "application.Function: get_work_summary" does not exist
+  Position: 15
+12:25:48.896 WARNING: Table.initColumnAutoUpdate - SQL: select * from application."Function: get_work_summary" where 0 = 1
+12:25:48.912 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "application.Function: getlodgement" does not exist
+  Position: 15
+12:25:48.912 WARNING: Table.initColumnAutoUpdate - SQL: select * from application."Function: getlodgement" where 0 = 1
+12:25:48.928 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "application.Function: getlodgetiming" does not exist
+  Position: 15
+12:25:48.928 WARNING: Table.initColumnAutoUpdate - SQL: select * from application."Function: getlodgetiming" where 0 = 1
+12:25:48.944 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "application.Sequence: application_nr_seq" does not exist
+  Position: 15
+12:25:48.944 WARNING: Table.initColumnAutoUpdate - SQL: select * from application."Sequence: application_nr_seq" where 0 = 1
+(3sec)
+Writing/graphing summary............(2sec)
+Writing/diagramming details..........................(9sec)
+Wrote relationship details of 26 tables/views to directory 'C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\application' in 14 seconds.
+View the results by opening C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\application\index.html
+Analyzing bulk_operation
+Using database properties:
+  C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\common\pgsql.properties
+Gathering schema details....12:26:01.588 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "bulk_operation.Function: clean_after_rollback" does not exist
+  Position: 15
+12:26:01.590 WARNING: Table.initColumnAutoUpdate - SQL: select * from bulk_operation."Function: clean_after_rollback" where 0 = 1
+12:26:01.600 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "bulk_operation.Function: move_cadastre_objects" does not exist
+  Position: 15
+12:26:01.600 WARNING: Table.initColumnAutoUpdate - SQL: select * from bulk_operation."Function: move_cadastre_objects" where 0 = 1
+12:26:01.610 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "bulk_operation.Function: move_other_objects" does not exist
+  Position: 15
+12:26:01.610 WARNING: Table.initColumnAutoUpdate - SQL: select * from bulk_operation."Function: move_other_objects" where 0 = 1
+12:26:01.620 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "bulk_operation.Function: move_spatial_units" does not exist
+  Position: 15
+12:26:01.621 WARNING: Table.initColumnAutoUpdate - SQL: select * from bulk_operation."Function: move_spatial_units" where 0 = 1
+(1sec)
+Writing/graphing summary............(0sec)
+Writing/diagramming details.....(0sec)
+Wrote relationship details of 5 tables/views to directory 'C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\bulk_operation' in 2 seconds.
+View the results by opening C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\bulk_operation\index.html
+Analyzing cadastre
+Using database properties:
+  C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\common\pgsql.properties
+Gathering schema details..................................12:26:08.005 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "cadastre.Function: add_topo_points" does not exist
+  Position: 15
+12:26:08.007 WARNING: Table.initColumnAutoUpdate - SQL: select * from cadastre."Function: add_topo_points" where 0 = 1
+12:26:08.019 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "cadastre.Function: cadastre_object_name_is_valid" does not exist
+  Position: 15
+12:26:08.019 WARNING: Table.initColumnAutoUpdate - SQL: select * from cadastre."Function: cadastre_object_name_is_valid" where 0 = 1
+12:26:08.030 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "cadastre.Function: generate_spatial_unit_group_name" does not exist
+  Position: 15
+12:26:08.031 WARNING: Table.initColumnAutoUpdate - SQL: select * from cadastre."Function: generate_spatial_unit_group_name" where 0 = 1
+12:26:08.041 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "cadastre.Function: get_map_center_label" does not exist
+  Position: 15
+12:26:08.041 WARNING: Table.initColumnAutoUpdate - SQL: select * from cadastre."Function: get_map_center_label" where 0 = 1
+12:26:08.051 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "cadastre.Function: get_new_cadastre_object_identifier_first_part" does not exist
+  Position: 15
+12:26:08.052 WARNING: Table.initColumnAutoUpdate - SQL: select * from cadastre."Function: get_new_cadastre_object_identifier_first_part" where 0 = 1
+12:26:08.061 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "cadastre.Function: get_new_cadastre_object_identifier_last_part" does not exist
+  Position: 15
+12:26:08.062 WARNING: Table.initColumnAutoUpdate - SQL: select * from cadastre."Function: get_new_cadastre_object_identifier_last_part" where 0 = 1
+12:26:08.075 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "cadastre.Function: snap_geometry_to_geometry" does not exist
+  Position: 15
+12:26:08.075 WARNING: Table.initColumnAutoUpdate - SQL: select * from cadastre."Function: snap_geometry_to_geometry" where 0 = 1
+12:26:08.085 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "cadastre.Trigger Function: f_for_tbl_cadastre_object_trg_geommodify" does not exist
+  Position: 15
+12:26:08.085 WARNING: Table.initColumnAutoUpdate - SQL: select * from cadastre."Trigger Function: f_for_tbl_cadastre_object_trg_geommodify" where 0 = 1
+12:26:08.098 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "cadastre.Trigger Function: f_for_tbl_cadastre_object_trg_new" does not exist
+  Position: 15
+12:26:08.099 WARNING: Table.initColumnAutoUpdate - SQL: select * from cadastre."Trigger Function: f_for_tbl_cadastre_object_trg_new" where 0 = 1
+12:26:08.117 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "cadastre.Trigger Function: f_for_tbl_cadastre_object_trg_remove" does not exist
+  Position: 15
+12:26:08.117 WARNING: Table.initColumnAutoUpdate - SQL: select * from cadastre."Trigger Function: f_for_tbl_cadastre_object_trg_remove" where 0 = 1
+(5sec)
+Writing/graphing summary............(2sec)
+Writing/diagramming details.........................................(10sec)
+Wrote relationship details of 41 tables/views to directory 'C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\cadastre' in 18 seconds.
+View the results by opening C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\cadastre\index.html
+Analyzing document
+Using database properties:
+  C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\common\pgsql.properties
+Gathering schema details.....12:26:21.886 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "document.Sequence: document_nr_seq" does not exist
+  Position: 15
+12:26:21.887 WARNING: Table.initColumnAutoUpdate - SQL: select * from document."Sequence: document_nr_seq" where 0 = 1
+(0sec)
+Writing/graphing summary.........(0sec)
+Writing/diagramming details...(0sec)
+Wrote relationship details of 3 tables/views to directory 'C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\document' in 1 seconds.
+View the results by opening C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\document\index.html
+Analyzing party
+Using database properties:
+  C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\common\pgsql.properties
+Gathering schema details..............12:26:24.283 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "party.Function: is_rightholder" does not exist
+  Position: 15
+12:26:24.285 WARNING: Table.initColumnAutoUpdate - SQL: select * from party."Function: is_rightholder" where 0 = 1
+(1sec)
+Writing/graphing summary............(0sec)
+Writing/diagramming details............(5sec)
+Wrote relationship details of 12 tables/views to directory 'C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\party' in 8 seconds.
+View the results by opening C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\party\index.html
+Analyzing source
+Using database properties:
+  C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\common\pgsql.properties
+Gathering schema details............12:26:33.001 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "source.Sequence: source_la_nr_seq" does not exist
+  Position: 15
+12:26:33.003 WARNING: Table.initColumnAutoUpdate - SQL: select * from source."Sequence: source_la_nr_seq" where 0 = 1
+12:26:33.013 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "source.Trigger Function: f_for_tbl_source_trg_change_of_status" does not exist
+  Position: 15
+12:26:33.013 WARNING: Table.initColumnAutoUpdate - SQL: select * from source."Trigger Function: f_for_tbl_source_trg_change_of_status" where 0 = 1
+(2sec)
+Writing/graphing summary............(1sec)
+Writing/diagramming details...........(4sec)
+Wrote relationship details of 11 tables/views to directory 'C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\source' in 8 seconds.
+View the results by opening C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\source\index.html
+Analyzing system
+Using database properties:
+  C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\common\pgsql.properties
+Gathering schema details...................................12:26:42.508 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "system.Function: consolidation_consolidate" does not exist
+  Position: 15
+12:26:42.510 WARNING: Table.initColumnAutoUpdate - SQL: select * from system."Function: consolidation_consolidate" where 0 = 1
+12:26:42.519 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "system.Function: consolidation_extract" does not exist
+  Position: 15
+12:26:42.519 WARNING: Table.initColumnAutoUpdate - SQL: select * from system."Function: consolidation_extract" where 0 = 1
+12:26:42.529 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "system.Function: get_setting" does not exist
+  Position: 15
+12:26:42.529 WARNING: Table.initColumnAutoUpdate - SQL: select * from system."Function: get_setting" where 0 = 1
+12:26:42.538 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "system.Function: get_text_from_schema" does not exist
+  Position: 15
+12:26:42.539 WARNING: Table.initColumnAutoUpdate - SQL: select * from system."Function: get_text_from_schema" where 0 = 1
+12:26:42.548 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "system.Function: script_to_schema" does not exist
+  Position: 15
+12:26:42.548 WARNING: Table.initColumnAutoUpdate - SQL: select * from system."Function: script_to_schema" where 0 = 1
+12:26:42.558 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "system.Function: setpassword" does not exist
+  Position: 15
+12:26:42.558 WARNING: Table.initColumnAutoUpdate - SQL: select * from system."Function: setpassword" where 0 = 1
+(3sec)
+Writing/graphing summary............(2sec)
+Writing/diagramming details......................................(7sec)
+Wrote relationship details of 38 tables/views to directory 'C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\system' in 13 seconds.
+View the results by opening C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\system\index.html
+Analyzing transaction
+Using database properties:
+  C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\common\pgsql.properties
+Gathering schema details.......(1sec)
+Writing/graphing summary............(1sec)
+Writing/diagramming details....(3sec)
+Wrote relationship details of 4 tables/views to directory 'C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\transaction' in 6 seconds.
+View the results by opening C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\transaction\index.html
+Analyzing public
+Using database properties:
+  C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\common\pgsql.properties
+Gathering schema details.........12:26:59.608 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "public.Function: fn_triggerall" does not exist
+  Position: 15
+12:26:59.609 WARNING: Table.initColumnAutoUpdate - SQL: select * from public."Function: fn_triggerall" where 0 = 1
+12:26:59.620 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "public.Function: clean_db" does not exist
+  Position: 15
+12:26:59.620 WARNING: Table.initColumnAutoUpdate - SQL: select * from public."Function: clean_db" where 0 = 1
+12:26:59.633 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "public.Function: compare_strings" does not exist
+  Position: 15
+12:26:59.633 WARNING: Table.initColumnAutoUpdate - SQL: select * from public."Function: compare_strings" where 0 = 1
+12:26:59.643 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "public.Function: get_geometry_with_srid" does not exist
+  Position: 15
+12:26:59.643 WARNING: Table.initColumnAutoUpdate - SQL: select * from public."Function: get_geometry_with_srid" where 0 = 1
+12:26:59.654 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "public.Function: get_translation" does not exist
+  Position: 15
+12:26:59.654 WARNING: Table.initColumnAutoUpdate - SQL: select * from public."Function: get_translation" where 0 = 1
+12:26:59.664 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "public.Function: clean_db_foreign_constraints" does not exist
+  Position: 15
+12:26:59.664 WARNING: Table.initColumnAutoUpdate - SQL: select * from public."Function: clean_db_foreign_constraints" where 0 = 1
+12:26:59.675 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "public.Function: clean_db_triggers" does not exist
+  Position: 15
+12:26:59.675 WARNING: Table.initColumnAutoUpdate - SQL: select * from public."Function: clean_db_triggers" where 0 = 1
+12:26:59.685 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "public.Trigger Function: f_for_trg_track_changes" does not exist
+  Position: 15
+12:26:59.685 WARNING: Table.initColumnAutoUpdate - SQL: select * from public."Trigger Function: f_for_trg_track_changes" where 0 = 1
+12:26:59.695 WARNING: Table.initColumnAutoUpdate - Failed to determine auto increment status: org.postgresql.util.PSQLException: ERROR: relation "public.Trigger Function: f_for_trg_track_history" does not exist
+  Position: 15
+12:26:59.695 WARNING: Table.initColumnAutoUpdate - SQL: select * from public."Trigger Function: f_for_trg_track_history" where 0 = 1
+(0sec)
+Writing/graphing summary.........(1sec)
+Writing/diagramming details...............(0sec)
+Wrote relationship details of 15 tables/views to directory 'C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\public' in 2 seconds.
+View the results by opening C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\public\index.html
+
+Wrote relationship details of 11 schemas in 104 seconds.
+Start with C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\index.html
+### Compressing dictionary... 
+
+7-Zip 9.20  Copyright (c) 1999-2010 Igor Pavlov  2010-11-18
+Scanning
+
+Creating archive C:\Users\rizzom\Desktop\SOLA-NIGERIA-REGISTRY\database-katsina\scripts\winos\..\..\doc\..\sola_data_dictionary.zip
+
+Compressing  doc\address\anomalies.html
+Compressing  doc\address\columns.byAuto.html
+Compressing  doc\address\columns.byColumn.html
+Compressing  doc\address\columns.byDefault.html
+Compressing  doc\address\columns.byNulls.html
+Compressing  doc\address\columns.bySize.html
+Compressing  doc\address\columns.byTable.html
+Compressing  doc\address\columns.byType.html
+Compressing  doc\address\constraints.html
+Compressing  doc\address\deletionOrder.txt
+Compressing  doc\address\diagrams\address.1degree.dot
+Compressing  doc\address\diagrams\address.1degree.png
+Compressing  doc\address\diagrams\summary\relationships.real.compact.dot
+Compressing  doc\address\diagrams\summary\relationships.real.compact.png
+Compressing  doc\address\diagrams\summary\relationships.real.large.dot
+Compressing  doc\address\diagrams\summary\relationships.real.large.png
+Compressing  doc\address\images\background.gif
+Compressing  doc\address\images\tabLeft.gif
+Compressing  doc\address\images\tabRight.gif
+Compressing  doc\address\index.html
+Compressing  doc\address\insertionOrder.txt
+Compressing  doc\address\jquery.js
+Compressing  doc\address\relationships.html
+Compressing  doc\address\schemaSpy.css
+Compressing  doc\address\schemaSpy.js
+Compressing  doc\address\sola.address.xml
+Compressing  doc\address\sola_original.address.xml
+Compressing  doc\address\tables\address.html
+Compressing  doc\address\utilities.html
+Compressing  doc\administrative\anomalies.html
+Compressing  doc\administrative\columns.byAuto.html
+Compressing  doc\administrative\columns.byColumn.html
+Compressing  doc\administrative\columns.byDefault.html
+Compressing  doc\administrative\columns.byNulls.html
+Compressing  doc\administrative\columns.bySize.html
+Compressing  doc\administrative\columns.byTable.html
+Compressing  doc\administrative\columns.byType.html
+Compressing  doc\administrative\constraints.html
+Compressing  doc\administrative\deletionOrder.txt
+Compressing  doc\administrative\diagrams\ba_unit.1degree.dot
+Compressing  doc\administrative\diagrams\ba_unit.1degree.png
+Compressing  doc\administrative\diagrams\ba_unit.2degrees.dot
+Compressing  doc\administrative\diagrams\ba_unit.2degrees.png
+Compressing  doc\administrative\diagrams\ba_unit_area.1degree.dot
+Compressing  doc\administrative\diagrams\ba_unit_area.1degree.png
+Compressing  doc\administrative\diagrams\ba_unit_area.2degrees.dot
+Compressing  doc\administrative\diagrams\ba_unit_area.2degrees.png
+Compressing  doc\administrative\diagrams\ba_unit_as_party.1degree.dot
+Compressing  doc\administrative\diagrams\ba_unit_as_party.1degree.png
+Compressing  doc\administrative\diagrams\ba_unit_as_party.2degrees.dot
+Compressing  doc\administrative\diagrams\ba_unit_as_party.2degrees.png
+Compressing  doc\administrative\diagrams\ba_unit_contains_spatial_unit.1degree.dot
+Compressing  doc\administrative\diagrams\ba_unit_contains_spatial_unit.1degree.png
+Compressing  doc\administrative\diagrams\ba_unit_contains_spatial_unit.2degrees.dot
+Compressing  doc\administrative\diagrams\ba_unit_contains_spatial_unit.2degrees.png
+Compressing  doc\administrative\diagrams\ba_unit_detail.1degree.dot
+Compressing  doc\administrative\diagrams\ba_unit_detail.1degree.png
+Compressing  doc\administrative\diagrams\ba_unit_detail.2degrees.dot
+Compressing  doc\administrative\diagrams\ba_unit_detail.2degrees.png
+Compressing  doc\administrative\diagrams\ba_unit_detail_type.1degree.dot
+Compressing  doc\administrative\diagrams\ba_unit_detail_type.1degree.png
+Compressing  doc\administrative\diagrams\ba_unit_detail_type.2degrees.dot
+Compressing  doc\administrative\diagrams\ba_unit_detail_type.2degrees.png
+Compressing  doc\administrative\diagrams\ba_unit_rel_type.1degree.dot
+Compressing  doc\administrative\diagrams\ba_unit_rel_type.1degree.png
+Compressing  doc\administrative\diagrams\ba_unit_rel_type.2degrees.dot
+Compressing  doc\administrative\diagrams\ba_unit_rel_type.2degrees.png
+Compressing  doc\administrative\diagrams\ba_unit_target.1degree.dot
+Compressing  doc\administrative\diagrams\ba_unit_target.1degree.png
+Compressing  doc\administrative\diagrams\ba_unit_target.2degrees.dot
+Compressing  doc\administrative\diagrams\ba_unit_target.2degrees.png
+Compressing  doc\administrative\diagrams\ba_unit_type.1degree.dot
+Compressing  doc\administrative\diagrams\ba_unit_type.1degree.png
+Compressing  doc\administrative\diagrams\ba_unit_type.2degrees.dot
+Compressing  doc\administrative\diagrams\ba_unit_type.2degrees.png
+Compressing  doc\administrative\diagrams\condition_for_rrr.1degree.dot
+Compressing  doc\administrative\diagrams\condition_for_rrr.1degree.png
+Compressing  doc\administrative\diagrams\condition_for_rrr.2degrees.dot
+Compressing  doc\administrative\diagrams\condition_for_rrr.2degrees.png
+Compressing  doc\administrative\diagrams\condition_type.1degree.dot
+Compressing  doc\administrative\diagrams\condition_type.1degree.png
+Compressing  doc\administrative\diagrams\condition_type.2degrees.dot
+Compressing  doc\administrative\diagrams\condition_type.2degrees.png
+Compressing  doc\administrative\diagrams\mortgage_isbased_in_rrr.1degree.dot
+Compressing  doc\administrative\diagrams\mortgage_isbased_in_rrr.1degree.png
+Compressing  doc\administrative\diagrams\mortgage_isbased_in_rrr.2degrees.dot
+Compressing  doc\administrative\diagrams\mortgage_isbased_in_rrr.2degrees.png
+Compressing  doc\administrative\diagrams\mortgage_type.1degree.dot
+Compressing  doc\administrative\diagrams\mortgage_type.1degree.png
+Compressing  doc\administrative\diagrams\mortgage_type.2degrees.dot
+Compressing  doc\administrative\diagrams\mortgage_type.2degrees.png
+Compressing  doc\administrative\diagrams\notation.1degree.dot
+Compressing  doc\administrative\diagrams\notation.1degree.png
+Compressing  doc\administrative\diagrams\notation.2degrees.dot
+Compressing  doc\administrative\diagrams\notation.2degrees.png
+Compressing  doc\administrative\diagrams\party_for_rrr.1degree.dot
+Compressing  doc\administrative\diagrams\party_for_rrr.1degree.png
+Compressing  doc\administrative\diagrams\party_for_rrr.2degrees.dot
+Compressing  doc\administrative\diagrams\party_for_rrr.2degrees.png
+Compressing  doc\administrative\diagrams\required_relationship_baunit.1degree.dot
+Compressing  doc\administrative\diagrams\required_relationship_baunit.1degree.png
+Compressing  doc\administrative\diagrams\required_relationship_baunit.2degrees.dot
+Compressing  doc\administrative\diagrams\required_relationship_baunit.2degrees.png
+Compressing  doc\administrative\diagrams\rrr.1degree.dot
+Compressing  doc\administrative\diagrams\rrr.1degree.png
+Compressing  doc\administrative\diagrams\rrr.2degrees.dot
+Compressing  doc\administrative\diagrams\rrr.2degrees.png
+Compressing  doc\administrative\diagrams\rrr_detail.1degree.dot
+Compressing  doc\administrative\diagrams\rrr_detail.1degree.png
+Compressing  doc\administrative\diagrams\rrr_detail.2degrees.dot
+Compressing  doc\administrative\diagrams\rrr_detail.2degrees.png
+Compressing  doc\administrative\diagrams\rrr_detail_type.1degree.dot
+Compressing  doc\administrative\diagrams\rrr_detail_type.1degree.png
+Compressing  doc\administrative\diagrams\rrr_detail_type.2degrees.dot
+Compressing  doc\administrative\diagrams\rrr_detail_type.2degrees.png
+Compressing  doc\administrative\diagrams\rrr_group_type.1degree.dot
+Compressing  doc\administrative\diagrams\rrr_group_type.1degree.png
+Compressing  doc\administrative\diagrams\rrr_group_type.2degrees.dot
+Compressing  doc\administrative\diagrams\rrr_group_type.2degrees.png
+Compressing  doc\administrative\diagrams\rrr_share.1degree.dot
+Compressing  doc\administrative\diagrams\rrr_share.1degree.png
+Compressing  doc\administrative\diagrams\rrr_share.2degrees.dot
+Compressing  doc\administrative\diagrams\rrr_share.2degrees.png
+Compressing  doc\administrative\diagrams\rrr_type.1degree.dot
+Compressing  doc\administrative\diagrams\rrr_type.1degree.png
+Compressing  doc\administrative\diagrams\rrr_type.2degrees.dot
+Compressing  doc\administrative\diagrams\rrr_type.2degrees.png
+Compressing  doc\administrative\diagrams\source_describes_ba_unit.1degree.dot
+Compressing  doc\administrative\diagrams\source_describes_ba_unit.1degree.png
+Compressing  doc\administrative\diagrams\source_describes_ba_unit.2degrees.dot
+Compressing  doc\administrative\diagrams\source_describes_ba_unit.2degrees.png
+Compressing  doc\administrative\diagrams\source_describes_rrr.1degree.dot
+Compressing  doc\administrative\diagrams\source_describes_rrr.1degree.png
+Compressing  doc\administrative\diagrams\source_describes_rrr.2degrees.dot
+Compressing  doc\administrative\diagrams\source_describes_rrr.2degrees.png
+Compressing  doc\administrative\diagrams\summary\ba_unit_name_is_valid.1degree.dot
+Compressing  doc\administrative\diagrams\summary\ba_unit_name_is_valid.1degree.png
+Compressing  doc\administrative\diagrams\summary\Function
+Compressing  doc\administrative\diagrams\summary\Functon
+Compressing  doc\administrative\diagrams\summary\notifiable_party_for_baunit.1degree.dot
+Compressing  doc\administrative\diagrams\summary\notifiable_party_for_baunit.1degree.png
+Compressing  doc\administrative\diagrams\summary\relationships.real.compact.dot
+Compressing  doc\administrative\diagrams\summary\relationships.real.compact.png
+Compressing  doc\administrative\diagrams\summary\relationships.real.large.dot
+Compressing  doc\administrative\diagrams\summary\relationships.real.large.png
+Compressing  doc\administrative\diagrams\summary\Sequence
+Compressing  doc\administrative\diagrams\summary\systematic_registration_listing.1degree.dot
+Compressing  doc\administrative\diagrams\summary\systematic_registration_listing.1degree.png
+Compressing  doc\administrative\diagrams\summary\sys_reg_owner_name.1degree.dot
+Compressing  doc\administrative\diagrams\summary\sys_reg_owner_name.1degree.png
+Compressing  doc\administrative\diagrams\summary\sys_reg_state_land.1degree.dot
+Compressing  doc\administrative\diagrams\summary\sys_reg_state_land.1degree.png
+Compressing  doc\administrative\diagrams\summary\Trigger Function
+Compressing  doc\administrative\images\background.gif
+Compressing  doc\administrative\images\tabLeft.gif
+Compressing  doc\administrative\images\tabRight.gif
+Compressing  doc\administrative\index.html
+Compressing  doc\administrative\insertionOrder.txt
+Compressing  doc\administrative\jquery.js
+Compressing  doc\administrative\relationships.html
+Compressing  doc\administrative\schemaSpy.css
+Compressing  doc\administrative\schemaSpy.js
+Compressing  doc\administrative\sola.administrative.xml
+Compressing  doc\administrative\sola_original.administrative.xml
+Compressing  doc\administrative\tables\ba_unit.html
+Compressing  doc\administrative\tables\ba_unit_area.html
+Compressing  doc\administrative\tables\ba_unit_as_party.html
+Compressing  doc\administrative\tables\ba_unit_contains_spatial_unit.html
+Compressing  doc\administrative\tables\ba_unit_detail.html
+Compressing  doc\administrative\tables\ba_unit_detail_type.html
+Compressing  doc\administrative\tables\ba_unit_name_is_valid.html
+Compressing  doc\administrative\tables\ba_unit_rel_type.html
+Compressing  doc\administrative\tables\ba_unit_target.html
+Compressing  doc\administrative\tables\ba_unit_type.html
+Compressing  doc\administrative\tables\condition_for_rrr.html
+Compressing  doc\administrative\tables\condition_type.html
+Compressing  doc\administrative\tables\Function
+Compressing  doc\administrative\tables\Functon
+Compressing  doc\administrative\tables\mortgage_isbased_in_rrr.html
+Compressing  doc\administrative\tables\mortgage_type.html
+Compressing  doc\administrative\tables\notation.html
+Compressing  doc\administrative\tables\notifiable_party_for_baunit.html
+Compressing  doc\administrative\tables\party_for_rrr.html
+Compressing  doc\administrative\tables\required_relationship_baunit.html
+Compressing  doc\administrative\tables\rrr.html
+Compressing  doc\administrative\tables\rrr_detail.html
+Compressing  doc\administrative\tables\rrr_detail_type.html
+Compressing  doc\administrative\tables\rrr_group_type.html
+Compressing  doc\administrative\tables\rrr_share.html
+Compressing  doc\administrative\tables\rrr_type.html
+Compressing  doc\administrative\tables\Sequence
+Compressing  doc\administrative\tables\source_describes_ba_unit.html
+Compressing  doc\administrative\tables\source_describes_rrr.html
+Compressing  doc\administrative\tables\systematic_registration_listing.html
+Compressing  doc\administrative\tables\sys_reg_owner_name.html
+Compressing  doc\administrative\tables\sys_reg_state_land.html
+Compressing  doc\administrative\tables\Trigger Function
+Compressing  doc\administrative\utilities.html
+Compressing  doc\application\anomalies.html
+Compressing  doc\application\columns.byAuto.html
+Compressing  doc\application\columns.byColumn.html
+Compressing  doc\application\columns.byDefault.html
+Compressing  doc\application\columns.byNulls.html
+Compressing  doc\application\columns.bySize.html
+Compressing  doc\application\columns.byTable.html
+Compressing  doc\application\columns.byType.html
+Compressing  doc\application\constraints.html
+Compressing  doc\application\deletionOrder.txt
+Compressing  doc\application\diagrams\application.1degree.dot
+Compressing  doc\application\diagrams\application.1degree.png
+Compressing  doc\application\diagrams\application.2degrees.dot
+Compressing  doc\application\diagrams\application.2degrees.png
+Compressing  doc\application\diagrams\application_action_type.1degree.dot
+Compressing  doc\application\diagrams\application_action_type.1degree.png
+Compressing  doc\application\diagrams\application_action_type.2degrees.dot
+Compressing  doc\application\diagrams\application_action_type.2degrees.png
+Compressing  doc\application\diagrams\application_property.1degree.dot
+Compressing  doc\application\diagrams\application_property.1degree.png
+Compressing  doc\application\diagrams\application_property.2degrees.dot
+Compressing  doc\application\diagrams\application_property.2degrees.png
+Compressing  doc\application\diagrams\application_spatial_unit.1degree.dot
+Compressing  doc\application\diagrams\application_spatial_unit.1degree.png
+Compressing  doc\application\diagrams\application_spatial_unit.2degrees.dot
+Compressing  doc\application\diagrams\application_spatial_unit.2degrees.png
+Compressing  doc\application\diagrams\application_status_type.1degree.dot
+Compressing  doc\application\diagrams\application_status_type.1degree.png
+Compressing  doc\application\diagrams\application_status_type.2degrees.dot
+Compressing  doc\application\diagrams\application_status_type.2degrees.png
+Compressing  doc\application\diagrams\application_uses_source.1degree.dot
+Compressing  doc\application\diagrams\application_uses_source.1degree.png
+Compressing  doc\application\diagrams\application_uses_source.2degrees.dot
+Compressing  doc\application\diagrams\application_uses_source.2degrees.png
+Compressing  doc\application\diagrams\notify.1degree.dot
+Compressing  doc\application\diagrams\notify.1degree.png
+Compressing  doc\application\diagrams\notify.2degrees.dot
+Compressing  doc\application\diagrams\notify.2degrees.png
+Compressing  doc\application\diagrams\notify_property.1degree.dot
+Compressing  doc\application\diagrams\notify_property.1degree.png
+Compressing  doc\application\diagrams\notify_property.2degrees.dot
+Compressing  doc\application\diagrams\notify_property.2degrees.png
+Compressing  doc\application\diagrams\notify_relationship_type.1degree.dot
+Compressing  doc\application\diagrams\notify_relationship_type.1degree.png
+Compressing  doc\application\diagrams\notify_relationship_type.2degrees.dot
+Compressing  doc\application\diagrams\notify_relationship_type.2degrees.png
+Compressing  doc\application\diagrams\notify_uses_source.1degree.dot
+Compressing  doc\application\diagrams\notify_uses_source.1degree.png
+Compressing  doc\application\diagrams\notify_uses_source.2degrees.dot
+Compressing  doc\application\diagrams\notify_uses_source.2degrees.png
+Compressing  doc\application\diagrams\request_category_type.1degree.dot
+Compressing  doc\application\diagrams\request_category_type.1degree.png
+Compressing  doc\application\diagrams\request_category_type.2degrees.dot
+Compressing  doc\application\diagrams\request_category_type.2degrees.png
+Compressing  doc\application\diagrams\request_display_group.1degree.dot
+Compressing  doc\application\diagrams\request_display_group.1degree.png
+Compressing  doc\application\diagrams\request_display_group.2degrees.dot
+Compressing  doc\application\diagrams\request_display_group.2degrees.png
+Compressing  doc\application\diagrams\request_type.1degree.dot
+Compressing  doc\application\diagrams\request_type.1degree.png
+Compressing  doc\application\diagrams\request_type.2degrees.dot
+Compressing  doc\application\diagrams\request_type.2degrees.png
+Compressing  doc\application\diagrams\request_type_requires_source_type.1degree.dot
+Compressing  doc\application\diagrams\request_type_requires_source_type.1degree.png
+Compressing  doc\application\diagrams\request_type_requires_source_type.2degrees.dot
+Compressing  doc\application\diagrams\request_type_requires_source_type.2degrees.png
+Compressing  doc\application\diagrams\service.1degree.dot
+Compressing  doc\application\diagrams\service.1degree.png
+Compressing  doc\application\diagrams\service.2degrees.dot
+Compressing  doc\application\diagrams\service.2degrees.png
+Compressing  doc\application\diagrams\service_action_type.1degree.dot
+Compressing  doc\application\diagrams\service_action_type.1degree.png
+Compressing  doc\application\diagrams\service_action_type.2degrees.dot
+Compressing  doc\application\diagrams\service_action_type.2degrees.png
+Compressing  doc\application\diagrams\service_status_type.1degree.dot
+Compressing  doc\application\diagrams\service_status_type.1degree.png
+Compressing  doc\application\diagrams\service_status_type.2degrees.dot
+Compressing  doc\application\diagrams\service_status_type.2degrees.png
+Compressing  doc\application\diagrams\summary\cancel_notification.1degree.dot
+Compressing  doc\application\diagrams\summary\cancel_notification.1degree.png
+Compressing  doc\application\diagrams\summary\Function
+Compressing  doc\application\diagrams\summary\notifiable_party_for_baunit.1degree.dot
+Compressing  doc\application\diagrams\summary\notifiable_party_for_baunit.1degree.png
+Compressing  doc\application\diagrams\summary\relationships.real.compact.dot
+Compressing  doc\application\diagrams\summary\relationships.real.compact.png
+Compressing  doc\application\diagrams\summary\relationships.real.large.dot
+Compressing  doc\application\diagrams\summary\relationships.real.large.png
+Compressing  doc\application\diagrams\summary\Sequence
+Compressing  doc\application\diagrams\summary\systematic_registration_certificates.1degree.dot
+Compressing  doc\application\diagrams\summary\systematic_registration_certificates.1degree.png
+Compressing  doc\application\diagrams\type_action.1degree.dot
+Compressing  doc\application\diagrams\type_action.1degree.png
+Compressing  doc\application\diagrams\type_action.2degrees.dot
+Compressing  doc\application\diagrams\type_action.2degrees.png
+Compressing  doc\application\images\background.gif
+Compressing  doc\application\images\tabLeft.gif
+Compressing  doc\application\images\tabRight.gif
+Compressing  doc\application\index.html
+Compressing  doc\application\insertionOrder.txt
+Compressing  doc\application\jquery.js
+Compressing  doc\application\relationships.html
+Compressing  doc\application\schemaSpy.css
+Compressing  doc\application\schemaSpy.js
+Compressing  doc\application\sola.application.xml
+Compressing  doc\application\sola_original.application.xml
+Compressing  doc\application\tables\application.html
+Compressing  doc\application\tables\application_action_type.html
+Compressing  doc\application\tables\application_property.html
+Compressing  doc\application\tables\application_spatial_unit.html
+Compressing  doc\application\tables\application_status_type.html
+Compressing  doc\application\tables\application_uses_source.html
+Compressing  doc\application\tables\cancel_notification.html
+Compressing  doc\application\tables\Function
+Compressing  doc\application\tables\notifiable_party_for_baunit.html
+Compressing  doc\application\tables\notify.html
+Compressing  doc\application\tables\notify_property.html
+Compressing  doc\application\tables\notify_relationship_type.html
+Compressing  doc\application\tables\notify_uses_source.html
+Compressing  doc\application\tables\request_category_type.html
+Compressing  doc\application\tables\request_display_group.html
+Compressing  doc\application\tables\request_type.html
+Compressing  doc\application\tables\request_type_requires_source_type.html
+Compressing  doc\application\tables\Sequence
+Compressing  doc\application\tables\service.html
+Compressing  doc\application\tables\service_action_type.html
+Compressing  doc\application\tables\service_status_type.html
+Compressing  doc\application\tables\systematic_registration_certificates.html
+Compressing  doc\application\tables\type_action.html
+Compressing  doc\application\utilities.html
+Compressing  doc\bulk_operation\anomalies.html
+Compressing  doc\bulk_operation\columns.byAuto.html
+Compressing  doc\bulk_operation\columns.byColumn.html
+Compressing  doc\bulk_operation\columns.byDefault.html
+Compressing  doc\bulk_operation\columns.byNulls.html
+Compressing  doc\bulk_operation\columns.bySize.html
+Compressing  doc\bulk_operation\columns.byTable.html
+Compressing  doc\bulk_operation\columns.byType.html
+Compressing  doc\bulk_operation\constraints.html
+Compressing  doc\bulk_operation\deletionOrder.txt
+Compressing  doc\bulk_operation\diagrams\spatial_unit_temporary.1degree.dot
+Compressing  doc\bulk_operation\diagrams\spatial_unit_temporary.1degree.png
+Compressing  doc\bulk_operation\diagrams\summary\Function
+Compressing  doc\bulk_operation\diagrams\summary\relationships.real.compact.dot
+Compressing  doc\bulk_operation\diagrams\summary\relationships.real.compact.png
+Compressing  doc\bulk_operation\diagrams\summary\relationships.real.large.dot
+Compressing  doc\bulk_operation\diagrams\summary\relationships.real.large.png
+Compressing  doc\bulk_operation\images\background.gif
+Compressing  doc\bulk_operation\images\tabLeft.gif
+Compressing  doc\bulk_operation\images\tabRight.gif
+Compressing  doc\bulk_operation\index.html
+Compressing  doc\bulk_operation\insertionOrder.txt
+Compressing  doc\bulk_operation\jquery.js
+Compressing  doc\bulk_operation\relationships.html
+Compressing  doc\bulk_operation\schemaSpy.css
+Compressing  doc\bulk_operation\schemaSpy.js
+Compressing  doc\bulk_operation\sola.bulk_operation.xml
+Compressing  doc\bulk_operation\sola_original.bulk_operation.xml
+Compressing  doc\bulk_operation\tables\Function
+Compressing  doc\bulk_operation\tables\spatial_unit_temporary.html
+Compressing  doc\bulk_operation\utilities.html
+Compressing  doc\cadastre\anomalies.html
+Compressing  doc\cadastre\columns.byAuto.html
+Compressing  doc\cadastre\columns.byColumn.html
+Compressing  doc\cadastre\columns.byDefault.html
+Compressing  doc\cadastre\columns.byNulls.html
+Compressing  doc\cadastre\columns.bySize.html
+Compressing  doc\cadastre\columns.byTable.html
+Compressing  doc\cadastre\columns.byType.html
+Compressing  doc\cadastre\constraints.html
+Compressing  doc\cadastre\deletionOrder.txt
+Compressing  doc\cadastre\diagrams\area_type.1degree.dot
+Compressing  doc\cadastre\diagrams\area_type.1degree.png
+Compressing  doc\cadastre\diagrams\area_type.2degrees.dot
+Compressing  doc\cadastre\diagrams\area_type.2degrees.png
+Compressing  doc\cadastre\diagrams\building_unit_type.1degree.dot
+Compressing  doc\cadastre\diagrams\building_unit_type.1degree.png
+Compressing  doc\cadastre\diagrams\building_unit_type.2degrees.dot
+Compressing  doc\cadastre\diagrams\building_unit_type.2degrees.png
+Compressing  doc\cadastre\diagrams\cadastre_object.1degree.dot
+Compressing  doc\cadastre\diagrams\cadastre_object.1degree.png
+Compressing  doc\cadastre\diagrams\cadastre_object.2degrees.dot
+Compressing  doc\cadastre\diagrams\cadastre_object.2degrees.png
+Compressing  doc\cadastre\diagrams\cadastre_object_node_target.1degree.dot
+Compressing  doc\cadastre\diagrams\cadastre_object_node_target.1degree.png
+Compressing  doc\cadastre\diagrams\cadastre_object_node_target.2degrees.dot
+Compressing  doc\cadastre\diagrams\cadastre_object_node_target.2degrees.png
+Compressing  doc\cadastre\diagrams\cadastre_object_target.1degree.dot
+Compressing  doc\cadastre\diagrams\cadastre_object_target.1degree.png
+Compressing  doc\cadastre\diagrams\cadastre_object_target.2degrees.dot
+Compressing  doc\cadastre\diagrams\cadastre_object_target.2degrees.png
+Compressing  doc\cadastre\diagrams\cadastre_object_type.1degree.dot
+Compressing  doc\cadastre\diagrams\cadastre_object_type.1degree.png
+Compressing  doc\cadastre\diagrams\cadastre_object_type.2degrees.dot
+Compressing  doc\cadastre\diagrams\cadastre_object_type.2degrees.png
+Compressing  doc\cadastre\diagrams\dimension_type.1degree.dot
+Compressing  doc\cadastre\diagrams\dimension_type.1degree.png
+Compressing  doc\cadastre\diagrams\dimension_type.2degrees.dot
+Compressing  doc\cadastre\diagrams\dimension_type.2degrees.png
+Compressing  doc\cadastre\diagrams\land_use_type.1degree.dot
+Compressing  doc\cadastre\diagrams\land_use_type.1degree.png
+Compressing  doc\cadastre\diagrams\land_use_type.2degrees.dot
+Compressing  doc\cadastre\diagrams\land_use_type.2degrees.png
+Compressing  doc\cadastre\diagrams\legal_space_utility_network.1degree.dot
+Compressing  doc\cadastre\diagrams\legal_space_utility_network.1degree.png
+Compressing  doc\cadastre\diagrams\legal_space_utility_network.2degrees.dot
+Compressing  doc\cadastre\diagrams\legal_space_utility_network.2degrees.png
+Compressing  doc\cadastre\diagrams\level.1degree.dot
+Compressing  doc\cadastre\diagrams\level.1degree.png
+Compressing  doc\cadastre\diagrams\level.2degrees.dot
+Compressing  doc\cadastre\diagrams\level.2degrees.png
+Compressing  doc\cadastre\diagrams\level_config_map_layer.1degree.dot
+Compressing  doc\cadastre\diagrams\level_config_map_layer.1degree.png
+Compressing  doc\cadastre\diagrams\level_config_map_layer.2degrees.dot
+Compressing  doc\cadastre\diagrams\level_config_map_layer.2degrees.png
+Compressing  doc\cadastre\diagrams\level_content_type.1degree.dot
+Compressing  doc\cadastre\diagrams\level_content_type.1degree.png
+Compressing  doc\cadastre\diagrams\level_content_type.2degrees.dot
+Compressing  doc\cadastre\diagrams\level_content_type.2degrees.png
+Compressing  doc\cadastre\diagrams\register_type.1degree.dot
+Compressing  doc\cadastre\diagrams\register_type.1degree.png
+Compressing  doc\cadastre\diagrams\register_type.2degrees.dot
+Compressing  doc\cadastre\diagrams\register_type.2degrees.png
+Compressing  doc\cadastre\diagrams\spatial_unit.1degree.dot
+Compressing  doc\cadastre\diagrams\spatial_unit.1degree.png
+Compressing  doc\cadastre\diagrams\spatial_unit.2degrees.dot
+Compressing  doc\cadastre\diagrams\spatial_unit.2degrees.png
+Compressing  doc\cadastre\diagrams\spatial_unit_address.1degree.dot
+Compressing  doc\cadastre\diagrams\spatial_unit_address.1degree.png
+Compressing  doc\cadastre\diagrams\spatial_unit_address.2degrees.dot
+Compressing  doc\cadastre\diagrams\spatial_unit_address.2degrees.png
+Compressing  doc\cadastre\diagrams\spatial_unit_group.1degree.dot
+Compressing  doc\cadastre\diagrams\spatial_unit_group.1degree.png
+Compressing  doc\cadastre\diagrams\spatial_unit_group.2degrees.dot
+Compressing  doc\cadastre\diagrams\spatial_unit_group.2degrees.png
+Compressing  doc\cadastre\diagrams\spatial_unit_in_group.1degree.dot
+Compressing  doc\cadastre\diagrams\spatial_unit_in_group.1degree.png
+Compressing  doc\cadastre\diagrams\spatial_unit_in_group.2degrees.dot
+Compressing  doc\cadastre\diagrams\spatial_unit_in_group.2degrees.png
+Compressing  doc\cadastre\diagrams\spatial_value_area.1degree.dot
+Compressing  doc\cadastre\diagrams\spatial_value_area.1degree.png
+Compressing  doc\cadastre\diagrams\spatial_value_area.2degrees.dot
+Compressing  doc\cadastre\diagrams\spatial_value_area.2degrees.png
+Compressing  doc\cadastre\diagrams\structure_type.1degree.dot
+Compressing  doc\cadastre\diagrams\structure_type.1degree.png
+Compressing  doc\cadastre\diagrams\structure_type.2degrees.dot
+Compressing  doc\cadastre\diagrams\structure_type.2degrees.png
+Compressing  doc\cadastre\diagrams\summary\Function
+Compressing  doc\cadastre\diagrams\summary\hierarchy.1degree.dot
+Compressing  doc\cadastre\diagrams\summary\hierarchy.1degree.png
+Compressing  doc\cadastre\diagrams\summary\hierarchy_level.1degree.dot
+Compressing  doc\cadastre\diagrams\summary\hierarchy_level.1degree.png
+Compressing  doc\cadastre\diagrams\summary\lga.1degree.dot
+Compressing  doc\cadastre\diagrams\summary\lga.1degree.png
+Compressing  doc\cadastre\diagrams\summary\parcel_plan.1degree.dot
+Compressing  doc\cadastre\diagrams\summary\parcel_plan.1degree.png
+Compressing  doc\cadastre\diagrams\summary\place_name.1degree.dot
+Compressing  doc\cadastre\diagrams\summary\place_name.1degree.png
+Compressing  doc\cadastre\diagrams\summary\relationships.real.compact.dot
+Compressing  doc\cadastre\diagrams\summary\relationships.real.compact.png
+Compressing  doc\cadastre\diagrams\summary\relationships.real.large.dot
+Compressing  doc\cadastre\diagrams\summary\relationships.real.large.png
+Compressing  doc\cadastre\diagrams\summary\road.1degree.dot
+Compressing  doc\cadastre\diagrams\summary\road.1degree.png
+Compressing  doc\cadastre\diagrams\summary\survey_control.1degree.dot
+Compressing  doc\cadastre\diagrams\summary\survey_control.1degree.png
+Compressing  doc\cadastre\diagrams\summary\Trigger Function
+Compressing  doc\cadastre\diagrams\summary\ward.1degree.dot
+Compressing  doc\cadastre\diagrams\summary\ward.1degree.png
+Compressing  doc\cadastre\diagrams\surface_relation_type.1degree.dot
+Compressing  doc\cadastre\diagrams\surface_relation_type.1degree.png
+Compressing  doc\cadastre\diagrams\surface_relation_type.2degrees.dot
+Compressing  doc\cadastre\diagrams\surface_relation_type.2degrees.png
+Compressing  doc\cadastre\diagrams\survey_point.1degree.dot
+Compressing  doc\cadastre\diagrams\survey_point.1degree.png
+Compressing  doc\cadastre\diagrams\survey_point.2degrees.dot
+Compressing  doc\cadastre\diagrams\survey_point.2degrees.png
+Compressing  doc\cadastre\diagrams\utility_network_status_type.1degree.dot
+Compressing  doc\cadastre\diagrams\utility_network_status_type.1degree.png
+Compressing  doc\cadastre\diagrams\utility_network_status_type.2degrees.dot
+Compressing  doc\cadastre\diagrams\utility_network_status_type.2degrees.png
+Compressing  doc\cadastre\diagrams\utility_network_type.1degree.dot
+Compressing  doc\cadastre\diagrams\utility_network_type.1degree.png
+Compressing  doc\cadastre\diagrams\utility_network_type.2degrees.dot
+Compressing  doc\cadastre\diagrams\utility_network_type.2degrees.png
+Compressing  doc\cadastre\images\background.gif
+Compressing  doc\cadastre\images\tabLeft.gif
+Compressing  doc\cadastre\images\tabRight.gif
+Compressing  doc\cadastre\index.html
+Compressing  doc\cadastre\insertionOrder.txt
+Compressing  doc\cadastre\jquery.js
+Compressing  doc\cadastre\relationships.html
+Compressing  doc\cadastre\schemaSpy.css
+Compressing  doc\cadastre\schemaSpy.js
+Compressing  doc\cadastre\sola.cadastre.xml
+Compressing  doc\cadastre\sola_original.cadastre.xml
+Compressing  doc\cadastre\tables\area_type.html
+Compressing  doc\cadastre\tables\building_unit_type.html
+Compressing  doc\cadastre\tables\cadastre_object.html
+Compressing  doc\cadastre\tables\cadastre_object_node_target.html
+Compressing  doc\cadastre\tables\cadastre_object_target.html
+Compressing  doc\cadastre\tables\cadastre_object_type.html
+Compressing  doc\cadastre\tables\dimension_type.html
+Compressing  doc\cadastre\tables\Function
+Compressing  doc\cadastre\tables\hierarchy.html
+Compressing  doc\cadastre\tables\hierarchy_level.html
+Compressing  doc\cadastre\tables\land_use_type.html
+Compressing  doc\cadastre\tables\legal_space_utility_network.html
+Compressing  doc\cadastre\tables\level.html
+Compressing  doc\cadastre\tables\level_config_map_layer.html
+Compressing  doc\cadastre\tables\level_content_type.html
+Compressing  doc\cadastre\tables\lga.html
+Compressing  doc\cadastre\tables\parcel_plan.html
+Compressing  doc\cadastre\tables\place_name.html
+Compressing  doc\cadastre\tables\register_type.html
+Compressing  doc\cadastre\tables\road.html
+Compressing  doc\cadastre\tables\spatial_unit.html
+Compressing  doc\cadastre\tables\spatial_unit_address.html
+Compressing  doc\cadastre\tables\spatial_unit_group.html
+Compressing  doc\cadastre\tables\spatial_unit_in_group.html
+Compressing  doc\cadastre\tables\spatial_value_area.html
+Compressing  doc\cadastre\tables\structure_type.html
+Compressing  doc\cadastre\tables\surface_relation_type.html
+Compressing  doc\cadastre\tables\survey_control.html
+Compressing  doc\cadastre\tables\survey_point.html
+Compressing  doc\cadastre\tables\Trigger Function
+Compressing  doc\cadastre\tables\utility_network_status_type.html
+Compressing  doc\cadastre\tables\utility_network_type.html
+Compressing  doc\cadastre\tables\ward.html
+Compressing  doc\cadastre\utilities.html
+Compressing  doc\document\anomalies.html
+Compressing  doc\document\columns.byAuto.html
+Compressing  doc\document\columns.byColumn.html
+Compressing  doc\document\columns.byDefault.html
+Compressing  doc\document\columns.byNulls.html
+Compressing  doc\document\columns.bySize.html
+Compressing  doc\document\columns.byTable.html
+Compressing  doc\document\columns.byType.html
+Compressing  doc\document\constraints.html
+Compressing  doc\document\deletionOrder.txt
+Compressing  doc\document\diagrams\summary\document.1degree.dot
+Compressing  doc\document\diagrams\summary\document.1degree.png
+Compressing  doc\document\diagrams\summary\document_chunk.1degree.dot
+Compressing  doc\document\diagrams\summary\document_chunk.1degree.png
+Compressing  doc\document\diagrams\summary\relationships.real.compact.dot
+Compressing  doc\document\diagrams\summary\Sequence
+Compressing  doc\document\images\background.gif
+Compressing  doc\document\images\tabLeft.gif
+Compressing  doc\document\images\tabRight.gif
+Compressing  doc\document\index.html
+Compressing  doc\document\insertionOrder.txt
+Compressing  doc\document\jquery.js
+Compressing  doc\document\relationships.html
+Compressing  doc\document\schemaSpy.css
+Compressing  doc\document\schemaSpy.js
+Compressing  doc\document\sola.document.xml
+Compressing  doc\document\sola_original.document.xml
+Compressing  doc\document\tables\document.html
+Compressing  doc\document\tables\document_chunk.html
+Compressing  doc\document\tables\Sequence
+Compressing  doc\document\utilities.html
+Compressing  doc\index.html
+Compressing  doc\opentenure\anomalies.html
+Compressing  doc\opentenure\columns.byAuto.html
+Compressing  doc\opentenure\columns.byColumn.html
+Compressing  doc\opentenure\columns.byDefault.html
+Compressing  doc\opentenure\columns.byNulls.html
+Compressing  doc\opentenure\columns.bySize.html
+Compressing  doc\opentenure\columns.byTable.html
+Compressing  doc\opentenure\columns.byType.html
+Compressing  doc\opentenure\constraints.html
+Compressing  doc\opentenure\deletionOrder.txt
+Compressing  doc\opentenure\diagrams\attachment.1degree.dot
+Compressing  doc\opentenure\diagrams\attachment.1degree.png
+Compressing  doc\opentenure\diagrams\claim.1degree.dot
+Compressing  doc\opentenure\diagrams\claim.1degree.png
+Compressing  doc\opentenure\diagrams\claim.2degrees.dot
+Compressing  doc\opentenure\diagrams\claim.2degrees.png
+Compressing  doc\opentenure\diagrams\claim_comment.1degree.dot
+Compressing  doc\opentenure\diagrams\claim_comment.1degree.png
+Compressing  doc\opentenure\diagrams\claim_comment.2degrees.dot
+Compressing  doc\opentenure\diagrams\claim_comment.2degrees.png
+Compressing  doc\opentenure\diagrams\claim_location.1degree.dot
+Compressing  doc\opentenure\diagrams\claim_location.1degree.png
+Compressing  doc\opentenure\diagrams\claim_location.2degrees.dot
+Compressing  doc\opentenure\diagrams\claim_location.2degrees.png
+Compressing  doc\opentenure\diagrams\claim_share.1degree.dot
+Compressing  doc\opentenure\diagrams\claim_share.1degree.png
+Compressing  doc\opentenure\diagrams\claim_share.2degrees.dot
+Compressing  doc\opentenure\diagrams\claim_share.2degrees.png
+Compressing  doc\opentenure\diagrams\claim_status.1degree.dot
+Compressing  doc\opentenure\diagrams\claim_status.1degree.png
+Compressing  doc\opentenure\diagrams\claim_status.2degrees.dot
+Compressing  doc\opentenure\diagrams\claim_status.2degrees.png
+Compressing  doc\opentenure\diagrams\claim_uses_attachment.1degree.dot
+Compressing  doc\opentenure\diagrams\claim_uses_attachment.1degree.png
+Compressing  doc\opentenure\diagrams\claim_uses_attachment.2degrees.dot
+Compressing  doc\opentenure\diagrams\claim_uses_attachment.2degrees.png
+Compressing  doc\opentenure\diagrams\field_constraint.1degree.dot
+Compressing  doc\opentenure\diagrams\field_constraint.1degree.png
+Compressing  doc\opentenure\diagrams\field_constraint.2degrees.dot
+Compressing  doc\opentenure\diagrams\field_constraint.2degrees.png
+Compressing  doc\opentenure\diagrams\field_constraint_option.1degree.dot
+Compressing  doc\opentenure\diagrams\field_constraint_option.1degree.png
+Compressing  doc\opentenure\diagrams\field_constraint_option.2degrees.dot
+Compressing  doc\opentenure\diagrams\field_constraint_option.2degrees.png
+Compressing  doc\opentenure\diagrams\field_constraint_type.1degree.dot
+Compressing  doc\opentenure\diagrams\field_constraint_type.1degree.png
+Compressing  doc\opentenure\diagrams\field_constraint_type.2degrees.dot
+Compressing  doc\opentenure\diagrams\field_constraint_type.2degrees.png
+Compressing  doc\opentenure\diagrams\field_payload.1degree.dot
+Compressing  doc\opentenure\diagrams\field_payload.1degree.png
+Compressing  doc\opentenure\diagrams\field_payload.2degrees.dot
+Compressing  doc\opentenure\diagrams\field_payload.2degrees.png
+Compressing  doc\opentenure\diagrams\field_template.1degree.dot
+Compressing  doc\opentenure\diagrams\field_template.1degree.png
+Compressing  doc\opentenure\diagrams\field_template.2degrees.dot
+Compressing  doc\opentenure\diagrams\field_template.2degrees.png
+Compressing  doc\opentenure\diagrams\field_type.1degree.dot
+Compressing  doc\opentenure\diagrams\field_type.1degree.png
+Compressing  doc\opentenure\diagrams\field_type.2degrees.dot
+Compressing  doc\opentenure\diagrams\field_type.2degrees.png
+Compressing  doc\opentenure\diagrams\field_value_type.1degree.dot
+Compressing  doc\opentenure\diagrams\field_value_type.1degree.png
+Compressing  doc\opentenure\diagrams\field_value_type.2degrees.dot
+Compressing  doc\opentenure\diagrams\field_value_type.2degrees.png
+Compressing  doc\opentenure\diagrams\form_payload.1degree.dot
+Compressing  doc\opentenure\diagrams\form_payload.1degree.png
+Compressing  doc\opentenure\diagrams\form_payload.2degrees.dot
+Compressing  doc\opentenure\diagrams\form_payload.2degrees.png
+Compressing  doc\opentenure\diagrams\form_template.1degree.dot
+Compressing  doc\opentenure\diagrams\form_template.1degree.png
+Compressing  doc\opentenure\diagrams\form_template.2degrees.dot
+Compressing  doc\opentenure\diagrams\form_template.2degrees.png
+Compressing  doc\opentenure\diagrams\land_use.1degree.dot
+Compressing  doc\opentenure\diagrams\land_use.1degree.png
+Compressing  doc\opentenure\diagrams\land_use.2degrees.dot
+Compressing  doc\opentenure\diagrams\land_use.2degrees.png
+Compressing  doc\opentenure\diagrams\party.1degree.dot
+Compressing  doc\opentenure\diagrams\party.1degree.png
+Compressing  doc\opentenure\diagrams\party.2degrees.dot
+Compressing  doc\opentenure\diagrams\party.2degrees.png
+Compressing  doc\opentenure\diagrams\party_for_claim_share.1degree.dot
+Compressing  doc\opentenure\diagrams\party_for_claim_share.1degree.png
+Compressing  doc\opentenure\diagrams\party_for_claim_share.2degrees.dot
+Compressing  doc\opentenure\diagrams\party_for_claim_share.2degrees.png
+Compressing  doc\opentenure\diagrams\rejection_reason.1degree.dot
+Compressing  doc\opentenure\diagrams\rejection_reason.1degree.png
+Compressing  doc\opentenure\diagrams\rejection_reason.2degrees.dot
+Compressing  doc\opentenure\diagrams\rejection_reason.2degrees.png
+Compressing  doc\opentenure\diagrams\section_element_payload.1degree.dot
+Compressing  doc\opentenure\diagrams\section_element_payload.1degree.png
+Compressing  doc\opentenure\diagrams\section_element_payload.2degrees.dot
+Compressing  doc\opentenure\diagrams\section_element_payload.2degrees.png
+Compressing  doc\opentenure\diagrams\section_payload.1degree.dot
+Compressing  doc\opentenure\diagrams\section_payload.1degree.png
+Compressing  doc\opentenure\diagrams\section_payload.2degrees.dot
+Compressing  doc\opentenure\diagrams\section_payload.2degrees.png
+Compressing  doc\opentenure\diagrams\section_template.1degree.dot
+Compressing  doc\opentenure\diagrams\section_template.1degree.png
+Compressing  doc\opentenure\diagrams\section_template.2degrees.dot
+Compressing  doc\opentenure\diagrams\section_template.2degrees.png
+Compressing  doc\opentenure\diagrams\summary\attachment_chunk.1degree.dot
+Compressing  doc\opentenure\diagrams\summary\attachment_chunk.1degree.png
+Compressing  doc\opentenure\diagrams\summary\relationships.real.compact.dot
+Compressing  doc\opentenure\diagrams\summary\relationships.real.compact.png
+Compressing  doc\opentenure\diagrams\summary\relationships.real.large.dot
+Compressing  doc\opentenure\diagrams\summary\relationships.real.large.png
+Compressing  doc\opentenure\images\background.gif
+Compressing  doc\opentenure\images\tabLeft.gif
+Compressing  doc\opentenure\images\tabRight.gif
+Compressing  doc\opentenure\index.html
+Compressing  doc\opentenure\insertionOrder.txt
+Compressing  doc\opentenure\jquery.js
+Compressing  doc\opentenure\relationships.html
+Compressing  doc\opentenure\schemaSpy.css
+Compressing  doc\opentenure\schemaSpy.js
+Compressing  doc\opentenure\sola.opentenure.xml
+Compressing  doc\opentenure\tables\attachment.html
+Compressing  doc\opentenure\tables\attachment_chunk.html
+Compressing  doc\opentenure\tables\claim.html
+Compressing  doc\opentenure\tables\claim_comment.html
+Compressing  doc\opentenure\tables\claim_location.html
+Compressing  doc\opentenure\tables\claim_share.html
+Compressing  doc\opentenure\tables\claim_status.html
+Compressing  doc\opentenure\tables\claim_uses_attachment.html
+Compressing  doc\opentenure\tables\field_constraint.html
+Compressing  doc\opentenure\tables\field_constraint_option.html
+Compressing  doc\opentenure\tables\field_constraint_type.html
+Compressing  doc\opentenure\tables\field_payload.html
+Compressing  doc\opentenure\tables\field_template.html
+Compressing  doc\opentenure\tables\field_type.html
+Compressing  doc\opentenure\tables\field_value_type.html
+Compressing  doc\opentenure\tables\form_payload.html
+Compressing  doc\opentenure\tables\form_template.html
+Compressing  doc\opentenure\tables\land_use.html
+Compressing  doc\opentenure\tables\party.html
+Compressing  doc\opentenure\tables\party_for_claim_share.html
+Compressing  doc\opentenure\tables\rejection_reason.html
+Compressing  doc\opentenure\tables\section_element_payload.html
+Compressing  doc\opentenure\tables\section_payload.html
+Compressing  doc\opentenure\tables\section_template.html
+Compressing  doc\opentenure\utilities.html
+Compressing  doc\party\anomalies.html
+Compressing  doc\party\columns.byAuto.html
+Compressing  doc\party\columns.byColumn.html
+Compressing  doc\party\columns.byDefault.html
+Compressing  doc\party\columns.byNulls.html
+Compressing  doc\party\columns.bySize.html
+Compressing  doc\party\columns.byTable.html
+Compressing  doc\party\columns.byType.html
+Compressing  doc\party\constraints.html
+Compressing  doc\party\deletionOrder.txt
+Compressing  doc\party\diagrams\communication_type.1degree.dot
+Compressing  doc\party\diagrams\communication_type.1degree.png
+Compressing  doc\party\diagrams\communication_type.2degrees.dot
+Compressing  doc\party\diagrams\communication_type.2degrees.png
+Compressing  doc\party\diagrams\gender_type.1degree.dot
+Compressing  doc\party\diagrams\gender_type.1degree.png
+Compressing  doc\party\diagrams\gender_type.2degrees.dot
+Compressing  doc\party\diagrams\gender_type.2degrees.png
+Compressing  doc\party\diagrams\group_party.1degree.dot
+Compressing  doc\party\diagrams\group_party.1degree.png
+Compressing  doc\party\diagrams\group_party.2degrees.dot
+Compressing  doc\party\diagrams\group_party.2degrees.png
+Compressing  doc\party\diagrams\group_party_type.1degree.dot
+Compressing  doc\party\diagrams\group_party_type.1degree.png
+Compressing  doc\party\diagrams\group_party_type.2degrees.dot
+Compressing  doc\party\diagrams\group_party_type.2degrees.png
+Compressing  doc\party\diagrams\id_type.1degree.dot
+Compressing  doc\party\diagrams\id_type.1degree.png
+Compressing  doc\party\diagrams\id_type.2degrees.dot
+Compressing  doc\party\diagrams\id_type.2degrees.png
+Compressing  doc\party\diagrams\party.1degree.dot
+Compressing  doc\party\diagrams\party.1degree.png
+Compressing  doc\party\diagrams\party.2degrees.dot
+Compressing  doc\party\diagrams\party.2degrees.png
+Compressing  doc\party\diagrams\party_member.1degree.dot
+Compressing  doc\party\diagrams\party_member.1degree.png
+Compressing  doc\party\diagrams\party_member.2degrees.dot
+Compressing  doc\party\diagrams\party_member.2degrees.png
+Compressing  doc\party\diagrams\party_role.1degree.dot
+Compressing  doc\party\diagrams\party_role.1degree.png
+Compressing  doc\party\diagrams\party_role.2degrees.dot
+Compressing  doc\party\diagrams\party_role.2degrees.png
+Compressing  doc\party\diagrams\party_role_type.1degree.dot
+Compressing  doc\party\diagrams\party_role_type.1degree.png
+Compressing  doc\party\diagrams\party_role_type.2degrees.dot
+Compressing  doc\party\diagrams\party_role_type.2degrees.png
+Compressing  doc\party\diagrams\party_type.1degree.dot
+Compressing  doc\party\diagrams\party_type.1degree.png
+Compressing  doc\party\diagrams\party_type.2degrees.dot
+Compressing  doc\party\diagrams\party_type.2degrees.png
+Compressing  doc\party\diagrams\source_describes_party.1degree.dot
+Compressing  doc\party\diagrams\source_describes_party.1degree.png
+Compressing  doc\party\diagrams\source_describes_party.2degrees.dot
+Compressing  doc\party\diagrams\source_describes_party.2degrees.png
+Compressing  doc\party\diagrams\summary\Function
+Compressing  doc\party\diagrams\summary\relationships.real.compact.dot
+Compressing  doc\party\diagrams\summary\relationships.real.compact.png
+Compressing  doc\party\diagrams\summary\relationships.real.large.dot
+Compressing  doc\party\diagrams\summary\relationships.real.large.png
+Compressing  doc\party\images\background.gif
+Compressing  doc\party\images\tabLeft.gif
+Compressing  doc\party\images\tabRight.gif
+Compressing  doc\party\index.html
+Compressing  doc\party\insertionOrder.txt
+Compressing  doc\party\jquery.js
+Compressing  doc\party\relationships.html
+Compressing  doc\party\schemaSpy.css
+Compressing  doc\party\schemaSpy.js
+Compressing  doc\party\sola.party.xml
+Compressing  doc\party\sola_original.party.xml
+Compressing  doc\party\tables\communication_type.html
+Compressing  doc\party\tables\Function
+Compressing  doc\party\tables\gender_type.html
+Compressing  doc\party\tables\group_party.html
+Compressing  doc\party\tables\group_party_type.html
+Compressing  doc\party\tables\id_type.html
+Compressing  doc\party\tables\party.html
+Compressing  doc\party\tables\party_member.html
+Compressing  doc\party\tables\party_role.html
+Compressing  doc\party\tables\party_role_type.html
+Compressing  doc\party\tables\party_type.html
+Compressing  doc\party\tables\source_describes_party.html
+Compressing  doc\party\utilities.html
+Compressing  doc\public\anomalies.html
+Compressing  doc\public\columns.byAuto.html
+Compressing  doc\public\columns.byColumn.html
+Compressing  doc\public\columns.byDefault.html
+Compressing  doc\public\columns.byNulls.html
+Compressing  doc\public\columns.bySize.html
+Compressing  doc\public\columns.byTable.html
+Compressing  doc\public\columns.byType.html
+Compressing  doc\public\constraints.html
+Compressing  doc\public\deletionOrder.txt
+Compressing  doc\public\diagrams\summary\Function
+Compressing  doc\public\diagrams\summary\geography_columns.1degree.dot
+Compressing  doc\public\diagrams\summary\geography_columns.1degree.png
+Compressing  doc\public\diagrams\summary\geometry_columns.1degree.dot
+Compressing  doc\public\diagrams\summary\geometry_columns.1degree.png
+Compressing  doc\public\diagrams\summary\KTLP242.1degree.dot
+Compressing  doc\public\diagrams\summary\KTLP242.1degree.png
+Compressing  doc\public\diagrams\summary\raster_columns.1degree.dot
+Compressing  doc\public\diagrams\summary\raster_columns.1degree.png
+Compressing  doc\public\diagrams\summary\raster_overviews.1degree.dot
+Compressing  doc\public\diagrams\summary\raster_overviews.1degree.png
+Compressing  doc\public\diagrams\summary\relationships.real.compact.dot
+Compressing  doc\public\diagrams\summary\spatial_ref_sys.1degree.dot
+Compressing  doc\public\diagrams\summary\spatial_ref_sys.1degree.png
+Compressing  doc\public\diagrams\summary\Trigger Function
+Compressing  doc\public\images\background.gif
+Compressing  doc\public\images\tabLeft.gif
+Compressing  doc\public\images\tabRight.gif
+Compressing  doc\public\index.html
+Compressing  doc\public\insertionOrder.txt
+Compressing  doc\public\jquery.js
+Compressing  doc\public\relationships.html
+Compressing  doc\public\schemaSpy.css
+Compressing  doc\public\schemaSpy.js
+Compressing  doc\public\sola.public.xml
+Compressing  doc\public\sola_original.public.xml
+Compressing  doc\public\tables\Function
+Compressing  doc\public\tables\geography_columns.html
+Compressing  doc\public\tables\geometry_columns.html
+Compressing  doc\public\tables\KTLP242.html
+Compressing  doc\public\tables\raster_columns.html
+Compressing  doc\public\tables\raster_overviews.html
+Compressing  doc\public\tables\spatial_ref_sys.html
+Compressing  doc\public\tables\Trigger Function
+Compressing  doc\public\utilities.html
+Compressing  doc\source\anomalies.html
+Compressing  doc\source\columns.byAuto.html
+Compressing  doc\source\columns.byColumn.html
+Compressing  doc\source\columns.byDefault.html
+Compressing  doc\source\columns.byNulls.html
+Compressing  doc\source\columns.bySize.html
+Compressing  doc\source\columns.byTable.html
+Compressing  doc\source\columns.byType.html
+Compressing  doc\source\constraints.html
+Compressing  doc\source\deletionOrder.txt
+Compressing  doc\source\diagrams\administrative_source_type.1degree.dot
+Compressing  doc\source\diagrams\administrative_source_type.1degree.png
+Compressing  doc\source\diagrams\administrative_source_type.2degrees.dot
+Compressing  doc\source\diagrams\administrative_source_type.2degrees.png
+Compressing  doc\source\diagrams\archive.1degree.dot
+Compressing  doc\source\diagrams\archive.1degree.png
+Compressing  doc\source\diagrams\archive.2degrees.dot
+Compressing  doc\source\diagrams\archive.2degrees.png
+Compressing  doc\source\diagrams\availability_status_type.1degree.dot
+Compressing  doc\source\diagrams\availability_status_type.1degree.png
+Compressing  doc\source\diagrams\availability_status_type.2degrees.dot
+Compressing  doc\source\diagrams\availability_status_type.2degrees.png
+Compressing  doc\source\diagrams\power_of_attorney.1degree.dot
+Compressing  doc\source\diagrams\power_of_attorney.1degree.png
+Compressing  doc\source\diagrams\power_of_attorney.2degrees.dot
+Compressing  doc\source\diagrams\power_of_attorney.2degrees.png
+Compressing  doc\source\diagrams\presentation_form_type.1degree.dot
+Compressing  doc\source\diagrams\presentation_form_type.1degree.png
+Compressing  doc\source\diagrams\presentation_form_type.2degrees.dot
+Compressing  doc\source\diagrams\presentation_form_type.2degrees.png
+Compressing  doc\source\diagrams\source.1degree.dot
+Compressing  doc\source\diagrams\source.1degree.png
+Compressing  doc\source\diagrams\source.2degrees.dot
+Compressing  doc\source\diagrams\source.2degrees.png
+Compressing  doc\source\diagrams\spatial_source.1degree.dot
+Compressing  doc\source\diagrams\spatial_source.1degree.png
+Compressing  doc\source\diagrams\spatial_source.2degrees.dot
+Compressing  doc\source\diagrams\spatial_source.2degrees.png
+Compressing  doc\source\diagrams\spatial_source_measurement.1degree.dot
+Compressing  doc\source\diagrams\spatial_source_measurement.1degree.png
+Compressing  doc\source\diagrams\spatial_source_measurement.2degrees.dot
+Compressing  doc\source\diagrams\spatial_source_measurement.2degrees.png
+Compressing  doc\source\diagrams\spatial_source_type.1degree.dot
+Compressing  doc\source\diagrams\spatial_source_type.1degree.png
+Compressing  doc\source\diagrams\spatial_source_type.2degrees.dot
+Compressing  doc\source\diagrams\spatial_source_type.2degrees.png
+Compressing  doc\source\diagrams\summary\relationships.real.compact.dot
+Compressing  doc\source\diagrams\summary\relationships.real.compact.png
+Compressing  doc\source\diagrams\summary\relationships.real.large.dot
+Compressing  doc\source\diagrams\summary\relationships.real.large.png
+Compressing  doc\source\diagrams\summary\Sequence
+Compressing  doc\source\diagrams\summary\Trigger Function
+Compressing  doc\source\images\background.gif
+Compressing  doc\source\images\tabLeft.gif
+Compressing  doc\source\images\tabRight.gif
+Compressing  doc\source\index.html
+Compressing  doc\source\insertionOrder.txt
+Compressing  doc\source\jquery.js
+Compressing  doc\source\relationships.html
+Compressing  doc\source\schemaSpy.css
+Compressing  doc\source\schemaSpy.js
+Compressing  doc\source\sola.source.xml
+Compressing  doc\source\sola_original.source.xml
+Compressing  doc\source\tables\administrative_source_type.html
+Compressing  doc\source\tables\archive.html
+Compressing  doc\source\tables\availability_status_type.html
+Compressing  doc\source\tables\power_of_attorney.html
+Compressing  doc\source\tables\presentation_form_type.html
+Compressing  doc\source\tables\Sequence
+Compressing  doc\source\tables\source.html
+Compressing  doc\source\tables\spatial_source.html
+Compressing  doc\source\tables\spatial_source_measurement.html
+Compressing  doc\source\tables\spatial_source_type.html
+Compressing  doc\source\tables\Trigger Function
+Compressing  doc\source\utilities.html
+Compressing  doc\system\anomalies.html
+Compressing  doc\system\columns.byAuto.html
+Compressing  doc\system\columns.byColumn.html
+Compressing  doc\system\columns.byDefault.html
+Compressing  doc\system\columns.byNulls.html
+Compressing  doc\system\columns.bySize.html
+Compressing  doc\system\columns.byTable.html
+Compressing  doc\system\columns.byType.html
+Compressing  doc\system\constraints.html
+Compressing  doc\system\deletionOrder.txt
+Compressing  doc\system\diagrams\appgroup.1degree.dot
+Compressing  doc\system\diagrams\appgroup.1degree.png
+Compressing  doc\system\diagrams\appgroup.2degrees.dot
+Compressing  doc\system\diagrams\appgroup.2degrees.png
+Compressing  doc\system\diagrams\approle.1degree.dot
+Compressing  doc\system\diagrams\approle.1degree.png
+Compressing  doc\system\diagrams\approle.2degrees.dot
+Compressing  doc\system\diagrams\approle.2degrees.png
+Compressing  doc\system\diagrams\approle_appgroup.1degree.dot
+Compressing  doc\system\diagrams\approle_appgroup.1degree.png
+Compressing  doc\system\diagrams\approle_appgroup.2degrees.dot
+Compressing  doc\system\diagrams\approle_appgroup.2degrees.png
+Compressing  doc\system\diagrams\appuser.1degree.dot
+Compressing  doc\system\diagrams\appuser.1degree.png
+Compressing  doc\system\diagrams\appuser.2degrees.dot
+Compressing  doc\system\diagrams\appuser.2degrees.png
+Compressing  doc\system\diagrams\appuser_appgroup.1degree.dot
+Compressing  doc\system\diagrams\appuser_appgroup.1degree.png
+Compressing  doc\system\diagrams\appuser_appgroup.2degrees.dot
+Compressing  doc\system\diagrams\appuser_appgroup.2degrees.png
+Compressing  doc\system\diagrams\appuser_setting.1degree.dot
+Compressing  doc\system\diagrams\appuser_setting.1degree.png
+Compressing  doc\system\diagrams\appuser_setting.2degrees.dot
+Compressing  doc\system\diagrams\appuser_setting.2degrees.png
+Compressing  doc\system\diagrams\br.1degree.dot
+Compressing  doc\system\diagrams\br.1degree.png
+Compressing  doc\system\diagrams\br.2degrees.dot
+Compressing  doc\system\diagrams\br.2degrees.png
+Compressing  doc\system\diagrams\br_definition.1degree.dot
+Compressing  doc\system\diagrams\br_definition.1degree.png
+Compressing  doc\system\diagrams\br_definition.2degrees.dot
+Compressing  doc\system\diagrams\br_definition.2degrees.png
+Compressing  doc\system\diagrams\br_severity_type.1degree.dot
+Compressing  doc\system\diagrams\br_severity_type.1degree.png
+Compressing  doc\system\diagrams\br_severity_type.2degrees.dot
+Compressing  doc\system\diagrams\br_severity_type.2degrees.png
+Compressing  doc\system\diagrams\br_technical_type.1degree.dot
+Compressing  doc\system\diagrams\br_technical_type.1degree.png
+Compressing  doc\system\diagrams\br_technical_type.2degrees.dot
+Compressing  doc\system\diagrams\br_technical_type.2degrees.png
+Compressing  doc\system\diagrams\br_validation.1degree.dot
+Compressing  doc\system\diagrams\br_validation.1degree.png
+Compressing  doc\system\diagrams\br_validation.2degrees.dot
+Compressing  doc\system\diagrams\br_validation.2degrees.png
+Compressing  doc\system\diagrams\br_validation_target_type.1degree.dot
+Compressing  doc\system\diagrams\br_validation_target_type.1degree.png
+Compressing  doc\system\diagrams\br_validation_target_type.2degrees.dot
+Compressing  doc\system\diagrams\br_validation_target_type.2degrees.png
+Compressing  doc\system\diagrams\config_map_layer.1degree.dot
+Compressing  doc\system\diagrams\config_map_layer.1degree.png
+Compressing  doc\system\diagrams\config_map_layer.2degrees.dot
+Compressing  doc\system\diagrams\config_map_layer.2degrees.png
+Compressing  doc\system\diagrams\config_map_layer_metadata.1degree.dot
+Compressing  doc\system\diagrams\config_map_layer_metadata.1degree.png
+Compressing  doc\system\diagrams\config_map_layer_metadata.2degrees.dot
+Compressing  doc\system\diagrams\config_map_layer_metadata.2degrees.png
+Compressing  doc\system\diagrams\config_map_layer_type.1degree.dot
+Compressing  doc\system\diagrams\config_map_layer_type.1degree.png
+Compressing  doc\system\diagrams\config_map_layer_type.2degrees.dot
+Compressing  doc\system\diagrams\config_map_layer_type.2degrees.png
+Compressing  doc\system\diagrams\config_panel_launcher.1degree.dot
+Compressing  doc\system\diagrams\config_panel_launcher.1degree.png
+Compressing  doc\system\diagrams\config_panel_launcher.2degrees.dot
+Compressing  doc\system\diagrams\config_panel_launcher.2degrees.png
+Compressing  doc\system\diagrams\map_search_option.1degree.dot
+Compressing  doc\system\diagrams\map_search_option.1degree.png
+Compressing  doc\system\diagrams\map_search_option.2degrees.dot
+Compressing  doc\system\diagrams\map_search_option.2degrees.png
+Compressing  doc\system\diagrams\panel_launcher_group.1degree.dot
+Compressing  doc\system\diagrams\panel_launcher_group.1degree.png
+Compressing  doc\system\diagrams\panel_launcher_group.2degrees.dot
+Compressing  doc\system\diagrams\panel_launcher_group.2degrees.png
+Compressing  doc\system\diagrams\query.1degree.dot
+Compressing  doc\system\diagrams\query.1degree.png
+Compressing  doc\system\diagrams\query.2degrees.dot
+Compressing  doc\system\diagrams\query.2degrees.png
+Compressing  doc\system\diagrams\query_field.1degree.dot
+Compressing  doc\system\diagrams\query_field.1degree.png
+Compressing  doc\system\diagrams\query_field.2degrees.dot
+Compressing  doc\system\diagrams\query_field.2degrees.png
+Compressing  doc\system\diagrams\summary\active_users.1degree.dot
+Compressing  doc\system\diagrams\summary\active_users.1degree.png
+Compressing  doc\system\diagrams\summary\br_current.1degree.dot
+Compressing  doc\system\diagrams\summary\br_current.1degree.png
+Compressing  doc\system\diagrams\summary\br_report.1degree.dot
+Compressing  doc\system\diagrams\summary\br_report.1degree.png
+Compressing  doc\system\diagrams\summary\consolidation_config.1degree.dot
+Compressing  doc\system\diagrams\summary\consolidation_config.1degree.png
+Compressing  doc\system\diagrams\summary\crs.1degree.dot
+Compressing  doc\system\diagrams\summary\crs.1degree.png
+Compressing  doc\system\diagrams\summary\email.1degree.dot
+Compressing  doc\system\diagrams\summary\email.1degree.png
+Compressing  doc\system\diagrams\summary\extracted_rows.1degree.dot
+Compressing  doc\system\diagrams\summary\extracted_rows.1degree.png
+Compressing  doc\system\diagrams\summary\Function
+Compressing  doc\system\diagrams\summary\geometry_columns.1degree.dot
+Compressing  doc\system\diagrams\summary\geometry_columns.1degree.png
+Compressing  doc\system\diagrams\summary\language.1degree.dot
+Compressing  doc\system\diagrams\summary\language.1degree.png
+Compressing  doc\system\diagrams\summary\relationships.real.compact.dot
+Compressing  doc\system\diagrams\summary\relationships.real.compact.png
+Compressing  doc\system\diagrams\summary\relationships.real.large.dot
+Compressing  doc\system\diagrams\summary\relationships.real.large.png
+Compressing  doc\system\diagrams\summary\setting.1degree.dot
+Compressing  doc\system\diagrams\summary\setting.1degree.png
+Compressing  doc\system\diagrams\summary\spatial_ref_sys.1degree.dot
+Compressing  doc\system\diagrams\summary\spatial_ref_sys.1degree.png
+Compressing  doc\system\diagrams\summary\user_pword_expiry.1degree.dot
+Compressing  doc\system\diagrams\summary\user_pword_expiry.1degree.png
+Compressing  doc\system\diagrams\summary\user_roles.1degree.dot
+Compressing  doc\system\diagrams\summary\user_roles.1degree.png
+Compressing  doc\system\diagrams\summary\version.1degree.dot
+Compressing  doc\system\diagrams\summary\version.1degree.png
+Compressing  doc\system\images\background.gif
+Compressing  doc\system\images\tabLeft.gif
+Compressing  doc\system\images\tabRight.gif
+Compressing  doc\system\index.html
+Compressing  doc\system\insertionOrder.txt
+Compressing  doc\system\jquery.js
+Compressing  doc\system\relationships.html
+Compressing  doc\system\schemaSpy.css
+Compressing  doc\system\schemaSpy.js
+Compressing  doc\system\sola.system.xml
+Compressing  doc\system\sola_original.system.xml
+Compressing  doc\system\tables\active_users.html
+Compressing  doc\system\tables\appgroup.html
+Compressing  doc\system\tables\approle.html
+Compressing  doc\system\tables\approle_appgroup.html
+Compressing  doc\system\tables\appuser.html
+Compressing  doc\system\tables\appuser_appgroup.html
+Compressing  doc\system\tables\appuser_setting.html
+Compressing  doc\system\tables\br.html
+Compressing  doc\system\tables\br_current.html
+Compressing  doc\system\tables\br_definition.html
+Compressing  doc\system\tables\br_report.html
+Compressing  doc\system\tables\br_severity_type.html
+Compressing  doc\system\tables\br_technical_type.html
+Compressing  doc\system\tables\br_validation.html
+Compressing  doc\system\tables\br_validation_target_type.html
+Compressing  doc\system\tables\config_map_layer.html
+Compressing  doc\system\tables\config_map_layer_metadata.html
+Compressing  doc\system\tables\config_map_layer_type.html
+Compressing  doc\system\tables\config_panel_launcher.html
+Compressing  doc\system\tables\consolidation_config.html
+Compressing  doc\system\tables\crs.html
+Compressing  doc\system\tables\email.html
+Compressing  doc\system\tables\extracted_rows.html
+Compressing  doc\system\tables\Function
+Compressing  doc\system\tables\geometry_columns.html
+Compressing  doc\system\tables\language.html
+Compressing  doc\system\tables\map_search_option.html
+Compressing  doc\system\tables\panel_launcher_group.html
+Compressing  doc\system\tables\query.html
+Compressing  doc\system\tables\query_field.html
+Compressing  doc\system\tables\setting.html
+Compressing  doc\system\tables\spatial_ref_sys.html
+Compressing  doc\system\tables\user_pword_expiry.html
+Compressing  doc\system\tables\user_roles.html
+Compressing  doc\system\tables\version.html
+Compressing  doc\system\utilities.html
+Compressing  doc\transaction\anomalies.html
+Compressing  doc\transaction\columns.byAuto.html
+Compressing  doc\transaction\columns.byColumn.html
+Compressing  doc\transaction\columns.byDefault.html
+Compressing  doc\transaction\columns.byNulls.html
+Compressing  doc\transaction\columns.bySize.html
+Compressing  doc\transaction\columns.byTable.html
+Compressing  doc\transaction\columns.byType.html
+Compressing  doc\transaction\constraints.html
+Compressing  doc\transaction\deletionOrder.txt
+Compressing  doc\transaction\diagrams\reg_status_type.1degree.dot
+Compressing  doc\transaction\diagrams\reg_status_type.1degree.png
+Compressing  doc\transaction\diagrams\reg_status_type.2degrees.dot
+Compressing  doc\transaction\diagrams\reg_status_type.2degrees.png
+Compressing  doc\transaction\diagrams\summary\relationships.real.compact.dot
+Compressing  doc\transaction\diagrams\summary\relationships.real.compact.png
+Compressing  doc\transaction\diagrams\summary\relationships.real.large.dot
+Compressing  doc\transaction\diagrams\summary\relationships.real.large.png
+Compressing  doc\transaction\diagrams\transaction.1degree.dot
+Compressing  doc\transaction\diagrams\transaction.1degree.png
+Compressing  doc\transaction\diagrams\transaction.2degrees.dot
+Compressing  doc\transaction\diagrams\transaction.2degrees.png
+Compressing  doc\transaction\diagrams\transaction_source.1degree.dot
+Compressing  doc\transaction\diagrams\transaction_source.1degree.png
+Compressing  doc\transaction\diagrams\transaction_source.2degrees.dot
+Compressing  doc\transaction\diagrams\transaction_source.2degrees.png
+Compressing  doc\transaction\diagrams\transaction_status_type.1degree.dot
+Compressing  doc\transaction\diagrams\transaction_status_type.1degree.png
+Compressing  doc\transaction\diagrams\transaction_status_type.2degrees.dot
+Compressing  doc\transaction\diagrams\transaction_status_type.2degrees.png
+Compressing  doc\transaction\images\background.gif
+Compressing  doc\transaction\images\tabLeft.gif
+Compressing  doc\transaction\images\tabRight.gif
+Compressing  doc\transaction\index.html
+Compressing  doc\transaction\insertionOrder.txt
+Compressing  doc\transaction\jquery.js
+Compressing  doc\transaction\relationships.html
+Compressing  doc\transaction\schemaSpy.css
+Compressing  doc\transaction\schemaSpy.js
+Compressing  doc\transaction\sola.transaction.xml
+Compressing  doc\transaction\sola_original.transaction.xml
+Compressing  doc\transaction\tables\reg_status_type.html
+Compressing  doc\transaction\tables\transaction.html
+Compressing  doc\transaction\tables\transaction_source.html
+Compressing  doc\transaction\tables\transaction_status_type.html
+Compressing  doc\transaction\utilities.html
+
+Everything is Ok
+Finished at 12:27:04.69 
