@@ -54,6 +54,7 @@ INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_fo
 INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('plotNum', 'Plot Number', 'Plot number', 'c', 'plan', 'TEXT', 13);
 INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('dateRegistered', 'Registration Date', 'Date when the CofO has been registered', 'c', 'cofo', 'DATE', 14);
 INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('dateSigned', 'Date Signed', 'Date when governor signed', 'c', 'plan', 'DATE', 15);
+INSERT INTO ba_unit_detail_type (code, display_value, description, status, is_for, field_type, order_view) VALUES ('IntellMapSheet', 'Sheet Number', 'Sheet Number', 'c', 'plan', 'TEXT', 16);
 
  
 -- Completed on 2015-09-14 09:53:36
@@ -72,10 +73,6 @@ ALTER TABLE ba_unit_detail_type ENABLE TRIGGER ALL;
 -- PostgreSQL database dump complete
 --
 
-
-
-
-
 --- METADATA AND SETTINGS  
 DELETE FROM system.config_map_layer_metadata  where name_layer = 'orthophoto' and "name" = 'date';
 DELETE FROM system.config_map_layer_metadata  where name_layer = 'orthophoto' and "name" = 'sheet-number';
@@ -83,7 +80,7 @@ DELETE FROM system.config_map_layer_metadata  where name_layer = 'orthophoto' an
 DELETE FROM system.config_map_layer_metadata  where name_layer = 'orthophoto' and "name" = 'data-source';
 
 insert into system.config_map_layer_metadata (name_layer ,"name" , "value") values ('orthophoto', 'date', 'TBU DATE ??');
-insert into system.config_map_layer_metadata (name_layer ,"name" , "value") values ('orthophoto', 'sheet-number', 'TBU ?? NW, SE, SW');
+--insert into system.config_map_layer_metadata (name_layer ,"name" , "value") values ('orthophoto', 'sheet-number', 'TBU ?? NW, SE, SW');
 insert into system.config_map_layer_metadata (name_layer ,"name" , "value") values ('orthophoto', 'resolution', 'TBU 50 cm ??');
 insert into system.config_map_layer_metadata (name_layer ,"name" , "value") values ('orthophoto', 'data-source', 'TBU DATUM ??');
 
@@ -100,21 +97,10 @@ insert into system.setting(name, vl, active, description) values('state', 'Katsi
 --insert into system.setting(name, vl, active, description) values('featureBack', 'images/sola/back.svg', true, 'svg for the background element in back page');
 
 
-DELETE FROM source.administrative_source_type  where  code" = 'parcelPlan';
+DELETE FROM source.administrative_source_type  where  code = 'parcelPlan';
 
 --- source type
 INSERT INTO source.administrative_source_type (code, display_value, status, description, is_for_registration) VALUES ('parcelPlan', 'Title Deeds Plan', 'x', '...::::::::...::::...::::...::::...::::...', false);
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -284,7 +270,7 @@ CREATE OR REPLACE VIEW application.systematic_registration_certificates AS
     administrative.get_baunit_detail(su.ba_unit_id, 'layoutPlan') 				AS plan, 
 
 -- 	 sheetnr  
-    administrative.get_baunit_detail(su.ba_unit_id, 'sheetnr') 				AS sheetnr, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'IntellMapSheet') 				AS sheetnr, 
 
 -- 	 date commenced
     administrative.get_baunit_detail(su.ba_unit_id, 'dateCommenced')  			AS commencingdate, 
@@ -405,7 +391,7 @@ CREATE OR REPLACE VIEW cadastre.parcel_plan AS
     administrative.get_baunit_detail(su.ba_unit_id, 'layoutPlan') 				AS title, 
 
 -- 	 sheetnr  
-    administrative.get_baunit_detail(su.ba_unit_id, 'sheetnr') 				AS sheetnr, 
+    administrative.get_baunit_detail(su.ba_unit_id, 'IntellMapSheet') 				AS sheetnr, 
 
 -- 	 date commenced
     administrative.get_baunit_detail(su.ba_unit_id, 'dateCommenced')  			AS commencingdate, 

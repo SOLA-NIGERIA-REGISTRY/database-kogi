@@ -3050,6 +3050,7 @@ ALTER FUNCTION application.getlodgetiming(fromdate date, todate date) OWNER TO p
 
 COMMENT ON FUNCTION getlodgetiming(fromdate date, todate date) IS 'Not used. Replaced by get_work_summary.';
 
+
 SET search_path = bulk_operation, pg_catalog;
 
 --
@@ -3289,8 +3290,6 @@ ALTER FUNCTION bulk_operation.move_spatial_units(transaction_id_v character vary
 --
 
 COMMENT ON FUNCTION move_spatial_units(transaction_id_v character varying, change_user_v character varying) IS 'Moves all spatial data from teh Bulk Operation schema to the Cadastre schema using the move_cadastre_objects and move_other_objects functions. This function is called after the bulk opearation transaction is created by the Bulk Operation application';
-
-
 
 
 SET search_path = cadastre, pg_catalog;
@@ -4863,7 +4862,7 @@ ALTER TABLE administrative.ba_unit_contains_spatial_unit_historic OWNER TO postg
 CREATE TABLE ba_unit_detail (
     id character varying(40) NOT NULL,
     ba_unit_id character varying(40) NOT NULL,
-    detail_code character varying(20),
+    detail_code character varying(255),
     custom_detail_text character varying(500),
     detail_quantity integer,
     detail_unit character varying(15),
@@ -4969,7 +4968,7 @@ COMMENT ON COLUMN ba_unit_detail.change_time IS 'The date and time the row was l
 CREATE TABLE ba_unit_detail_historic (
     id character varying(40),
     ba_unit_id character varying(40),
-    detail_code character varying(20),
+    detail_code character varying(255),
     custom_detail_text character varying(500),
     detail_quantity integer,
     detail_unit character varying(15),
@@ -4985,11 +4984,18 @@ CREATE TABLE ba_unit_detail_historic (
 ALTER TABLE administrative.ba_unit_detail_historic OWNER TO postgres;
 
 --
+-- Name: COLUMN ba_unit_detail_historic.detail_code; Type: COMMENT; Schema: administrative; Owner: postgres
+--
+
+COMMENT ON COLUMN ba_unit_detail_historic.detail_code IS 'The type of detail.';
+
+
+--
 -- Name: ba_unit_detail_type; Type: TABLE; Schema: administrative; Owner: postgres; Tablespace: 
 --
 
 CREATE TABLE ba_unit_detail_type (
-    code character varying(20) NOT NULL,
+    code character varying(255) NOT NULL,
     display_value character varying(500) NOT NULL,
     description character varying(10000) NOT NULL,
     status character(1) NOT NULL,
@@ -9166,7 +9172,7 @@ SET search_path = application, pg_catalog;
 --
 
 CREATE VIEW systematic_registration_certificates AS
-    SELECT DISTINCT co.id, co.name_firstpart, co.name_lastpart, su.ba_unit_id, round(sa.size) AS size, administrative.get_parcel_share(su.ba_unit_id) AS owners, (SELECT setting.vl FROM system.setting WHERE ((setting.name)::text = 'state'::text)) AS state, (SELECT setting.vl FROM system.setting WHERE ((setting.name)::text = 'surveyor'::text)) AS surveyor, (SELECT setting.vl FROM system.setting WHERE ((setting.name)::text = 'surveyorRank'::text)) AS rank, (SELECT config_map_layer_metadata.value FROM system.config_map_layer_metadata WHERE (((config_map_layer_metadata.name_layer)::text = 'orthophoto'::text) AND ((config_map_layer_metadata.name)::text = 'date'::text))) AS imagerydate, (SELECT config_map_layer_metadata.value FROM system.config_map_layer_metadata WHERE (((config_map_layer_metadata.name_layer)::text = 'orthophoto'::text) AND ((config_map_layer_metadata.name)::text = 'resolution'::text))) AS imageryresolution, (SELECT config_map_layer_metadata.value FROM system.config_map_layer_metadata WHERE (((config_map_layer_metadata.name_layer)::text = 'orthophoto'::text) AND ((config_map_layer_metadata.name)::text = 'data-source'::text))) AS imagerysource, administrative.get_baunit_detail(su.ba_unit_id, 'lga'::character varying) AS lga, administrative.get_baunit_detail(su.ba_unit_id, 'zone'::character varying) AS zone, administrative.get_baunit_detail(su.ba_unit_id, 'location'::character varying) AS location, administrative.get_baunit_detail(su.ba_unit_id, 'plan'::character varying) AS plan, administrative.get_baunit_detail(su.ba_unit_id, 'sheetnr'::character varying) AS sheetnr, administrative.get_baunit_detail(su.ba_unit_id, 'startdate'::character varying) AS commencingdate, administrative.get_baunit_detail(su.ba_unit_id, 'purpose'::character varying) AS purpose, administrative.get_baunit_detail(su.ba_unit_id, 'term'::character varying) AS term, administrative.get_baunit_detail(su.ba_unit_id, 'rent'::character varying) AS rent FROM cadastre.cadastre_object co, administrative.ba_unit bu, cadastre.spatial_value_area sa, administrative.ba_unit_contains_spatial_unit su WHERE (((((bu.id)::text = (su.ba_unit_id)::text) AND ((su.spatial_unit_id)::text = (sa.spatial_unit_id)::text)) AND ((sa.spatial_unit_id)::text = (co.id)::text)) AND ((sa.type_code)::text = 'officialArea'::text)) ORDER BY co.name_firstpart, co.name_lastpart;
+    SELECT DISTINCT co.id, co.name_firstpart, co.name_lastpart, su.ba_unit_id, round(sa.size) AS size, administrative.get_parcel_share(su.ba_unit_id) AS owners, (SELECT setting.vl FROM system.setting WHERE ((setting.name)::text = 'state'::text)) AS state, (SELECT setting.vl FROM system.setting WHERE ((setting.name)::text = 'surveyor'::text)) AS surveyor, (SELECT setting.vl FROM system.setting WHERE ((setting.name)::text = 'surveyorRank'::text)) AS rank, (SELECT config_map_layer_metadata.value FROM system.config_map_layer_metadata WHERE (((config_map_layer_metadata.name_layer)::text = 'orthophoto'::text) AND ((config_map_layer_metadata.name)::text = 'date'::text))) AS imagerydate, (SELECT config_map_layer_metadata.value FROM system.config_map_layer_metadata WHERE (((config_map_layer_metadata.name_layer)::text = 'orthophoto'::text) AND ((config_map_layer_metadata.name)::text = 'resolution'::text))) AS imageryresolution, (SELECT config_map_layer_metadata.value FROM system.config_map_layer_metadata WHERE (((config_map_layer_metadata.name_layer)::text = 'orthophoto'::text) AND ((config_map_layer_metadata.name)::text = 'data-source'::text))) AS imagerysource, administrative.get_baunit_detail(su.ba_unit_id, 'LGA'::character varying) AS lga, administrative.get_baunit_detail(su.ba_unit_id, 'zone'::character varying) AS zone, administrative.get_baunit_detail(su.ba_unit_id, 'location'::character varying) AS location, administrative.get_baunit_detail(su.ba_unit_id, 'layoutPlan'::character varying) AS plan, administrative.get_baunit_detail(su.ba_unit_id, 'IntellMapSheet'::character varying) AS sheetnr, administrative.get_baunit_detail(su.ba_unit_id, 'dateCommenced'::character varying) AS commencingdate, administrative.get_baunit_detail(su.ba_unit_id, 'cOfOtype'::character varying) AS purpose, administrative.get_baunit_detail(su.ba_unit_id, 'term'::character varying) AS term, administrative.get_baunit_detail(su.ba_unit_id, 'yearlyRent'::character varying) AS rent FROM cadastre.cadastre_object co, administrative.ba_unit bu, cadastre.spatial_value_area sa, administrative.ba_unit_contains_spatial_unit su WHERE (((((bu.id)::text = (su.ba_unit_id)::text) AND ((su.spatial_unit_id)::text = (sa.spatial_unit_id)::text)) AND ((sa.spatial_unit_id)::text = (co.id)::text)) AND ((sa.type_code)::text = 'officialArea'::text)) ORDER BY co.name_firstpart, co.name_lastpart;
 
 
 ALTER TABLE application.systematic_registration_certificates OWNER TO postgres;
@@ -9221,7 +9227,6 @@ COMMENT ON COLUMN type_action.description IS 'Description of the request type ac
 COMMENT ON COLUMN type_action.status IS 'Status of the request type action.';
 
 
-
 SET search_path = bulk_operation, pg_catalog;
 
 --
@@ -9244,8 +9249,7 @@ CREATE TABLE spatial_unit_temporary (
     change_user character varying(50),
     change_time timestamp without time zone DEFAULT now() NOT NULL,
     CONSTRAINT enforce_dims_geom CHECK ((public.st_ndims(geom) = 2)),
-    CONSTRAINT enforce_srid_geom CHECK ((public.st_srid(geom) = 2193)),
-    CONSTRAINT enforce_valid_geom CHECK (public.st_isvalid(geom))
+    CONSTRAINT enforce_srid_geom CHECK ((public.st_srid(geom) = 32632))
 );
 
 
@@ -9320,7 +9324,6 @@ COMMENT ON COLUMN spatial_unit_temporary.official_area IS 'The official area for
 --
 
 COMMENT ON COLUMN spatial_unit_temporary.label IS 'The label to use for the spatial unit. Only applicable if the type_code IS NOT cadastre_object.';
-
 
 
 SET search_path = cadastre, pg_catalog;
@@ -10332,7 +10335,7 @@ ALTER TABLE cadastre.lga OWNER TO postgres;
 --
 
 CREATE VIEW parcel_plan AS
-    SELECT DISTINCT co.name_firstpart, co.name_lastpart, co.id, su.ba_unit_id, round(sa.size) AS size, administrative.get_parcel_share(su.ba_unit_id) AS owners, (SELECT setting.vl FROM system.setting WHERE ((setting.name)::text = 'system-id'::text)) AS state, (SELECT setting.vl FROM system.setting WHERE ((setting.name)::text = 'surveyor'::text)) AS surveyor, (SELECT setting.vl FROM system.setting WHERE ((setting.name)::text = 'surveyorRank'::text)) AS rank, (SELECT config_map_layer_metadata.value FROM system.config_map_layer_metadata WHERE (((config_map_layer_metadata.name_layer)::text = 'orthophoto'::text) AND ((config_map_layer_metadata.name)::text = 'date'::text))) AS imagerydate, (SELECT config_map_layer_metadata.value FROM system.config_map_layer_metadata WHERE (((config_map_layer_metadata.name_layer)::text = 'orthophoto'::text) AND ((config_map_layer_metadata.name)::text = 'resolution'::text))) AS imageryresolution, (SELECT config_map_layer_metadata.value FROM system.config_map_layer_metadata WHERE (((config_map_layer_metadata.name_layer)::text = 'orthophoto'::text) AND ((config_map_layer_metadata.name)::text = 'data-source'::text))) AS imagerysource, administrative.get_baunit_detail(su.ba_unit_id, 'lga'::character varying) AS lga, administrative.get_baunit_detail(su.ba_unit_id, 'zone'::character varying) AS zone, administrative.get_baunit_detail(su.ba_unit_id, 'location'::character varying) AS proplocation, administrative.get_baunit_detail(su.ba_unit_id, 'plan'::character varying) AS title, administrative.get_baunit_detail(su.ba_unit_id, 'sheetnr'::character varying) AS sheetnr, administrative.get_baunit_detail(su.ba_unit_id, 'startdate'::character varying) AS commencingdate, administrative.get_baunit_detail(su.ba_unit_id, 'purpose'::character varying) AS landuse, administrative.get_baunit_detail(su.ba_unit_id, 'term'::character varying) AS term, administrative.get_baunit_detail(su.ba_unit_id, 'rent'::character varying) AS rent FROM cadastre_object co, administrative.ba_unit bu, spatial_value_area sa, administrative.ba_unit_contains_spatial_unit su WHERE (((((bu.id)::text = (su.ba_unit_id)::text) AND ((su.spatial_unit_id)::text = (sa.spatial_unit_id)::text)) AND ((sa.spatial_unit_id)::text = (co.id)::text)) AND ((sa.type_code)::text = 'officialArea'::text)) ORDER BY co.name_firstpart, co.name_lastpart;
+    SELECT DISTINCT co.name_firstpart, co.name_lastpart, co.id, su.ba_unit_id, round(sa.size) AS size, administrative.get_parcel_share(su.ba_unit_id) AS owners, (SELECT setting.vl FROM system.setting WHERE ((setting.name)::text = 'system-id'::text)) AS state, (SELECT setting.vl FROM system.setting WHERE ((setting.name)::text = 'surveyor'::text)) AS surveyor, (SELECT setting.vl FROM system.setting WHERE ((setting.name)::text = 'surveyorRank'::text)) AS rank, (SELECT config_map_layer_metadata.value FROM system.config_map_layer_metadata WHERE (((config_map_layer_metadata.name_layer)::text = 'orthophoto'::text) AND ((config_map_layer_metadata.name)::text = 'date'::text))) AS imagerydate, (SELECT config_map_layer_metadata.value FROM system.config_map_layer_metadata WHERE (((config_map_layer_metadata.name_layer)::text = 'orthophoto'::text) AND ((config_map_layer_metadata.name)::text = 'resolution'::text))) AS imageryresolution, (SELECT config_map_layer_metadata.value FROM system.config_map_layer_metadata WHERE (((config_map_layer_metadata.name_layer)::text = 'orthophoto'::text) AND ((config_map_layer_metadata.name)::text = 'data-source'::text))) AS imagerysource, administrative.get_baunit_detail(su.ba_unit_id, 'LGA'::character varying) AS lga, administrative.get_baunit_detail(su.ba_unit_id, 'zone'::character varying) AS zone, administrative.get_baunit_detail(su.ba_unit_id, 'location'::character varying) AS proplocation, administrative.get_baunit_detail(su.ba_unit_id, 'layoutPlan'::character varying) AS title, administrative.get_baunit_detail(su.ba_unit_id, 'IntellMapSheet'::character varying) AS sheetnr, administrative.get_baunit_detail(su.ba_unit_id, 'dateCommenced'::character varying) AS commencingdate, administrative.get_baunit_detail(su.ba_unit_id, 'cOfOtype'::character varying) AS landuse, administrative.get_baunit_detail(su.ba_unit_id, 'term'::character varying) AS term, administrative.get_baunit_detail(su.ba_unit_id, 'yearlyRent'::character varying) AS rent FROM cadastre_object co, administrative.ba_unit bu, spatial_value_area sa, administrative.ba_unit_contains_spatial_unit su WHERE (((((bu.id)::text = (su.ba_unit_id)::text) AND ((su.spatial_unit_id)::text = (sa.spatial_unit_id)::text)) AND ((sa.spatial_unit_id)::text = (co.id)::text)) AND ((sa.type_code)::text = 'officialArea'::text)) ORDER BY co.name_firstpart, co.name_lastpart;
 
 
 ALTER TABLE cadastre.parcel_plan OWNER TO postgres;
@@ -18165,8 +18168,7 @@ SET search_path = bulk_operation, pg_catalog;
 
 ALTER TABLE ONLY spatial_unit_temporary
     ADD CONSTRAINT spatial_unit_temporary_pkey PRIMARY KEY (id);
-	
-	
+
 
 SET search_path = cadastre, pg_catalog;
 
@@ -20302,8 +20304,6 @@ CREATE INDEX spatial_unit_temporary_index_on_rowidentifier ON spatial_unit_tempo
 --
 
 CREATE INDEX spatial_unit_temporary_transaction_id_fk132_ind ON spatial_unit_temporary USING btree (transaction_id);
-
-
 
 
 SET search_path = cadastre, pg_catalog;
@@ -22987,7 +22987,6 @@ ALTER TABLE ONLY service
     ADD CONSTRAINT service_status_code_fk24 FOREIGN KEY (status_code) REFERENCES service_status_type(code) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 
-
 SET search_path = bulk_operation, pg_catalog;
 
 --
@@ -23004,7 +23003,7 @@ ALTER TABLE ONLY spatial_unit_temporary
 
 ALTER TABLE ONLY spatial_unit_temporary
     ADD CONSTRAINT spatial_unit_temporary_transaction_id_fk132 FOREIGN KEY (transaction_id) REFERENCES transaction.transaction(id) ON UPDATE CASCADE ON DELETE CASCADE;
-	
+
 
 SET search_path = cadastre, pg_catalog;
 

@@ -74,7 +74,6 @@ INSERT INTO br (id, display_name, technical_type_code, feedback, description, te
 INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('source-attach-in-transaction-no-pendings', 'source-attach-in-transaction-no-pendings', 'sql', 'Document (source file) must not be duplicated::::Документ не должен дублироваться.::::يجب عدم تكرار الوثيقة  (ملف المصدر)::::Le document (fichier source) ne doit pas être dupliqué.::::::::::::Documento (arquivo de origem) não deve ser duplicada::::::::文件 (来源文件夹) 必须不能被复制', NULL, '#{id}(source.source.id) is requested. It checks if the source has already a record with the status pending.');
 INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('baunit-has-multiple-mortgages', 'baunit-has-multiple-mortgages', 'sql', 'For the Register Mortgage service the identified title has no existing mortgages::::Для регистрации ипотеки указанная недвижимость не должна иметь существующих записей об ипотеки.::::في خدمة  تسجيل  رهن  السند المحدد لا يجب ان يكون عليه رهونات اخرى::::Pour le service d''enregistrement de l''hypothèque, le titre identifié n''a pas d''hypothèques existantes.::::::::::::Para o Registo de Hipoteca o título identificado não possui hipotecas::::::::对于抵押登记服务， 确定的产权没有现成的抵押。 ', NULL, '#{id}(administrative.ba_unit.id) is requested');
 INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('spatial-unit-group-name-unique', 'spatial-unit-group-name-unique', 'sql', 'Spatial unit groups must be unique.::::Пространственные группы должны быть уникальны.::::مجموعة الوحدات المكانية يجب ان لا تتكرر::::::::::::::::Grupo de unidade espacial deves ser único.::::::::空间单元组必须是独一无二的。', NULL, 'There is no parameter required.');
-INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('target-and-new-union-the-same', 'target-and-new-union-the-same', 'sql', 'The union of new parcel polygons is the same with the union of the target parcel polygons::::Объединение полигонов новых участков должно быть таким же как форма полигонов целевых участков.::::الاتحاد بين مضلعات القطعة الجديدة يساوي الاتحاد بين مضلعات القطعة المستهدفة::::L''union des polygones des nouvelles parcells est le même que l''union des polygones des parcelles cibles.::::::::::::A união de polígonos de novas parcelas é o mesmo que a união dos polígonos das parcelas alvo::::::::新地块多边形的联合与目标宗地多边形是相同的。', NULL, '#{id}(transaction_id) is requested');
 INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('application-br3-check-properties-are-not-historic', 'application-br3-check-properties-are-not-historic', 'sql', 'All the titles identified for the application must be current.::::Все права собственности, относящиеся к заявлению должны иметь текущий (активный) статус.::::جميع سندات الملكية داخل الطلب يجب ان  تكون حالية::::Tous les titres identifiés pour la demande doivent être courants.::::::::::::Todos os títulos identificados para o pedido devem ser atuais.::::::::申请中说明的所有产权都必须是目前的。', NULL, 'Checks the title reference recorded at lodgement against titles in the database and if there is a ba_unit record it checks if it is current (PASS)');
 INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('public-display-check-complete-status', 'public-display-check-complete-status', 'sql', 'At least 90% of the parcels must have an associated Systematic Application with complete status.::::По крайней мере 90% участков должны иметь соответствующие заявления на системную регистрацию с завершенным статусом.::::على الأقل 90% من القطع يجب ان يكون لها  ارتباط بالطلب المنتظم وبحالة مكتملة ::::::::::::::::Pelo menos 90% das parcelas devem uma Aplicação Sistemática com o status completo associado.::::::::至少90% 的地块必须有与完成情况相关的系统申请。', NULL, '#{lastPart}(name_lastpart) is requested');
 INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('bulk-spatial-geom-overlaps-with-existing', 'bulk-spatial-geom-overlaps-with-existing', 'sql', 'Cadastre objects must not overlap with existing cadastre objects. ::::Кадастровые объекты не должны пересекаться с существующими кадастровыми объектами.::::كينونات المساحة يجب ان لا تتداخل::::::::::::::::Cadastro de objetos não deve se sobrepor com cadastro de objetos existentes.::::::::地籍目标必须不能与现有的地籍目标相交叠。', NULL, '#{id}(transaction_id) is requested');
@@ -93,6 +92,7 @@ INSERT INTO br (id, display_name, technical_type_code, feedback, description, te
 INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('newtitle-br22-check-different-owners', 'newtitle-br22-check-different-owners', 'sql', 'Owners of new titles should be the same as owners of underlying titles::::Владельцы новых объектов недвижимости должны быть такие же как в родительских объектах.::::المالكون في سند الملكية الجديد يجب ان يكونوا نفس المالكين من السندات السابقة::::Les propriétaires des nouveaux titres doivent être les mêmes que les propriétaires des titres sous-jacents.::::::::::::Os proprietários de novos títulos devem ser os mesmos que os proprietários de títulos subjacentes::::::::新的产权所有者必须与基础产权的所有者相同。', NULL, '#{id}(baunit_id) is requested.
 Check that new title owners are the same as underlying titles owners (Give WARNING if > 0)');
 INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('ba_unit-has-cadastre-object', 'ba_unit-has-cadastre-object', 'sql', 'Title must have an associated parcel (or cadastre object)::::Недвижимость должна иметь земельный участок (или кадастровый объект).::::سند الملكية يجب ان يحتوي على قطعة  او كائن مساحة::::Le titre doit avoir une parcelle associée (ou objet cadastre)::::::::::::Título deve ter uma parcela associada (ou objeto de cadastro)::::::::财产必须具备一个相关地块（或地籍目标）。', NULL, '#{id}(administrative.ba_unit.id) is requested');
+INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('public-display-check-baunit-has-co', 'public-display-check-baunit-has-co', 'sql', 'All property must have an associated cadastre object.::::Все объекты недвижимости должны иметь соответствующие кадастровые объекты.::::جميع الملكيات يجب ان ترتبط بكائن مساحي::::::::::::::::Toda propriedade deve ter um cadastro de objeto associado.::::::::所有的财产都必须有一个相关的地籍目标。', NULL, '#{lastPart}(name_lastpart) is requested');
 INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('source-attach-in-transaction-allowed-type', 'source-attach-in-transaction-allowed-type', 'sql', 'Document to be registered must have an allowable and current source type::::Документы для регистрации должны иметь допустимый тип.::::الوثيقة المراد تسجيلها يجب ان يكون لها نوع مصدر حالي مسموح به::::Le document à enregistrer doit avoir un type de source courant et disponible.::::::::::::Documento a ser registrado deve ter um tipo de fonte admissível e atual::::::::待登记的文件必须有允许的和当前的来源类型。', NULL, '#{id}(source.source.id) is requested. It checks if the source has a type which has the is_for_registration attribute true.');
 INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('application-br4-check-sources-date-not-in-the-future', 'application-br4-check-sources-date-not-in-the-future', 'sql', 'Documents should have dates formalised by source agency that are not in the future.::::Документы должны иметь дату документа меньше текущей.::::تواريخ الوثائق المعتمدة من الوكالة المصدر يجب ان لا تكون في المستقبل::::Les documents doivent avoir des dates formalisées par l''agence source qui ne sont pas dans le future.::::::::::::Os documentos devem ter datas formalizadas pela agência de origem que não estejam no futuro.::::::::文件应由来源机构标注正式日期以显示那不是在未来。', NULL, 'Checks the date of the document as recorded at lodgement (source.recordation) and checks it is not a date in the future');
 INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('area-check-percentage-newareas-oldareas', 'area-check-percentage-newareas-oldareas', 'sql', 'The difference between the total of the new parcels official areas and the total of the old parcels official areas should not be greater than 0.1%::::Разница между общей официальной площадью новых участков и площадью старых участков не должна превышать 0.1%.::::الفرق بين مجموع مساحات  القطع الجديدة الرسمية  ومجموع المساحات السابقة للقطع القديمة يجب ان لا يتجاوز 0.1 %::::La différence entre la superficie totale officielle des nouvelles parcelles et la superficie totale officielle des anciennes parcelles ne doit pas être supérieur à 0.1%.::::::::::::A diferença entre o total das novas áreas das parcelas oficiais e o total das áreas das parcelas oficiais antigas, não deve ser superior a 0,1%::::::::新宗地的登记总面积和旧宗地的总面积之差不应超过 0.1%。', NULL, '');
@@ -118,8 +118,6 @@ INSERT INTO br (id, display_name, technical_type_code, feedback, description, te
  Check new official area - calculated new area / new official area in percentage (Give in WARNING description, percentage & parcel if percentage > 1%)');
 INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('app-title-has-primary-right', 'app-title-has-primary-right', 'sql', 'A single primary right (such as ownership) must be identified whenever a new title record is created::::Единственное право собственности должно быть зарегистрировано для нового объекта недвижимости.::::يجب تحديد حق اساسي وحيد  عند انشاء سند ملكية جديد::::Un unique droit principal (tel que la propriété) doit être identifié lorsqu''un nouveau titre est créé.::::::::::::Um direito fundamental individual (como a propriedade) deve ser identificado sempre que um novo registro do título for criado.::::::::无论新的产权记录是在何时创建的，单一的基本权利(如所有权) 必须明确。', NULL, '#{id}(application.application.id) is requested');
 INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('ba_unit-has-a-valid-primary-right', 'ba_unit-has-a-valid-primary-right', 'sql', 'A title must have a valid primary right::::Недвижимость должна иметь первичное право собственности.::::سند الملكية يجب ان يحتوي على حق اساسي صالح::::Un titre doit avoir un droit principal valide.::::::::::::Um título deve ter um direito primário válido::::::::一项产权必须具有正当的初始权利。', NULL, '#{id}(baunit_id) is requested.');
-INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('public-display-check-baunit-has-co', 'public-display-check-baunit-has-co', 'sql', 'All property must have an associated cadastre object.::::Все объекты недвижимости должны иметь соответствующие кадастровые объекты.::::جميع الملكيات يجب ان ترتبط بكائن مساحي::::::::::::::::Toda propriedade deve ter um cadastro de objeto associado.::::::::所有的财产都必须有一个相关的地籍目标。', NULL, '#{lastPart}(name_lastpart) is requested');
-INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('application-approve-cancel-old-titles', 'application-approve-cancel-old-titles', 'sql', 'An application including a new freehold service must also terminate the parent title(s) with a cancel title service.::::Identificati titoli esistenti. Prego terminare i titoli esistenti usando il servizio di Cancellazione Titolo::::الطلب الذي يحتوي على خدمة  تملك حر يجب ان يحتوي على خدمة اخرى تلغي جميع سندات الملكية السابقة::::Une demande incluant un nouveau service de propriété franche doit aussi résilier le(s) titre(s) parent(s) avec un service d''annulation.::::::::::::Um pedido, incluindo um novo serviço do propriedade também deve rescindir o título(s) principal com um serviço de cancelar título.::::::::一项包括新的终身保有服务的申请也必须终止带有取消产权服务的源产权。', NULL, '');
 INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('required-sources-are-present', 'required-sources-are-present', 'sql', 'All documents required for the service ''req_type'' are present.::::Должны присутствовать все документы необходимые для услуги ''req_type'' .::::جميع الوثائق المطلوبة لخدمة  ''req_type''  موجودة::::Tous les documents requis pour le service ''req_type'' sont présents.::::::::::::Todos os documentos necessários para o ''req_type'' estão presentes.::::::::所有需要作为服务“请求_类型”的文件都要呈现。', NULL, 'Checks that all required documents for any of the services in an application are recorded. Null value is returned if there are no required documents');
 INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('application-br1-check-required-sources-are-present', 'application-br1-check-required-sources-are-present', 'sql', 'All documents required for the services in this application are present.::::Все документы, необходимые для указанных услуг должны присутствовать в заявлении.::::جميع الوثائق المطلوبة للخدمة  موجودة::::Tous les documents requis pour les services de cette demande sont présents.::::::::::::Todos os documentos necessários para os serviços nesta aplicação estão presentes.::::::::申请中需要的所有文件都需要呈上。', NULL, 'Checks that all required documents for any of the services in an application are recorded. Null value is returned if there are no required documents');
 INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('application-cancel-property-service-before-new-title', 'application-cancel-property-service-before-new-title', 'sql', 'New Freehold title service must come before Cancel Title service in the application.::::Услуга нового права собственности (свободное) должна быть перед услугой отмены права собственности.
@@ -141,6 +139,8 @@ INSERT INTO br (id, display_name, technical_type_code, feedback, description, te
 INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('cancel-obscuration-request', 'cancel-obscuration-request', 'sql', 'cancel-obscuration-request::::...::::...::::...::::...::::...::::...::::...::::...', NULL, '#{id}(service_id) is requested');
 INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('cancel-relation-notification', 'cancel-relation-notification', 'sql', 'Cancel notification for the services of the application', NULL, '#{id}(application_id) is requested');
 INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('delete-relation-notification', 'delete-relation-notification', 'sql', 'Delete notification for the services of the application', NULL, '#{id}(application_id) is requested');
+INSERT INTO br (id, display_name, technical_type_code, feedback, description, technical_description) VALUES ('generate-cofo-nr', 'generate-cofo-nr', 'sql', '...::::::::...::::::::::::::::...::::::::...', NULL, '');
+
 
 ALTER TABLE br ENABLE TRIGGER ALL;
 
@@ -367,21 +367,6 @@ SELECT 	CASE 	WHEN (SELECT (SUM(1) IS NULL) FROM reqForAp) THEN NULL
 		WHEN ((SELECT COUNT(*) FROM inclInAp) - (SELECT COUNT(*) FROM reqForAp) >= 0) THEN TRUE
 		ELSE FALSE
 	END AS vl');
-INSERT INTO br_definition (br_id, active_from, active_until, body) VALUES ('application-approve-cancel-old-titles', '2014-02-20', 'infinity', '
-WITH 	newFreeholdApp	AS	(SELECT (SUM(1) > 0) AS fhCheck FROM application.service se
-				WHERE se.application_id = #{id}
-				AND se.request_type_code = ''newFreehold''),
-	parent_titles	AS	(SELECT DISTINCT ON (ba.id) ba.id AS liveTitle, ba.status_code FROM administrative.ba_unit ba
-				INNER JOIN transaction.transaction tn ON (ba.transaction_id = tn.id)
-				INNER JOIN application.service s ON (tn.from_service_id = s.id) 
-				INNER JOIN administrative.required_relationship_baunit pt ON (ba.id = pt.to_ba_unit_id)
-				WHERE s.application_id = #{id}
-				AND ba.status_code = ''pending'')
-				
-SELECT CASE WHEN fhCheck IS TRUE THEN (SELECT COUNT(liveTitle) FROM parent_titles) > 0
-		ELSE NULL
-	END AS vl FROM newFreeholdApp
-');
 INSERT INTO br_definition (br_id, active_from, active_until, body) VALUES ('application-br5-check-there-are-front-desk-services', '2014-02-20', 'infinity', 'SELECT CASE WHEN (COUNT(*)= 0) THEN NULL
 	ELSE FALSE 
 	end AS vl
@@ -389,17 +374,15 @@ FROM application.service
 WHERE application_id = #{id} 
 AND action_code != ''cancel''
 AND request_type_code IN (''serviceEnquiry'', ''documentCopy'', ''cadastrePrint'', ''surveyPlanCopy'', ''titleSearch'')');
-INSERT INTO br_definition (br_id, active_from, active_until, body) VALUES ('application-for-new-title-has-cancel-property-service', '2014-02-20', 'infinity', '
-WITH 	newFreeholdApp	AS	(SELECT (SUM(1) > 0) AS fhCheck FROM application.service se
-				WHERE se.application_id = #{id}
-				AND se.request_type_code = ''newFreehold'')
-					
-				
-SELECT CASE WHEN fhCheck IS TRUE THEN (SELECT COUNT(id) FROM application.service sv 
-					WHERE sv.application_id = #{id}
-					AND sv.request_type_code = ''cancelProperty'') > 0
-		ELSE NULL
-	END AS vl FROM newFreeholdApp');
+INSERT INTO br_definition (br_id, active_from, active_until, body) VALUES ('baunit-has-multiple-mortgages', '2014-02-20', 'infinity', 'SELECT	(SELECT (COUNT(*) = 0) FROM application.service sv2
+		 INNER JOIN transaction.transaction tn ON (sv2.id = tn.from_service_id)
+		 INNER JOIN administrative.rrr rr ON (tn.id = rr.transaction_id)
+		 INNER JOIN administrative.rrr rr2 ON ((rr.ba_unit_id = rr2.ba_unit_id) AND (rr2.type_code = ''mortgage'') AND (rr2.status_code =''current'') ) 
+	WHERE sv.id = #{id}) AS vl FROM application.service sv
+WHERE sv.id = #{id}
+AND sv.request_type_code = ''mortgage''
+ORDER BY 1
+LIMIT 1');
 INSERT INTO br_definition (br_id, active_from, active_until, body) VALUES ('cancel-title-check-rrr-cancelled', '2014-02-20', 'infinity', 'WITH 	pending_property_rrr AS (SELECT DISTINCT ON(rr1.nr) rr1.nr FROM administrative.rrr rr1 
 				INNER JOIN transaction.transaction tn ON (rr1.transaction_id = tn.id)
 				INNER JOIN application.service sv1 ON (tn.from_service_id = sv1.id) 
@@ -536,15 +519,7 @@ INSERT INTO br_definition (br_id, active_from, active_until, body) VALUES ('appl
            )
 
         ) as vl');
-INSERT INTO br_definition (br_id, active_from, active_until, body) VALUES ('baunit-has-multiple-mortgages', '2014-02-20', 'infinity', 'SELECT	(SELECT (COUNT(*) = 0) FROM application.service sv2
-		 INNER JOIN transaction.transaction tn ON (sv2.id = tn.from_service_id)
-		 INNER JOIN administrative.rrr rr ON (tn.id = rr.transaction_id)
-		 INNER JOIN administrative.rrr rr2 ON ((rr.ba_unit_id = rr2.ba_unit_id) AND (rr2.type_code = ''mortgage'') AND (rr2.status_code =''current'') ) 
-	WHERE sv.id = #{id}) AS vl FROM application.service sv
-WHERE sv.id = #{id}
-AND sv.request_type_code = ''mortgage''
-ORDER BY 1
-LIMIT 1');
+INSERT INTO br_definition (br_id, active_from, active_until, body) VALUES ('generate-process-progress-extract-max', '2014-09-12', 'infinity', 'select 7 + (count(*)*(3+5)) + 2 + 10 as vl from system.consolidation_config');
 INSERT INTO br_definition (br_id, active_from, active_until, body) VALUES ('document-supporting-rrr-is-current', '2014-02-20', 'infinity', 'WITH serviceDocs AS	(SELECT DISTINCT ON (sc.id) sv.id AS sv_id, sc.id AS sc_id, sc.status_code, sc.type_code FROM application.service sv
 				INNER JOIN transaction.transaction tn ON (sv.id = tn.from_service_id)
 				INNER JOIN administrative.rrr rr ON (tn.id = rr.transaction_id)
@@ -743,16 +718,6 @@ SELECT COALESCE(ROUND(CAST (ST_AREA(ST_UNION(co.geom_polygon))AS NUMERIC), (SELE
 FROM cadastre.cadastre_object co 
 WHERE transaction_id = #{id} ');
 INSERT INTO br_definition (br_id, active_from, active_until, body) VALUES ('new-cadastre-objects-present', '2014-02-20', 'infinity', 'select count (*) > 0 as vl from cadastre.cadastre_object where transaction_id= #{id}');
-INSERT INTO br_definition (br_id, active_from, active_until, body) VALUES ('target-and-new-union-the-same', '2014-02-20', 'infinity', 'select st_equals(geom_to_snap,target_geom) as vl
-from cadastre.snap_geometry_to_geometry(
-(select st_union(co.geom_polygon) 
-from cadastre.cadastre_object co where transaction_id = #{id})
-, (select st_union(co.geom_polygon)
-from cadastre.cadastre_object co 
-where id in (select cadastre_object_id 
-  from cadastre.cadastre_object_target  where transaction_id = #{id})), 
-  system.get_setting(''map-tolerance'')::double precision, true)
- ');
 INSERT INTO br_definition (br_id, active_from, active_until, body) VALUES ('target-parcels-check-isapolygon', '2014-02-20', 'infinity', 'select St_GeometryType(ST_Union(co.geom_polygon)) = ''ST_Polygon'' as vl
  from cadastre.cadastre_object co 
   inner join cadastre.cadastre_object_target co_target
@@ -844,6 +809,7 @@ SELECT	CASE 	WHEN (SELECT (cnt = 0) FROM checkServiceType) THEN NULL
 		WHEN (SELECT (cnt = 0) FROM checkSource) THEN TRUE
 		ELSE FALSE
 	END AS vl');
+INSERT INTO br_definition (br_id, active_from, active_until, body) VALUES ('consolidation-extraction-file-name', '2014-09-12', 'infinity', 'select ''consolidation-'' || system.get_setting(''system-id'') || to_char(clock_timestamp(), ''-yyyy-MM-dd-HH24-MI'') as vl');
 INSERT INTO br_definition (br_id, active_from, active_until, body) VALUES ('source-attach-in-transaction-allowed-type', '2014-02-20', 'infinity', 'WITH checkServiceType	AS	(SELECT COUNT(*) AS cnt FROM application.service sv1
 					INNER JOIN transaction.transaction tn ON (sv1.id = tn.from_service_id)
 					INNER JOIN source.source sc1 ON (tn.id = sc1.transaction_id)
@@ -991,8 +957,6 @@ INSERT INTO br_definition (br_id, active_from, active_until, body) VALUES ('gene
   + 2 + (select count(*)*2 from system.consolidation_config) 
   + 1 + (select count(*)*2 from system.br_validation where target_code=''consolidate'')
   + 4 + (select count(*)*2 from system.consolidation_config) as vl');
-INSERT INTO br_definition (br_id, active_from, active_until, body) VALUES ('generate-process-progress-extract-max', '2014-09-12', 'infinity', 'select 7 + (count(*)*(3+5)) + 2 + 10 as vl from system.consolidation_config');
-INSERT INTO br_definition (br_id, active_from, active_until, body) VALUES ('consolidation-extraction-file-name', '2014-09-12', 'infinity', 'select ''consolidation-'' || system.get_setting(''system-id'') || to_char(clock_timestamp(), ''-yyyy-MM-dd-HH24-MI'') as vl');
 INSERT INTO br_definition (br_id, active_from, active_until, body) VALUES ('consolidation-db-structure-the-same', '2014-02-20', 'infinity', 'with def_of_tables as (
   select source_table_name, target_table_name, 
     (select string_agg(col_definition, ''##'') from (select column_name || '' '' 
@@ -1030,9 +994,7 @@ WHERE obscure_service_id  = #{id}
 ;
 select 0=0 as vl
 ');
-insert into system.br_definition(br_id, active_from, active_until, body) 
-values('cancel-relation-notification', now(), 'infinity', 
- 'UPDATE application.notify_property
+INSERT INTO br_definition (br_id, active_from, active_until, body) VALUES ('cancel-relation-notification', '2015-10-12', 'infinity', 'UPDATE application.notify_property
  set status = ''x''
 WHERE cancel_service_id in
 (
@@ -1062,10 +1024,7 @@ WHERE 	      s.application_id::text = aa.id::text
 ;
 select 0=0 as vl
 ');
-
-insert into system.br_definition(br_id, active_from, active_until, body) 
-values('delete-relation-notification', now(), 'infinity', 
- 'DELETE from application.notify
+INSERT INTO br_definition (br_id, active_from, active_until, body) VALUES ('delete-relation-notification', '2015-10-12', 'infinity', 'DELETE from application.notify
 WHERE 
 service_id in (
 SELECT        npbu.service_id
@@ -1086,6 +1045,26 @@ WHERE 	      s.application_id::text = aa.id::text
 ;
 select 0=0 as vl
 ');
+INSERT INTO br_definition (br_id, active_from, active_until, body) VALUES ('application-for-new-title-has-cancel-property-service', '2014-02-20', 'infinity', 'WITH 	newFreeholdApp	AS	(SELECT (SUM(1) > 0) AS fhCheck FROM application.service se
+				WHERE 
+				se.application_id = #{id}	AND 
+				se.request_type_code = ''newFreehold''),
+	parent_titles	AS	((SELECT DISTINCT ON (ba.id) ba.id AS liveTitle
+				FROM administrative.ba_unit ba
+				INNER JOIN transaction.transaction tn ON (ba.transaction_id = tn.id)
+				INNER JOIN application.service s ON (tn.from_service_id = s.id) 
+				INNER JOIN administrative.required_relationship_baunit pt ON (ba.id = pt.to_ba_unit_id)
+				WHERE 
+				s.application_id = #{id} AND 
+				ba.status_code = ''pending''))
+				SELECT CASE WHEN (fhCheck IS TRUE AND (SELECT COUNT(liveTitle) FROM parent_titles) > 0) 
+				THEN (SELECT COUNT(id) FROM application.service sv 
+					WHERE 
+					sv.application_id = #{id} AND 
+					sv.request_type_code = ''cancelProperty'') > 0
+				ELSE null
+				END AS vl FROM newFreeholdApp');
+INSERT INTO br_definition (br_id, active_from, active_until, body) VALUES ('generate-cofo-nr', '2014-02-20', 'infinity', 'SELECT coalesce(system.get_setting(''system-id''), '''') || to_char(now(), ''yymm'') || trim(to_char(nextval(''administrative.cofo_nr_seq''), ''0000'')) AS vl');
 
 
 ALTER TABLE br_definition ENABLE TRIGGER ALL;
@@ -1114,7 +1093,6 @@ INSERT INTO br_validation (id, br_id, target_code, target_application_moment, ta
 INSERT INTO br_validation (id, br_id, target_code, target_application_moment, target_service_moment, target_reg_moment, target_request_type_code, target_rrr_type_code, severity_code, order_of_execution) VALUES ('bef3ae1a-99dd-11e3-bf37-03b8fdd851ed', 'application-verifies-identification', 'application', 'validate', NULL, NULL, NULL, NULL, 'medium', 530);
 INSERT INTO br_validation (id, br_id, target_code, target_application_moment, target_service_moment, target_reg_moment, target_request_type_code, target_rrr_type_code, severity_code, order_of_execution) VALUES ('bef47174-99dd-11e3-a840-57d6651e3211', 'newtitle-br24-check-rrr-accounted', 'application', 'validate', NULL, NULL, NULL, NULL, 'critical', 160);
 INSERT INTO br_validation (id, br_id, target_code, target_application_moment, target_service_moment, target_reg_moment, target_request_type_code, target_rrr_type_code, severity_code, order_of_execution) VALUES ('bef534c4-99dd-11e3-9dad-2b73d16122d5', 'application-br1-check-required-sources-are-present', 'application', 'validate', NULL, NULL, NULL, NULL, 'critical', 210);
-INSERT INTO br_validation (id, br_id, target_code, target_application_moment, target_service_moment, target_reg_moment, target_request_type_code, target_rrr_type_code, severity_code, order_of_execution) VALUES ('bef61f24-99dd-11e3-b5c3-3f18d066d216', 'application-approve-cancel-old-titles', 'application', 'approve', NULL, NULL, NULL, NULL, 'critical', 250);
 INSERT INTO br_validation (id, br_id, target_code, target_application_moment, target_service_moment, target_reg_moment, target_request_type_code, target_rrr_type_code, severity_code, order_of_execution) VALUES ('bef6e27e-99dd-11e3-b5b1-2fd1b09cc082', 'application-br5-check-there-are-front-desk-services', 'application', 'validate', NULL, NULL, NULL, NULL, 'warning', 740);
 INSERT INTO br_validation (id, br_id, target_code, target_application_moment, target_service_moment, target_reg_moment, target_request_type_code, target_rrr_type_code, severity_code, order_of_execution) VALUES ('bef7ccde-99dd-11e3-bd39-d39c50f8cc80', 'application-for-new-title-has-cancel-property-service', 'application', 'validate', NULL, NULL, NULL, NULL, 'critical', 1);
 INSERT INTO br_validation (id, br_id, target_code, target_application_moment, target_service_moment, target_reg_moment, target_request_type_code, target_rrr_type_code, severity_code, order_of_execution) VALUES ('bef8b73e-99dd-11e3-a4e4-cb550d80f143', 'cancel-title-check-rrr-cancelled', 'application', 'validate', NULL, NULL, NULL, NULL, 'critical', 150);
@@ -1158,8 +1136,6 @@ INSERT INTO br_validation (id, br_id, target_code, target_application_moment, ta
 INSERT INTO br_validation (id, br_id, target_code, target_application_moment, target_service_moment, target_reg_moment, target_request_type_code, target_rrr_type_code, severity_code, order_of_execution) VALUES ('bf60f074-99dd-11e3-b103-3f68ada0b2ea', 'new-cadastre-objects-do-not-overlap', 'cadastre_object', NULL, NULL, 'current', 'cadastreChange', NULL, 'medium', 480);
 INSERT INTO br_validation (id, br_id, target_code, target_application_moment, target_service_moment, target_reg_moment, target_request_type_code, target_rrr_type_code, severity_code, order_of_execution) VALUES ('bf6228fe-99dd-11e3-8222-fb2038631753', 'new-cadastre-objects-present', 'cadastre_object', NULL, NULL, 'pending', 'cadastreChange', NULL, 'warning', 370);
 INSERT INTO br_validation (id, br_id, target_code, target_application_moment, target_service_moment, target_reg_moment, target_request_type_code, target_rrr_type_code, severity_code, order_of_execution) VALUES ('bf629e2e-99dd-11e3-9f6d-1bce9d19f1b0', 'new-cadastre-objects-present', 'cadastre_object', NULL, NULL, 'current', 'cadastreChange', NULL, 'critical', 50);
-INSERT INTO br_validation (id, br_id, target_code, target_application_moment, target_service_moment, target_reg_moment, target_request_type_code, target_rrr_type_code, severity_code, order_of_execution) VALUES ('bf6424ce-99dd-11e3-871d-e34e420bd308', 'target-and-new-union-the-same', 'cadastre_object', NULL, NULL, 'pending', 'cadastreChange', NULL, 'warning', 470);
-INSERT INTO br_validation (id, br_id, target_code, target_application_moment, target_service_moment, target_reg_moment, target_request_type_code, target_rrr_type_code, severity_code, order_of_execution) VALUES ('bf649a08-99dd-11e3-9400-bf6d3595104e', 'target-and-new-union-the-same', 'cadastre_object', NULL, NULL, 'current', 'cadastreChange', NULL, 'warning', 460);
 INSERT INTO br_validation (id, br_id, target_code, target_application_moment, target_service_moment, target_reg_moment, target_request_type_code, target_rrr_type_code, severity_code, order_of_execution) VALUES ('bf65ab78-99dd-11e3-8578-97b6e4e3f10c', 'target-parcels-check-isapolygon', 'cadastre_object', NULL, NULL, 'pending', 'cadastreChange', NULL, 'critical', 90);
 INSERT INTO br_validation (id, br_id, target_code, target_application_moment, target_service_moment, target_reg_moment, target_request_type_code, target_rrr_type_code, severity_code, order_of_execution) VALUES ('bf6647b8-99dd-11e3-8e01-d33af44aed65', 'target-parcels-check-isapolygon', 'cadastre_object', NULL, NULL, 'current', 'cadastreChange', NULL, 'critical', 80);
 INSERT INTO br_validation (id, br_id, target_code, target_application_moment, target_service_moment, target_reg_moment, target_request_type_code, target_rrr_type_code, severity_code, order_of_execution) VALUES ('bf678042-99dd-11e3-91fc-23b055a0f1db', 'target-parcels-check-nopending', 'cadastre_object', NULL, NULL, 'pending', NULL, NULL, 'critical', 310);
@@ -1187,7 +1163,7 @@ INSERT INTO br_validation (id, br_id, target_code, target_application_moment, ta
 INSERT INTO br_validation (id, br_id, target_code, target_application_moment, target_service_moment, target_reg_moment, target_request_type_code, target_rrr_type_code, severity_code, order_of_execution) VALUES ('consolidation-not-again', 'consolidation-not-again', 'consolidation', NULL, NULL, NULL, NULL, NULL, 'critical', 1);
 INSERT INTO br_validation (id, br_id, target_code, target_application_moment, target_service_moment, target_reg_moment, target_request_type_code, target_rrr_type_code, severity_code, order_of_execution) VALUES ('bfc0ec2c-99dd-11e3-bc3f-13923fd8d236', 'spatial-unit-group-inside-other-spatial-unit-group', 'spatial_unit_group', NULL, NULL, NULL, NULL, NULL, 'medium', 2);
 INSERT INTO br_validation (id, br_id, target_code, target_application_moment, target_service_moment, target_reg_moment, target_request_type_code, target_rrr_type_code, severity_code, order_of_execution) VALUES ('cancel-relation-notification', 'cancel-relation-notification', 'application', 'approve', NULL, NULL, NULL, NULL, 'warning', 300);
-INSERT INTO br_validation (id, br_id, target_code, target_application_moment, target_service_moment, target_reg_moment, target_request_type_code, target_rrr_type_code, severity_code, order_of_execution) VALUES ('delete-relation-notification', 'delete-relation-notification','application', 'archive',  NULL, NULL, NULL, NULL, 'warning', 300);  
+INSERT INTO br_validation (id, br_id, target_code, target_application_moment, target_service_moment, target_reg_moment, target_request_type_code, target_rrr_type_code, severity_code, order_of_execution) VALUES ('delete-relation-notification', 'delete-relation-notification', 'application', 'archive', NULL, NULL, NULL, NULL, 'warning', 300);
 
 
 ALTER TABLE br_validation ENABLE TRIGGER ALL;
