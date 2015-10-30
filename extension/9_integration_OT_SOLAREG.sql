@@ -1,6 +1,6 @@
 ----   update in source.administrative_source_type
 UPDATE source.administrative_source_type
-   SET display_value='Diagram Image'
+   SET display_value='Diagram'
  WHERE code='cadastralSurvey';
 
 
@@ -46,3 +46,34 @@ UPDATE administrative.ba_unit_detail  SET detail_code='cOfOtype' WHERE detail_co
 UPDATE administrative.ba_unit_detail  SET detail_code='yearlyRent' WHERE detail_code='rent';
 UPDATE administrative.ba_unit_detail  SET detail_code='reviewPeriod' WHERE detail_code='revperiod';
 UPDATE administrative.ba_unit_detail  SET detail_code='dateCommenced' WHERE detail_code='startdate';
+
+
+UPDATE administrative.ba_unit_detail_type
+   SET  status='x',
+       order_view=17
+ WHERE code='estate';
+
+UPDATE administrative.ba_unit_detail_type
+   SET  status='x',
+       order_view=18
+ WHERE code='zone';
+
+UPDATE administrative.ba_unit_detail_type
+   SET  status='c',
+       order_view=16
+ WHERE code='LGA';
+
+UPDATE administrative.ba_unit_detail_type
+   SET  status='x',
+       order_view=19
+ WHERE code='IntellMapSheet';
+
+UPDATE administrative.ba_unit_detail_type
+   SET  status='x',
+       order_view=20
+ WHERE code='instrumentRegistrationNo';
+
+UPDATE system.setting 
+   SET vl = 'KT'
+ WHERE name = 'system-id'
+  
